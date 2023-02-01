@@ -46,7 +46,7 @@
 
             float: left;
             display: inline-flex;
-          /*  padding-right: .15in;*/
+            /*  padding-right: .15in;*/
         }
 
         img.qr_img {
@@ -142,7 +142,7 @@
                             src="{{ Storage::disk('public')->url('') . e($snipeSettings->label_logo) }}">
                     </div>
                 @endif
-               @if ($settings->qr_text != '')
+                @if ($settings->qr_text != '')
                     <div class="pull-left">
                         <strong>{{ $settings->qr_text }}</strong>
                         <br>
@@ -174,13 +174,18 @@
                         Emplacement: <strong>{{ $asset->company->name }}</strong>
                     </div>
                 @endif
+                @if ($asset->purchase_date)
+                    <div class="pull-left">
+                        Date achat: <strong>{{ $asset->purchase_date->format('d/m/Y') }}</strong>
+                    </div>
+                @endif
 
                 @if ($asset->last_checkout)
                     <div class="pull-left">
                         Date livraison: <strong>{{ $asset->last_checkout->format('d/m/Y') }}</strong>
                     </div>
                 @endif
-           
+
 
             </div>
 
