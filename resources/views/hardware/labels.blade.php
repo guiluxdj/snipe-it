@@ -53,8 +53,8 @@
 
             width: 100%;
             height: 100%;
-            margin-top: -6.9%;
-            margin-left: -6.9%;
+            margin-top: 0;
+            margin-left: 0;
             padding-bottom: .04in;
         }
 
