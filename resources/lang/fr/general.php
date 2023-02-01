@@ -238,7 +238,7 @@ return [
     'show_current'  		=> 'Afficher l\'actuel',
     'sign_in'				=> 'Connexion',
     'signature'             => 'Signature',
-    'signed_off_by'         => 'Déconnecté par',
+    'signed_off_by'         => 'Signé par',
     'skin'       			=> 'Habillage',
     'slack_msg_note'        => 'Un message Slack sera envoyé',
     'slack_test_msg'        => 'Woohoo ! On dirait que votre intégration Slack -> Snipe-IT fonctionne !',
