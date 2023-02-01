@@ -58,7 +58,7 @@
         <table class="inventory">
             <thead>
             <tr>
-                <th colspan="8">{{ trans('general.assets') }}</th>
+                <th colspan="9">{{ trans('general.assets') }}</th>
             </tr>
             </thead>
             <thead>
@@ -68,7 +68,8 @@
                 <th style="width: 20%;">{{ trans('general.name') }}</th>
                 <th style="width: 10%;">{{ trans('general.category') }}</th>
                 <th style="width: 20%;">{{ trans('admin/hardware/form.model') }}</th>
-                <th style="width: 20%;">{{ trans('admin/hardware/form.serial') }}</th>
+                <th style="width: 10%;">{{ trans('admin/hardware/form.serial') }}</th>
+                <th style="width: 10%;">Date d'achat</th>
                 <th style="width: 10%;">{{ trans('admin/hardware/table.checkout_date') }}</th>
                 <th data-formatter="imageFormatter" style="width: 20%;">{{ trans('general.signature') }}</th>
             </tr>
@@ -83,6 +84,7 @@
                     <td>{{ $asset->model->category->name }}</td>
                     <td>{{ $asset->model->name }}</td>
                     <td>{{ $asset->serial }}</td>
+                     <td>{{ $asset->purchase_date }}</td>
                     <td>
                         {{ $asset->last_checkout }}</td>
                     <td>
