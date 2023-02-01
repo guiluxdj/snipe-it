@@ -28,6 +28,7 @@
     @endif
     @can('view', \App\Models\User::class)
         <a class="btn btn-default pull-right" href="{{ route('users.export') }}" style="margin-right: 5px;">{{ trans('general.export') }}</a>
+        <a class="btn btn-default pull-right" href="{{ route('users.printall') }}" style="margin-right: 5px;">Impression inventaire</a>
     @endcan
 @stop
 
