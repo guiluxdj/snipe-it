@@ -138,6 +138,19 @@ Route::group(['prefix' => 'users', 'middleware' => ['auth']], function () {
     )->name('users/bulkeditsave');
 
 
+
+    // My Update
+    /////////////////////////////////////////////
+
+    Route::get(
+        'printall',
+        [
+            Users\UsersController::class,
+            'printInventoryAll'
+        ]
+    )->name('users.printall');
+
+
 });
 
 Route::resource('users', Users\UsersController::class, [

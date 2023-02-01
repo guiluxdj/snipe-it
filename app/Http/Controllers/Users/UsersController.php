@@ -668,4 +668,30 @@ class UsersController extends Controller
 
         return redirect()->back()->with('error', 'User is not activated, is LDAP synced, or does not have an email address ');
     }
+
+
+    // My update
+    /////////////////////////////////////////////////////////////
+
+
+    /**
+     * Print inventoryAll
+     *
+     * @author Guillaume Debarsy
+     * @since [v1.8]
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function printInventoryAll()
+    {
+        $this->authorize('view', User::class);
+
+        $users = User::orderBy('last_name')
+        ->with('accessories')
+        ->with('assets')
+        ->with('licenses')
+        ->get();
+
+        return view('users/printall')->with('users', $users)
+            ->with('settings', Setting::getSettings());
+    }
 }
