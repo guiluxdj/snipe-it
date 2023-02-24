@@ -41,8 +41,10 @@
         }
 
         div.qr_img {
-            width: {{ $qr_size }}in;
-            height: {{ $qr_size }}in;
+            /* width: {{ $qr_size }}in;
+            height: {{ $qr_size }}in; */
+              width: 0.8in;
+            height: 0.8in;
 
             float: left;
             display: inline-flex;
@@ -122,7 +124,9 @@
             }
         }
 
-        @if ($snipeSettings->custom_css){!! $snipeSettings->show_custom_css() !!} @endif
+        @if ($snipeSettings->custom_css)
+            {!! $snipeSettings->show_custom_css() !!}
+        @endif
     </style>
 
     @foreach ($assets as $asset)
@@ -174,16 +178,19 @@
                         Emplacement: <strong>{{ $asset->company->name }}</strong>
                     </div>
                 @endif
-                @if ($asset->purchase_date)
-                    <div class="pull-left">
-                        Date achat: <strong>{{ $asset->purchase_date->format('d/m/Y') }}</strong>
-                    </div>
-                @endif
+
 
                 @if ($asset->last_checkout)
                     <div class="pull-left">
-                        Date livraison: <strong>{{ $asset->last_checkout->format('d/m/Y') }}</strong>
+                        Livraison: <strong> {{ $asset->assignedTo->present()->name() }}
+                            ({{ $asset->last_checkout->format('d/m/Y') }})</strong>
                     </div>
+                @else
+                    @if ($asset->purchase_date)
+                        <div class="pull-left">
+                            Date achat: <strong>{{ $asset->purchase_date->format('d/m/Y') }}</strong>
+                        </div>
+                    @endif
                 @endif
 
 
