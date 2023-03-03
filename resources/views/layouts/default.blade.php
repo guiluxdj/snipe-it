@@ -837,6 +837,9 @@
                   {!!  Helper::parseEscapedMarkedown($snipeSettings->footer_text)  !!}
               </div>
           @endif
+          
+
+          WALI-IT - Powered by <a target="_blank" href="https://snipeitapp.com" rel="noopener">Snipe-IT</a>
       </footer>
 
 
