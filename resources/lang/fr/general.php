@@ -326,7 +326,7 @@ return [
     'last_checkout'         => 'Dernière affectation',
     'due_to_checkin'        => 'Les :count éléments suivants doivent bientôt être restitués:',
     'expected_checkin'      => 'Date de restitution prévue',
-    'reminder_checked_out_items' => 'Ceci est un rappel des éléments associés à votre compte. Si vous pensez que cette liste est erronée (un article est manquant, ou quelque chose apparaît que vous n\'avez jamais eu), merci d\'adresser un courriel à :reply_to_name à l\'adresse :reply_to_adress.',
+    'reminder_checked_out_items' => 'Bonjour,<br>Ceci est un rappel des éléments associés à votre compte. <br>Si vous pensez que cette liste est erronée (un article est manquant, ou quelque chose apparaît que vous n\'avez jamais eu), merci d\'adresser un courriel à :reply_to_name à l\'adresse :reply_to_address',
     'changed'               => 'Modifié',
     'to'                    => 'À',
     'report_fields_info'    => '<p>Merci de sélectionner les champs que vous souhaitez inclure dans votre rapport personnalisé, puis cliquez sur Générer. Le fichier (custom-asset-report-AAAA-MM-JJ.csv) sera télécharger automatiquement, et vous pourrrez l\'ouvrir dans Excel.</p>
