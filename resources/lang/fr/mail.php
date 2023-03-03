@@ -43,7 +43,7 @@ return [
     'login_first_admin' => 'Connectez-vous à votre nouvelle installation Snipe-IT en utilisant les informations d\'identification ci-dessous :',
     'login' => 'Nom d\'utilisateur:',
     'Low_Inventory_Report' => 'Rapport d’inventaire bas',
-    'inventory_report' => 'Rapport d\'inventaire matériel',
+    'inventory_report' => 'Rapport d\'inventaire matériel ',
     'min_QTY' => 'Quantité minimum',
     'name' => 'Nom',
     'new_item_checked' => 'Un nouvel élément a été vérifié sous votre nom, les détails sont ci-dessous.',
