@@ -839,7 +839,7 @@
           @endif
           
 
-          WALI-IT - Powered by <a target="_blank" href="https://snipeitapp.com" rel="noopener">Snipe-IT</a>
+          WAL-IT - Powered by <a target="_blank" href="https://snipeitapp.com" rel="noopener">Snipe-IT</a>
       </footer>
 
 
