@@ -96,8 +96,6 @@
         <a class="skip-main" href="#main">{{ trans('general.skip_to_main_content') }}</a>
         <div class="wrapper">
 
-          WALI-IT - Powered by <a target="_blank" href="https://snipeitapp.com" rel="noopener">Snipe-IT</a>
-      </footer>
             <header class="main-header">
 
                 <!-- Logo -->
