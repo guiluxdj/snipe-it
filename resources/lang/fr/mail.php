@@ -49,7 +49,6 @@ return [
     'new_item_checked' => 'Un nouvel élément a été vérifié sous votre nom, les détails sont ci-dessous.',
     'password' => 'Mot de passe:',
     'password_reset' => 'Réinitialisation du mot de passe',
-
     'read_the_terms' => 'Merci de lire les conditions d\'utilisation ci-dessous.',
     'read_the_terms_and_click' => 'Merci de lire les conditions d\'utilisation ci-dessous, et cliquer sur le lien ci-dessous pour confirmer que vous avez lu                         et accepté les conditions d\'utilisation et reçu l\'équipement.',
     'requested' => 'Demandé:',

@@ -697,4 +697,4 @@ class UsersController extends Controller
             ->with('settings', Setting::getSettings());
     }
 }
-}
+
