@@ -79,5 +79,5 @@ return [
     'Expected_Checkin_Notification' => 'Rappel : la date limite de vérification de :name approche',
     'Expected_Checkin_Date' => 'Un matériel que vous avez emprunté doit être vérifié à nouveau le :date',
     'your_assets' => 'Voir vos matériels',
-    'rights_reserved' => 'All rights reserved.',
+    'rights_reserved' => 'Tous droits réservés.',
 ];
