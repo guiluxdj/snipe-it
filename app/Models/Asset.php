@@ -403,7 +403,7 @@ class Asset extends Depreciable
      */
     public function components()
     {
-        return $this->belongsToMany('\App\Models\Component', 'components_assets', 'asset_id', 'component_id')->withPivot('id', 'assigned_qty', 'created_at')->withTrashed();
+        return $this->belongsToMany('\App\Models\Component', 'components_assets', 'asset_id', 'component_id')->withPivot('id', 'assigned_qty', 'created_at');
     }
 
 
@@ -1566,7 +1566,7 @@ class Asset extends Depreciable
     */
     public function scopeOrderModelNumber($query, $order)
     {
-        return $query->join('models', 'assets.model_id', '=', 'models.id')->orderBy('models.model_number', $order);
+        return $query->leftJoin('models as model_number_sort', 'assets.model_id', '=', 'model_number_sort.id')->orderBy('model_number_sort.model_number', $order);
     }
 
 
@@ -1667,7 +1667,7 @@ class Asset extends Depreciable
     public function scopeOrderManufacturer($query, $order)
     {
         return $query->join('models as order_asset_model', 'assets.model_id', '=', 'order_asset_model.id')
-            ->join('manufacturers as manufacturer_order', 'order_asset_model.manufacturer_id', '=', 'manufacturer_order.id')
+            ->leftjoin('manufacturers as manufacturer_order', 'order_asset_model.manufacturer_id', '=', 'manufacturer_order.id')
             ->orderBy('manufacturer_order.name', $order);
     }
 
