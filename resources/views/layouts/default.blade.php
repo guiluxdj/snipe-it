@@ -174,14 +174,14 @@
                                     </a>
                                 </li>
                             @endcan
-                            @can('view', \App\Models\Component::class)
+                            {{-- @can('view', \App\Models\Component::class)
                                 <li aria-hidden="true"{!! (Request::is('components*') ? ' class="active"' : '') !!}>
                                     <a href="{{ route('components.index') }}" accesskey="5" tabindex="-1">
                                         <i class="far fa-hdd fa-fw"></i>
                                         <span class="sr-only">{{ trans('general.components') }}</span>
                                     </a>
                                 </li>
-                            @endcan
+                            @endcan --}}
 
                             @can('index', \App\Models\Asset::class)
                                 <li>
@@ -244,14 +244,14 @@
                                                 </a>
                                             </li>
                                         @endcan
-                                        @can('create', \App\Models\Component::class)
+                                        {{-- @can('create', \App\Models\Component::class)
                                             <li {!! (Request::is('components/create') ? 'class="active"' : '') !!}>
                                                 <a href="{{ route('components.create') }}" tabindex="-1">
                                                     <i class="far fa-hdd fa-fw" aria-hidden="true"></i>
                                                     {{ trans('general.component') }}
                                                 </a>
                                             </li>
-                                        @endcan
+                                        @endcan --}}
                                         @can('create', \App\Models\User::class)
                                             <li {!! (Request::is('users/create') ? 'class="active"' : '') !!}>
                                                 <a href="{{ route('users.create') }}" tabindex="-1">
@@ -596,14 +596,14 @@
                                 </a>
                             </li>
                         @endcan
-                        @can('view', \App\Models\Component::class)
+                        {{-- @can('view', \App\Models\Component::class)
                             <li{!! (Request::is('components*') ? ' class="active"' : '') !!}>
                                 <a href="{{ route('components.index') }}">
                                     <i class="far fa-hdd fa-fw"></i>
                                     <span>{{ trans('general.components') }}</span>
                                 </a>
                             </li>
-                        @endcan
+                        @endcan --}}
                         @can('view', \App\Models\PredefinedKit::class)
                             <li{!! (Request::is('kits') ? ' class="active"' : '') !!}>
                                 <a href="{{ route('kits.index') }}">
