@@ -215,6 +215,7 @@ class Importer extends Component
             'manufacturer' => trans('general.manufacturer'),
             'order_number' => trans('general.order_number'),
             'image' => trans('general.importer.image_filename'),
+            'asset_eol_date' => trans('admin/hardware/form.eol_date'),
             /**
              * Checkout fields:
              * Assets can be checked out to other assets, people, or locations, but we currently
@@ -284,6 +285,9 @@ class Importer extends Component
             'maintained' => trans('admin/licenses/form.maintained'),
             'checkout_class' => trans('general.importer.checkout_type'),
             'serial' => trans('general.license_serial'),
+            'email' => trans('general.importer.checked_out_to_email'),
+            'username' => trans('general.importer.checked_out_to_username'),
+            'manufacturer' => trans('general.manufacturer'),
         ];
 
         $this->users_fields  = [
@@ -313,7 +317,7 @@ class Importer extends Component
             'gravatar' => trans('general.importer.gravatar'),
             'start_date'    => trans('general.start_date'),
             'end_date'   => trans('general.end_date'),
-            'employee_number'   => trans('general.employee_number'),
+            'employee_num'   => trans('general.employee_number'),
         ];
 
         $this->locations_fields  = [
