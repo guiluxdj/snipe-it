@@ -148,22 +148,204 @@
 
     @if ($counts['grand_total'] == 0)
         <div class="row">
-            <div class="col-md-12">
-                <div class="box">
-                    <div class="box-header with-border">
-                        <h2 class="box-title">{{ trans('general.dashboard_info') }}</h2>
-                    </div>
-                    <!-- /.box-header -->
-                    <div class="box-body">
-                        <div class="row">
-                            <div class="col-md-12">
+          <div class="col-md-12">
+            <div class="table-responsive">
 
-                                <div class="progress">
-                                    <div class="progress-bar progress-bar-yellow" role="progressbar" aria-valuenow="60"
-                                        aria-valuemin="0" aria-valuemax="100" style="width: 60%">
-                                        <span class="sr-only">{{ trans('general.60_percent_warning') }}</span>
-                                    </div>
-                                </div>
+                <table
+                    data-cookie-id-table="dashActivityReport"
+                    data-height="350"
+                    data-pagination="false"
+                    data-id-table="dashActivityReport"
+                    data-side-pagination="server"
+                    data-sort-order="desc"
+                    data-sort-name="created_at"
+                    id="dashActivityReport"
+                    class="table table-striped snipe-table"
+                    data-url="{{ route('api.activity.index', ['limit' => 25]) }}">
+                    <thead>
+                    <tr>
+                        <th data-field="icon" data-visible="true" style="width: 40px;" class="hidden-xs" data-formatter="iconFormatter"><span  class="sr-only">{{ trans('admin/hardware/table.icon') }}</span></th>
+                        <th class="col-sm-3" data-visible="true" data-field="created_at" data-formatter="dateDisplayFormatter">{{ trans('general.date') }}</th>
+                        <th class="col-sm-2" data-visible="true" data-field="admin" data-formatter="usersLinkObjFormatter">{{ trans('general.admin') }}</th>
+                        <th class="col-sm-2" data-visible="true" data-field="action_type">{{ trans('general.action') }}</th>
+                        <th class="col-sm-3" data-visible="true" data-field="item" data-formatter="polymorphicItemFormatter">{{ trans('general.item') }}</th>
+                        <th class="col-sm-2" data-visible="true" data-field="target" data-formatter="polymorphicItemFormatter">{{ trans('general.target') }}</th>
+                    </tr>
+                    </thead>
+                </table>
+
+
+
+            </div><!-- /.responsive -->
+          </div><!-- /.col -->
+          <div class="text-center col-md-12" style="padding-top: 10px;">
+            <a href="{{ route('reports.activity') }}" class="btn btn-primary btn-sm" style="width: 100%">{{ trans('general.viewall') }}</a>
+          </div>
+        </div><!-- /.row -->
+      </div><!-- ./box-body -->
+    </div><!-- /.box -->
+  </div>
+  <div class="col-md-4">
+        <div class="box box-default">
+            <div class="box-header with-border">
+                <h2 class="box-title">
+                    {{ (\App\Models\Setting::getSettings()->dash_chart_type == 'name') ? trans('general.assets_by_status') : trans('general.assets_by_status_type') }}
+                </h2>
+                <div class="box-tools pull-right">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse" aria-hidden="true">
+                        <i class="fas fa-minus" aria-hidden="true"></i>
+                        <span class="sr-only">{{ trans('general.collapse') }}</span>
+                    </button>
+                </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="chart-responsive">
+                            <canvas id="statusPieChart" height="260"></canvas>
+                        </div> <!-- ./chart-responsive -->
+                    </div> <!-- /.col -->
+                </div> <!-- /.row -->
+            </div><!-- /.box-body -->
+        </div> <!-- /.box -->
+  </div>
+
+</div> <!--/row-->
+<div class="row">
+    <div class="col-md-6">
+
+		@if ($snipeSettings->full_multiple_companies_support=='1')
+			 <!-- Companies -->	
+			<div class="box box-default">
+				<div class="box-header with-border">
+					<h2 class="box-title">{{ trans('general.companies') }}</h2>
+					<div class="box-tools pull-right">
+						<button type="button" class="btn btn-box-tool" data-widget="collapse">
+							<i class="fas fa-minus" aria-hidden="true"></i>
+							<span class="sr-only">{{ trans('general.collapse') }}</span>
+						</button>
+					</div>
+				</div>
+				<!-- /.box-header -->
+				<div class="box-body">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="table-responsive">
+							<table
+									data-cookie-id-table="dashCompanySummary"
+									data-height="400"
+									data-pagination="true"
+									data-side-pagination="server"
+									data-sort-order="desc"
+									data-sort-field="assets_count"
+									id="dashCompanySummary"
+									class="table table-striped snipe-table"
+									data-url="{{ route('api.companies.index', ['sort' => 'assets_count', 'order' => 'asc']) }}">
+
+								<thead>
+								<tr>
+									<th class="col-sm-3" data-visible="true" data-field="name" data-formatter="companiesLinkFormatter" data-sortable="true">{{ trans('general.name') }}</th>
+									<th class="col-sm-1" data-visible="true" data-field="users_count" data-sortable="true">
+										<i class="fas fa-users" aria-hidden="true"></i>
+										<span class="sr-only">{{ trans('general.people') }}</span>
+									</th>
+									<th class="col-sm-1" data-visible="true" data-field="assets_count" data-sortable="true">
+										<i class="fas fa-barcode" aria-hidden="true"></i>
+										<span class="sr-only">{{ trans('general.asset_count') }}</span>
+									</th>
+									<th class="col-sm-1" data-visible="true" data-field="accessories_count" data-sortable="true">
+										<i class="far fa-keyboard" aria-hidden="true"></i>
+										<span class="sr-only">{{ trans('general.accessories_count') }}</span>
+									</th>
+									<th class="col-sm-1" data-visible="true" data-field="consumables_count" data-sortable="true">
+										<i class="fas fa-tint" aria-hidden="true"></i>
+										<span class="sr-only">{{ trans('general.consumables_count') }}</span>
+									</th>
+									<th class="col-sm-1" data-visible="true" data-field="components_count" data-sortable="true">
+										<i class="far fa-hdd" aria-hidden="true"></i>
+										<span class="sr-only">{{ trans('general.components_count') }}</span>
+									</th>
+									<th class="col-sm-1" data-visible="true" data-field="licenses_count" data-sortable="true">
+										<i class="far fa-save" aria-hidden="true"></i>
+										<span class="sr-only">{{ trans('general.licenses_count') }}</span>
+									</th>
+								</tr>
+								</thead>
+							</table>
+							</div>
+						</div> <!-- /.col -->
+						<div class="text-center col-md-12" style="padding-top: 10px;">
+							<a href="{{ route('companies.index') }}" class="btn btn-primary btn-sm" style="width: 100%">{{ trans('general.viewall') }}</a>
+						</div>
+					</div> <!-- /.row -->
+
+				</div><!-- /.box-body -->
+			</div> <!-- /.box -->
+		
+		@else
+			 <!-- Locations -->
+			 <div class="box box-default">
+				<div class="box-header with-border">
+					<h2 class="box-title">{{ trans('general.locations') }}</h2>
+					<div class="box-tools pull-right">
+						<button type="button" class="btn btn-box-tool" data-widget="collapse">
+							<i class="fas fa-minus" aria-hidden="true"></i>
+							<span class="sr-only">{{ trans('general.collapse') }}</span>
+						</button>
+					</div>
+				</div>
+				<!-- /.box-header -->
+				<div class="box-body">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="table-responsive">
+							<table
+									data-cookie-id-table="dashLocationSummary"
+									data-height="400"
+									data-pagination="true"
+									data-side-pagination="server"
+									data-sort-order="desc"
+									data-sort-field="assets_count"
+									id="dashLocationSummary"
+									class="table table-striped snipe-table"
+									data-url="{{ route('api.locations.index', ['sort' => 'assets_count', 'order' => 'asc']) }}">
+
+								<thead>
+								<tr>
+									<th class="col-sm-3" data-visible="true" data-field="name" data-formatter="locationsLinkFormatter" data-sortable="true">{{ trans('general.name') }}</th>
+									
+									<th class="col-sm-1" data-visible="true" data-field="assets_count" data-sortable="true">
+										<i class="fas fa-barcode" aria-hidden="true"></i>
+										<span class="sr-only">{{ trans('general.asset_count') }}</span>
+									</th>
+									<th class="col-sm-1" data-visible="true" data-field="assigned_assets_count" data-sortable="true">
+										
+										{{ trans('general.assigned') }}
+									</th>
+									<th class="col-sm-1" data-visible="true" data-field="users_count" data-sortable="true">
+										<i class="fas fa-users" aria-hidden="true"></i>
+										<span class="sr-only">{{ trans('general.people') }}</span>
+										
+									</th>
+									
+								</tr>
+								</thead>
+							</table>
+							</div>
+						</div> <!-- /.col -->
+						<div class="text-center col-md-12" style="padding-top: 10px;">
+							<a href="{{ route('locations.index') }}" class="btn btn-primary btn-sm" style="width: 100%">{{ trans('general.viewall') }}</a>
+						</div>
+					</div> <!-- /.row -->
+
+				</div><!-- /.box-body -->
+			</div> <!-- /.box -->
+
+		@endif
+			
+    </div>
+    <div class="col-md-6">
 
 
                                 <p><strong>{{ trans('general.dashboard_empty') }}</strong></p>

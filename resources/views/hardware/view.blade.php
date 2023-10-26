@@ -660,6 +660,15 @@
                                                 @else
                                                     {{ trans('general.na_no_purchase_date') }}
                                                 @endif
+                                                @if ($asset->eol_explicit)
+                                                    <i class="fas fa-exclamation-triangle text-orange"
+                                                       aria-hidden="true"
+                                                       data-tooltip="true"
+                                                       data-placement="top"
+                                                       data-title="Explicit EOL"
+                                                       title="Explicit EOL">
+                                                    </i>
+                                                @endif
                                             </div>
                                         </div>
                                     @endif
@@ -1021,6 +1030,8 @@
                                         <th>{{ trans('general.qty') }}</th>
                                         <th>{{ trans('general.purchase_cost') }}</th>
                                         <th>{{trans('admin/hardware/form.serial')}}</th>
+                                        <th>{{trans('general.checkin')}}</th>
+                                        <th></th>
                                         </thead>
                                         <tbody>
                                         <?php $totalCost = 0; ?>
@@ -1035,6 +1046,9 @@
                                                     <td>{{ $component->pivot->assigned_qty }}</td>
                                                     <td>{{ Helper::formatCurrencyOutput($component->purchase_cost) }} each</td>
                                                     <td>{{ $component->serial }}</td>
+                                                    <td>
+                                                        <a href="{{ route('components.checkin.show', $component->pivot->id) }}" class="btn btn-sm bg-purple" data-tooltip="true">{{ trans('general.checkin') }}</a>
+                                                    </td>
 
                                                     <?php $totalCost = $totalCost + ($component->purchase_cost *$component->pivot->assigned_qty) ?>
                                                 </tr>
