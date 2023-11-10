@@ -247,6 +247,9 @@ class ReportsController extends Controller
                 trans('general.action'),
                 trans('general.type'),
                 trans('general.item'),
+                trans('general.license_serial'),
+                trans('general.model_name'),
+                trans('general.model_no'),
                 'To',
                 trans('general.notes'),
                 'Changed',
@@ -289,6 +292,9 @@ class ReportsController extends Controller
                         $actionlog->present()->actionType(),
                         e($actionlog->itemType()),
                         ($actionlog->itemType() == 'user') ? $actionlog->filename : $item_name,
+                        ($actionlog->item->serial) ? $actionlog->item->serial : null,
+                        ($actionlog->item->model) ? htmlspecialchars($actionlog->item->model->name, ENT_NOQUOTES) : null,
+                        ($actionlog->item->model) ? $actionlog->item->model->model_number : null,
                         $target_name,
                         ($actionlog->note) ? e($actionlog->note) : '',
                         $actionlog->log_meta,
@@ -528,6 +534,30 @@ class ReportsController extends Controller
                 $header[] = trans('admin/users/table.title');
             }
 
+            if ($request->filled('phone')) {
+                $header[] = trans('admin/users/table.phone');
+            }
+
+            if ($request->filled('user_address')) {
+                $header[] = trans('admin/reports/general.custom_export.user_address');
+            }
+
+            if ($request->filled('user_city')) {
+                $header[] = trans('admin/reports/general.custom_export.user_city');
+            }
+
+            if ($request->filled('user_state')) {
+                $header[] = trans('admin/reports/general.custom_export.user_state');
+            }
+
+            if ($request->filled('user_country')) {
+                $header[] = trans('admin/reports/general.custom_export.user_country');
+            }
+
+            if ($request->filled('user_zip')) {
+                $header[] = trans('admin/reports/general.custom_export.user_zip');
+            }
+
             if ($request->filled('status')) {
                 $header[] = trans('general.status');
             }
@@ -744,7 +774,7 @@ class ReportsController extends Controller
                     }
 
                     if ($request->filled('eol')) {
-                        $row[] = ($asset->purchase_date != '') ? $asset->present()->eol_date() : '';
+                            $row[] = ($asset->asset_eol_date) ? $asset->asset_eol_date : '';
                     }
 
                     if ($request->filled('order')) {
@@ -823,6 +853,54 @@ class ReportsController extends Controller
                     if ($request->filled('title')) {
                         if ($asset->checkedOutToUser()) {
                             $row[] = ($asset->assignedto) ? $asset->assignedto->jobtitle : '';
+                        } else {
+                            $row[] = ''; // Empty string if unassigned
+                        }
+                    }
+
+                    if ($request->filled('phone')) {
+                        if ($asset->checkedOutToUser()) {
+                            $row[] = ($asset->assignedto) ? $asset->assignedto->phone : '';
+                        } else {
+                            $row[] = ''; // Empty string if unassigned
+                        }
+                    }
+
+                    if ($request->filled('user_address')) {
+                        if ($asset->checkedOutToUser()) {
+                            $row[] = ($asset->assignedto) ? $asset->assignedto->address : '';
+                        } else {
+                            $row[] = ''; // Empty string if unassigned
+                        }
+                    }
+
+                    if ($request->filled('user_city')) {
+                        if ($asset->checkedOutToUser()) {
+                            $row[] = ($asset->assignedto) ? $asset->assignedto->city : '';
+                        } else {
+                            $row[] = ''; // Empty string if unassigned
+                        }
+                    }
+
+                    if ($request->filled('user_state')) {
+                        if ($asset->checkedOutToUser()) {
+                            $row[] = ($asset->assignedto) ? $asset->assignedto->state : '';
+                        } else {
+                            $row[] = ''; // Empty string if unassigned
+                        }
+                    }
+
+                    if ($request->filled('user_country')) {
+                        if ($asset->checkedOutToUser()) {
+                            $row[] = ($asset->assignedto) ? $asset->assignedto->country : '';
+                        } else {
+                            $row[] = ''; // Empty string if unassigned
+                        }
+                    }
+
+                    if ($request->filled('user_zip')) {
+                        if ($asset->checkedOutToUser()) {
+                            $row[] = ($asset->assignedto) ? $asset->assignedto->zip : '';
                         } else {
                             $row[] = ''; // Empty string if unassigned
                         }
