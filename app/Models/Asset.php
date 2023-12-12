@@ -1339,7 +1339,7 @@ class Asset extends Depreciable
      *
      * @return \Illuminate\Database\Query\Builder          Modified query builder
      */
-    public function scopeAssignedSearch($query, $search)
+    public function scopeAssignedSearch($query,  $search)
     {
         $search = explode(' OR ', $search);
 

@@ -254,7 +254,7 @@
                     </div>
                 @endif
 
-                @if ($settings->labels_display_company_name == '1' && $asset->company)
+                @if ($settings->labels_display_company_name == '1' && $asset->location)
                     <div class="pull-left">
                         Emplacement: <strong>{{ $asset->location->name }}</strong>
                     </div>
@@ -263,7 +263,10 @@
 
                 @if ($asset->last_checkout)
                     <div class="pull-left">
-                        Livraison: <strong> {{ $asset->assignedTo->present()->name() }}
+                        Livraison: <strong> 
+                           @if ($asset->assignedTo)
+                                {{ $asset->assignedTo->present()->name() }}
+                            @endif
                             ({{ $asset->last_checkout->format('d/m/Y') }})</strong>
                     </div>
                 @else
