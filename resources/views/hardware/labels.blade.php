@@ -264,8 +264,8 @@
                 @if ($asset->last_checkout)
                     <div class="pull-left">
                         Livraison: <strong> 
-                           @if ($asset->assignedTo)
-                                {{ $asset->assignedTo->present()->name() }}
+                           @if ($asset->assignedToUser)
+                                {{ $asset->assignedTouser->first_name . '' . $asset->assignedTouser->last_name}}
                             @endif
                             ({{ $asset->last_checkout->format('d/m/Y') }})</strong>
                     </div>

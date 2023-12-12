@@ -478,7 +478,11 @@ class Asset extends Depreciable
     {
         return $this->morphTo('assigned', 'assigned_type', 'assigned_to')->withTrashed();
     }
-
+    
+    public function assignedToUser()
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
+    }
     /**
      * Gets assets assigned to this asset
      *
