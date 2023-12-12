@@ -256,7 +256,7 @@
 
                 @if ($settings->labels_display_company_name == '1' && $asset->company)
                     <div class="pull-left">
-                        Emplacement: <strong>{{ $asset->company->name }}</strong>
+                        Emplacement: <strong>{{ $asset->location->name }}</strong>
                     </div>
                 @endif
 
