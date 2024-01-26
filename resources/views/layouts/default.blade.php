@@ -1010,6 +1010,14 @@
                 event.preventDefault();
                 $(this).ekkoLightbox();
             });
+            //This prevents multi-click checkouts for accessories, components, consumables
+            $(document).ready(function () {
+                $('#checkout_form').submit(function (event) {
+                    event.preventDefault();
+                    $('#submit_button').prop('disabled', true);
+                    this.submit();
+                });
+            });
 
 
         </script>
