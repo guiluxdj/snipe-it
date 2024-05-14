@@ -1,6 +1,7 @@
 <?php
 
 return [
+    '2FA_reset'             => '2FA reset',
     'accessories'			=> 'Accessories',
     'activated'			    => 'Activated',
     'accepted_date'         => 'Date Accepted',
@@ -175,7 +176,7 @@ return [
     'last_name'             => 'Last Name',
     'license'				=> 'License',
     'license_report'        => 'License Report',
-    'licenses_available'	=> 'licenses available',
+    'licenses_available'	=> 'Licenses available',
     'licenses'				=> 'Licenses',
     'list_all'				=> 'List All',
     'loading'				=> 'Loading... please wait....',
@@ -244,6 +245,7 @@ return [
     'select_all'            => 'Select All',
     'search'				=> 'Search',
     'select_category'       => 'Select a Category',
+    'select_datasource' => 'Select a Datasource',
     'select_department'     => 'Select a Department',
     'select_depreciation'	=> 'Select a Depreciation Type',
     'select_location'		=> 'Select a Location',
@@ -311,6 +313,10 @@ return [
     'token_expired'         => 'Your form session has expired. Please try again.',
     'login_enabled'         => 'Login Enabled',
     'audit_due'             => 'Due for Audit',
+    'audit_due_days'        => 'Assets Due for Audit Within :days Day|Assets Due for Audit Within :days Days',
+    'checkin_due'           => 'Due for Checkin',
+    'checkin_overdue'       => 'Overdue for Checkin',
+    'checkin_due_days'      => 'Assets Due for Checkin Within :days Day|Assets Due for Checkin Within :days Days',
     'audit_overdue'         => 'Overdue for Audit',
     'accept'                => 'Accept :asset',
     'i_accept'              => 'I accept',
@@ -506,6 +512,9 @@ return [
     'or' => 'or',
     'url'                   => 'URL',
     'edit_fieldset' => 'Edit fieldset fields and options',
+    'permission_denied_superuser_demo' => 'Permission denied. You cannot update user information for superadmins on the demo.',
+    'pwd_reset_not_sent' => 'User is not activated, is LDAP synced, or does not have an email address',
+    'error_sending_email' => 'Error sending email',
     'bulk' => [
             'delete' =>
                 [
@@ -518,5 +527,14 @@ return [
              ],
     ],
     'no_requestable' => 'There are no requestable assets or asset models.',
+
+    'countable' => [
+        'accessories'  => ':count Accessory|:count Accessories',
+        'assets'  => ':count Asset|:count Assets',
+        'licenses'  => ':count License|:count Licenses',
+        'license_seats'  => ':count License Seat|:count License Seats',
+        'consumables'  => ':count Consumable|:count Consumables',
+        'components'  => ':count Component|:count Components',
+    ]
 
 ];

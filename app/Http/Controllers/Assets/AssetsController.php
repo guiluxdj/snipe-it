@@ -102,6 +102,10 @@ class AssetsController extends Controller
     {
         $this->authorize(Asset::class);
 
+        // There are a lot more rules to add here but prevents
+        // errors around `asset_tags` not being present below.
+        $this->validate($request, ['asset_tags' => ['required', 'array']]);
+
         // Handle asset tags - there could be one, or potentially many.
         // This is only necessary on create, not update, since bulk editing is handled
         // differently
@@ -850,11 +854,11 @@ class AssetsController extends Controller
         return view('hardware/audit-due');
     }
 
-    public function overdueForAudit()
+    public function dueForCheckin()
     {
-        $this->authorize('audit', Asset::class);
+        $this->authorize('checkin', Asset::class);
 
-        return view('hardware/audit-overdue');
+        return view('hardware/checkin-due');
     }
 
 
