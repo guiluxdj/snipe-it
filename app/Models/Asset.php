@@ -10,15 +10,17 @@ use App\Http\Traits\UniqueUndeletedTrait;
 use App\Models\Traits\Acceptable;
 use App\Models\Traits\Searchable;
 use App\Presenters\Presentable;
-use AssetPresenter;
-use Auth;
+use App\Presenters\AssetPresenter;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Storage;
 use Watson\Validating\ValidatingTrait;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * Model for Assets.
@@ -28,7 +30,7 @@ use Watson\Validating\ValidatingTrait;
 class Asset extends Depreciable
 {
 
-    protected $presenter = \App\Presenters\AssetPresenter::class;
+    protected $presenter = AssetPresenter::class;
 
     use CompanyableTrait;
     use HasFactory, Loggable, Requestable, Presentable, SoftDeletes, ValidatingTrait, UniqueUndeletedTrait;
@@ -59,6 +61,12 @@ class Asset extends Depreciable
     * @var string
     */
     protected $table = 'assets';
+
+    /**
+     * Leaving this commented out, since we need to test further, but this would eager load the model relationship every single
+     * time the asset model is loaded.
+     */
+     // protected $with = ['model'];
 
     /**
     * Whether the model should inject it's identifier to the unique
@@ -99,7 +107,8 @@ class Asset extends Depreciable
         'last_checkin'     => 'nullable|date_format:Y-m-d H:i:s',
         'expected_checkin' => 'nullable|date',
         'last_audit_date'  => 'nullable|date_format:Y-m-d H:i:s',
-        'next_audit_date'  => 'nullable|date|after:last_audit_date',
+        // 'next_audit_date'  => 'nullable|date|after:last_audit_date',
+        'next_audit_date'  => 'nullable|date',
         'location_id'      => 'nullable|exists:locations,id',
         'rtd_location_id'  => 'nullable|exists:locations,id',
         'purchase_date'    => 'nullable|date|date_format:Y-m-d',
@@ -144,31 +153,33 @@ class Asset extends Depreciable
         'expected_checkin',
         'byod',
         'asset_eol_date',
-        'eol_explicit', 
+        'eol_explicit',
         'last_audit_date',
         'next_audit_date',
         'asset_eol_date',
+        'last_checkin',
+        'last_checkout',
     ];
 
     use Searchable;
 
     /**
      * The attributes that should be included when searching the model.
-     * 
+     *
      * @var array
      */
     protected $searchableAttributes = [
-      'name', 
-      'asset_tag', 
-      'serial', 
-      'order_number', 
-      'purchase_cost', 
-      'notes', 
+      'name',
+      'asset_tag',
+      'serial',
+      'order_number',
+      'purchase_cost',
+      'notes',
       'created_at',
-      'updated_at',      
-      'purchase_date', 
-      'expected_checkin', 
-      'next_audit_date', 
+      'updated_at',
+      'purchase_date',
+      'expected_checkin',
+      'next_audit_date',
       'last_audit_date',
       'last_checkin',
       'last_checkout',
@@ -177,7 +188,7 @@ class Asset extends Depreciable
 
     /**
      * The relations and their attributes that should be included when searching the model.
-     * 
+     *
      * @var array
      */
     protected $searchableRelations = [
@@ -290,7 +301,7 @@ class Asset extends Depreciable
 
             // The asset status is not archived and is deployable
             if (($this->assetstatus) && ($this->assetstatus->archived == '0')
-                && ($this->assetstatus->deployable == '1')) 
+                && ($this->assetstatus->deployable == '1'))
             {
                 return true;
 
@@ -358,7 +369,7 @@ class Asset extends Depreciable
             } elseif (get_class($admin) === \App\Models\User::class) {
                 $checkedOutBy = $admin;
             } else {
-                $checkedOutBy = Auth::user();
+                $checkedOutBy = auth()->user();
             }
             event(new CheckoutableCheckedOut($this, $target, $checkedOutBy, $note, $originalValues));
 
@@ -567,7 +578,7 @@ class Asset extends Depreciable
      */
     public function assignedType()
     {
-        return strtolower(class_basename($this->assigned_type));
+        return $this->assigned_type ? strtolower(class_basename($this->assigned_type)) : null;
     }
 
 
@@ -851,11 +862,11 @@ class Asset extends Depreciable
         foreach ($assets as $asset) {
             $results = preg_match("/\d+$/", $asset['asset_tag'], $matches);
 
-            if ($results) 
+            if ($results)
             {
                 $number = $matches[0];
 
-                if ($number > $max) 
+                if ($number > $max)
                 {
                     $max = $number;
                 }
@@ -911,6 +922,23 @@ class Asset extends Depreciable
 
     }
 
+
+    /**
+     * Determine whether this asset's next audit date is before the last audit date
+     *
+     * @return bool
+     * @since [v6.4.1]
+     * @author [A. Gianotto] [<snipe@snipe.net>]
+     * */
+    public function checkInvalidNextAuditDate()
+    {
+        if (($this->last_audit_date) && ($this->next_audit_date) && ($this->last_audit_date > $this->next_audit_date)) {
+            return true;
+        }
+        return false;
+    }
+
+
     /**
      * Checks for a category-specific EULA, and if that doesn't exist,
      * checks for a settings level EULA
@@ -949,6 +977,56 @@ class Asset extends Depreciable
      **/
 
     /**
+     * Make sure the next_audit_date is formatted as Y-m-d.
+     *
+     * This is kind of dumb and confusing, since we already cast it that way AND it's a date field
+     * in the database, but here we are.
+     *
+     * @param $value
+     * @return void
+     */
+
+    protected function nextAuditDate(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+            set: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+        );
+    }
+
+    protected function lastAuditDate(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d H:i:s') : null,
+            set: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d H:i:s') : null,
+        );
+    }
+
+    protected function lastCheckout(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d H:i:s') : null,
+            set: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d H:i:s') : null,
+        );
+    }
+
+    protected function lastCheckin(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d H:i:s') : null,
+            set: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d H:i:s') : null,
+        );
+    }
+
+    protected function assetEolDate(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+            set: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+        );
+    }
+
+    /**
      * This sets the requestable to a boolean 0 or 1. This accounts for forms or API calls that
      * explicitly pass the requestable field but it has a null or empty value.
      *
@@ -957,9 +1035,13 @@ class Asset extends Depreciable
      * @param $value
      * @return void
      */
-    public function setRequestableAttribute($value)
+
+    protected function requestable(): Attribute
     {
-        $this->attributes['requestable'] = (int) filter_var($value, FILTER_VALIDATE_BOOLEAN);
+        return Attribute::make(
+            get: fn ($value) => (int) filter_var($value, FILTER_VALIDATE_BOOLEAN),
+            set: fn ($value) => (int) filter_var($value, FILTER_VALIDATE_BOOLEAN),
+        );
     }
 
 

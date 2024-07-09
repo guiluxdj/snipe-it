@@ -382,7 +382,6 @@
 
 {{-- Javascript files --}}
 <script src="{{ url(mix('js/dist/all.js')) }}" nonce="{{ csrf_token() }}"></script>
-<script defer src="{{ url(mix('js/dist/all-defer.js')) }}" nonce="{{ csrf_token() }}"></script>
 
 
 @push('css')
@@ -468,7 +467,7 @@
         });
     });
 </script>
-
+@endpush
 
 
 </body>

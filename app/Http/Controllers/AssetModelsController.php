@@ -4,20 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Helpers\Helper;
 use App\Http\Requests\ImageUploadRequest;
+use App\Http\Requests\StoreAssetModelRequest;
 use App\Models\Actionlog;
-use App\Models\Asset;
 use App\Models\AssetModel;
 use App\Models\CustomField;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Validator;
-use Redirect;
-use Request;
-use Storage;
-use Symfony\Component\HttpFoundation\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use \Illuminate\Contracts\View\View;
+use \Illuminate\Http\RedirectResponse;
+
 
 /**
  * This class controls all actions related to asset models for
@@ -34,10 +34,8 @@ class AssetModelsController extends Controller
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
      * @since [v1.0]
-     * @return View
-     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function index()
+    public function index() : View
     {
         $this->authorize('index', AssetModel::class);
 
@@ -49,10 +47,8 @@ class AssetModelsController extends Controller
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
      * @since [v1.0]
-     * @return View
-     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function create()
+    public function create() : View
     {
         $this->authorize('create', AssetModel::class);
 
@@ -67,16 +63,12 @@ class AssetModelsController extends Controller
      * @author [A. Gianotto] [<snipe@snipe.net>]
      * @since [v1.0]
      * @param ImageUploadRequest $request
-     * @return Redirect
-     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function store(ImageUploadRequest $request)
+    public function store(StoreAssetModelRequest $request) : RedirectResponse
     {
         $this->authorize('create', AssetModel::class);
-        // Create a new asset model
         $model = new AssetModel;
 
-        // Save the model data
         $model->eol = $request->input('eol');
         $model->depreciation_id = $request->input('depreciation_id');
         $model->name = $request->input('name');
@@ -86,7 +78,7 @@ class AssetModelsController extends Controller
         $model->category_id = $request->input('category_id');
         $model->notes = $request->input('notes');
         $model->user_id = Auth::id();
-        $model->requestable = Request::has('requestable');
+        $model->requestable = $request->has('requestable');
 
         if ($request->input('fieldset_id') != '') {
             $model->fieldset_id = $request->input('fieldset_id');
@@ -94,7 +86,6 @@ class AssetModelsController extends Controller
 
         $model = $request->handleImages($model);
 
-        // Was it created?
         if ($model->save()) {
             if ($this->shouldAddDefaultValues($request->input())) {
                 if (!$this->assignCustomFieldsDefaultValues($model, $request->input('default_values'))){
@@ -114,18 +105,14 @@ class AssetModelsController extends Controller
      * @author [A. Gianotto] [<snipe@snipe.net>]
      * @since [v1.0]
      * @param int $modelId
-     * @return View
-     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function edit($modelId = null)
+    public function edit($modelId = null) : View | RedirectResponse
     {
         $this->authorize('update', AssetModel::class);
         if ($item = AssetModel::find($modelId)) {
             $category_type = 'asset';
-            $view = View::make('models/edit', compact('item', 'category_type'));
-            $view->with('depreciation_list', Helper::depreciationList());
+            return view('models/edit', compact('item', 'category_type'))->with('depreciation_list', Helper::depreciationList());
 
-            return $view;
         }
 
         return redirect()->route('models.index')->with('error', trans('admin/models/message.does_not_exist'));
@@ -140,15 +127,14 @@ class AssetModelsController extends Controller
      * @since [v1.0]
      * @param ImageUploadRequest $request
      * @param int $modelId
-     * @return Redirect
+     * @return \Illuminate\Http\RedirectResponse
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function update(ImageUploadRequest $request, $modelId = null)
+    public function update(StoreAssetModelRequest $request, $modelId) : RedirectResponse
     {
         $this->authorize('update', AssetModel::class);
-        // Check if the model exists
+
         if (is_null($model = AssetModel::find($modelId))) {
-            // Redirect to the models management page
             return redirect()->route('models.index')->with('error', trans('admin/models/message.does_not_exist'));
         }
 
@@ -174,9 +160,6 @@ class AssetModelsController extends Controller
             }
         }
 
-       
-      
-       
         if ($model->save()) {
             if ($model->wasChanged('eol')) {
                     if ($model->eol > 0) {
@@ -201,10 +184,8 @@ class AssetModelsController extends Controller
      * @author [A. Gianotto] [<snipe@snipe.net>]
      * @since [v1.0]
      * @param int $modelId
-     * @return Redirect
-     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function destroy($modelId)
+    public function destroy($modelId) : RedirectResponse
     {
         $this->authorize('delete', AssetModel::class);
         // Check if the model exists
@@ -221,7 +202,7 @@ class AssetModelsController extends Controller
             try {
                 Storage::disk('public')->delete('models/'.$model->image);
             } catch (\Exception $e) {
-                \Log::info($e);
+                Log::info($e);
             }
         }
 
@@ -238,10 +219,8 @@ class AssetModelsController extends Controller
      * @author [A. Gianotto] [<snipe@snipe.net>]
      * @since [v1.0]
      * @param int $id
-     * @return Redirect
-     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function getRestore($id)
+    public function getRestore($id) : RedirectResponse
     {
         $this->authorize('create', AssetModel::class);
 
@@ -256,7 +235,7 @@ class AssetModelsController extends Controller
                 $logaction->item_type = User::class;
                 $logaction->item_id = $model->id;
                 $logaction->created_at = date('Y-m-d H:i:s');
-                $logaction->user_id = Auth::user()->id;
+                $logaction->user_id = auth()->id();
                 $logaction->logaction('restore');
 
 
@@ -283,13 +262,11 @@ class AssetModelsController extends Controller
      * @author [A. Gianotto] [<snipe@snipe.net>]
      * @since [v1.0]
      * @param int $modelId
-     * @return View
-     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function show($modelId = null)
+    public function show($modelId = null) : View | RedirectResponse
     {
         $this->authorize('view', AssetModel::class);
-        $model = AssetModel::withTrashed()->withCount('assets')->find($modelId);
+        $model = AssetModel::withTrashed()->find($modelId);
 
         if (isset($model->id)) {
             return view('models/view', compact('model'));
@@ -304,9 +281,8 @@ class AssetModelsController extends Controller
      * @author [A. Gianotto] [<snipe@snipe.net>]
      * @since [v1.0]
      * @param int $modelId
-     * @return View
      */
-    public function getClone($modelId = null)
+    public function getClone($modelId = null) : View | RedirectResponse
     {
         $this->authorize('create', AssetModel::class);
         // Check if the model exists
@@ -332,9 +308,8 @@ class AssetModelsController extends Controller
      * @author [B. Wetherington] [<uberbrady@gmail.com>]
      * @since [v2.0]
      * @param int $modelId
-     * @return View
      */
-    public function getCustomFields($modelId)
+    public function getCustomFields($modelId) : View
     {
         return view('models.custom_fields_form')->with('model', AssetModel::find($modelId));
     }
@@ -346,9 +321,8 @@ class AssetModelsController extends Controller
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
      * @since [v1.7]
-     * @return \Illuminate\Contracts\View\View
      */
-    public function postBulkEdit(Request $request)
+    public function postBulkEdit(Request $request) : View | RedirectResponse
     {
         $models_raw_array = $request->input('ids');
 
@@ -390,9 +364,8 @@ class AssetModelsController extends Controller
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
      * @since [v1.7]
-     * @return \Illuminate\Contracts\View\View
      */
-    public function postBulkEditSave(Request $request)
+    public function postBulkEditSave(Request $request) : RedirectResponse
     {
         $models_raw_array = $request->input('ids');
         $update_array = [];
@@ -430,9 +403,8 @@ class AssetModelsController extends Controller
      * @author [A. Gianotto] [<snipe@snipe.net>]
      * @since [v1.0]
      * @param int $modelId
-     * @return Redirect
      */
-    public function postBulkDelete(Request $request)
+    public function postBulkDelete(Request $request) : RedirectResponse
     {
         $models_raw_array = $request->input('ids');
 
@@ -471,9 +443,8 @@ class AssetModelsController extends Controller
      * any default values were entered into the form.
      *
      * @param  array  $input
-     * @return bool
      */
-    private function shouldAddDefaultValues(array $input)
+    private function shouldAddDefaultValues(array $input) : bool
     {
         return ! empty($input['add_default_values'])
             && ! empty($input['default_values'])
@@ -485,7 +456,6 @@ class AssetModelsController extends Controller
      *
      * @param  AssetModel $model
      * @param  array      $defaultValues
-     * @return void
      */
     private function assignCustomFieldsDefaultValues(AssetModel $model, array $defaultValues): bool
     {
@@ -528,9 +498,8 @@ class AssetModelsController extends Controller
     /**
      * Removes all default values
      *
-     * @return void
      */
-    private function removeCustomFieldsDefaultValues(AssetModel $model)
+    private function removeCustomFieldsDefaultValues(AssetModel $model) : void
     {
         $model->defaultValues()->detach();
     }
