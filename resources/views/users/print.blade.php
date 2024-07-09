@@ -83,25 +83,6 @@
         @php
             $counter = 1;
         @endphp
-        <table class="inventory">
-            <thead>
-            <tr>
-                <th colspan="9">{{ trans('general.assets') }}</th>
-            </tr>
-            </thead>
-            <thead>
-            <tr>
-                <th style="width: 20px;"></th>
-                <th style="width: 20%;">{{ trans('admin/hardware/table.asset_tag') }}</th>
-                <th style="width: 20%;">{{ trans('general.name') }}</th>
-                <th style="width: 10%;">{{ trans('general.category') }}</th>
-                <th style="width: 20%;">{{ trans('admin/hardware/form.model') }}</th>
-                <th style="width: 10%;">{{ trans('admin/hardware/form.serial') }}</th>
-                <th style="width: 10%;">Date d'achat</th>
-                <th style="width: 10%;">{{ trans('admin/hardware/table.checkout_date') }}</th>
-                <th data-formatter="imageFormatter" style="width: 20%;">{{ trans('general.signature') }}</th>
-            </tr>
-            </thead>
 
         <div id="assets-toolbar">
             <h4>{{ trans_choice('general.countable.assets', $assets->count(), ['count' => $assets->count()]) }}
@@ -124,16 +105,15 @@
                 data-cookie-id-table="AssetsAssigned">
             <thead>
                 <th data-field="asset_id" data-sortable="false" data-visible="true" data-switchable="false">#</th>
-                <th data-field="asset_image" data-sortable="true" data-visible="false" data-switchable="true">{{ trans('general.image') }}</th>
+                <th data-field="asset_image" data-sortable="true" data-visible="true" data-switchable="true">{{ trans('general.image') }}</th>
                 <th data-field="asset_tag" data-sortable="true" data-visible="true" data-switchable="false">{{ trans('admin/hardware/table.asset_tag') }}</th>
                 <th data-field="asset_name" data-sortable="true" data-visible="true">{{ trans('general.name') }}</th>
                 <th data-field="asset_category" data-sortable="true" data-visible="true">{{ trans('general.category') }}</th>
                 <th data-field="asset_model" data-sortable="true" data-visible="true">{{ trans('admin/hardware/form.model') }}</th>
-                <th data-field="rtd_location" data-sortable="true" data-visible="true">{{ trans('admin/hardware/form.default_location') }}</th>
                 <th data-field="asset_location" data-sortable="true" data-visible="false">{{ trans('general.location') }}</th>
                 <th data-field="asset_serial" data-sortable="true" data-visible="true">{{ trans('admin/hardware/form.serial') }}</th>
                 <th data-field="asset_checkout_date" data-sortable="true" data-visible="true">{{ trans('admin/hardware/table.checkout_date') }}</th>
-                <th data-field="signature" data-sortable="true" data-visible="true">{{ trans('general.signature') }}</th>
+                <th data-field="signature" data-sortable="false" data-visible="true">{{ trans('general.signature') }}</th>
             </thead>
             <tbody>
             @foreach ($assets as $asset)
@@ -149,10 +129,8 @@
                     <td>{{ $asset->name }}</td>
                     <td>{{ (($asset->model) && ($asset->model->category)) ? $asset->model->category->name : trans('general.invalid_category') }}</td>
                     <td>{{ ($asset->model) ? $asset->model->name : trans('general.invalid_model') }}</td>
-                    <td>{{ ($asset->defaultLoc) ? $asset->defaultLoc->name : '' }}</td>
                     <td>{{ ($asset->location) ? $asset->location->name : '' }}</td>
                     <td>{{ $asset->serial }}</td>
-                     <td>{{ $asset->purchase_date }}</td>
                     <td>
                         {{ Helper::getFormattedDateObject($asset->last_checkout, 'datetime', false) }}</td>
                     <td>
@@ -381,7 +359,7 @@
         </tr>
         <tr style="height: 80px;">
             <td></td>
-            <td style="padding-right: 10px; vertical-align: top;">Name</td>
+            <td style="padding-right: 10px; vertical-align: top;">Nom</td>
             <td style="padding-right: 10px; vertical-align: top;">Signature</td>
             <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.date') }}</td>
         </tr>
@@ -394,7 +372,7 @@
         </tr>
         <tr>
             <td></td>
-            <td style="padding-right: 10px; vertical-align: top;">Name</td>
+            <td style="padding-right: 10px; vertical-align: top;">Nom</td>
             <td style="padding-right: 10px; vertical-align: top;">Signature</td>
             <td style="padding-right: 10px; vertical-align: top;">{{ trans('general.date') }}</td>
             <td></td>
