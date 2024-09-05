@@ -142,7 +142,7 @@
             <table class="inventory">
                 <thead>
                     <tr>
-                        <th colspan="6">{{ trans('general.accessories') }}</th>
+                        <th colspan="7">{{ trans('general.accessories') }}</th>
                     </tr>
                 </thead>
                 <thead>
@@ -153,7 +153,7 @@
                         <th style="width: 30%;">{{ trans('general.category') }}</th>
                         <th style="width: 10%;">Marque</th>
                         <th style="width: 10%;">{{ trans('general.checked_out') }}</th>
-                        <th style="width: 20%;">Notes}</th>
+                        <th style="width: 20%;">Notes</th>
                     </tr>
                 </thead>
                 @php
