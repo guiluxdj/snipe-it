@@ -111,27 +111,8 @@
     </div>
   </div><!-- ./col -->
 
-  <div class="col-lg-2 col-xs-6">
-    <a href="{{ route('components.index') }}">
-   <!-- small box -->
-   <div class="dashboard small-box bg-yellow">
-     <div class="inner">
-       <h3>{{ number_format($counts['component']) }}</h3>
-       <p>{{ strtolower(trans('general.components')) }}</p>
-     </div>
-     <div class="icon" aria-hidden="true">
-         <x-icon type="components" />
-     </div>
-       @can('view', \App\Models\License::class)
-         <a href="{{ route('components.index') }}" class="small-box-footer">{{ trans('general.view_all') }}
-             <x-icon type="arrow-circle-right" />
-         </a>
-       @endcan
-   </div>
-    </a>
- </div><!-- ./col -->
-
- <div class="col-lg-2 col-xs-6">
+ 
+ <div class="col-lg-4 col-xs-6">
     <a href="{{ route('users.index') }}">
    <!-- small box -->
    <div class="dashboard small-box bg-light-blue">
@@ -537,10 +518,10 @@
                                     <x-icon type="consumables" />
                                     <span class="sr-only">{{ trans('general.consumables_count') }}</span>
                                 </th>
-                                <th class="col-sm-1" data-visible="true" data-field="components_count" data-sortable="true">
+                                {{-- <th class="col-sm-1" data-visible="true" data-field="components_count" data-sortable="true">
                                     <x-icon type="components" />
                                     <span class="sr-only">{{ trans('general.components_count') }}</span>
-                                </th>
+                                </th> --}}
                                 <th class="col-sm-1" data-visible="true" data-field="licenses_count" data-sortable="true">
                                     <x-icon type="licenses" />
                                     <span class="sr-only">{{ trans('general.licenses_count') }}</span>
@@ -673,11 +654,11 @@
                                                     <i class="fas fa-tint" aria-hidden="true"></i>
                                                     <span class="sr-only">{{ trans('general.consumables_count') }}</span>
                                                 </th>
-                                                <th class="col-sm-1" data-visible="true" data-field="components_count"
+                                                {{-- <th class="col-sm-1" data-visible="true" data-field="components_count"
                                                     data-sortable="true">
                                                     <i class="far fa-hdd" aria-hidden="true"></i>
                                                     <span class="sr-only">{{ trans('general.components_count') }}</span>
-                                                </th>
+                                                </th> --}}
                                                 <th class="col-sm-1" data-visible="true" data-field="licenses_count"
                                                     data-sortable="true">
                                                     <i class="far fa-save" aria-hidden="true"></i>
