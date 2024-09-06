@@ -73,7 +73,7 @@
 
             img.label-logo {
                 height: 0.5in;
-                margin-top: 60px;
+                margin-top: 35px;
                 margin-right: 0px;
             }
 
@@ -154,7 +154,7 @@
 
             img.label-logo {
                 height: 0.5in;
-                margin-top: 60px;
+                margin-top: 35px;
                 margin-right: 0px;
             }
 
@@ -265,9 +265,9 @@
                     <div class="pull-left">
                         Livraison: <strong> 
                            @if ($asset->assignedToUser)
-                                {{ $asset->assignedTouser->first_name . '' . $asset->assignedTouser->last_name}}
+                                {{ $asset->assignedTouser->first_name . ' ' . $asset->assignedTouser->last_name}}
                             @endif
-                            ({{ $asset->last_checkout->format('d/m/Y') }})</strong>
+                            ({{ \Carbon\Carbon::parse($asset->last_checkout)->format('d/m/Y') }})</strong>
                     </div>
                 @else
                     @if ($asset->purchase_date)
