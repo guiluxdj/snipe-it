@@ -685,4 +685,31 @@ class UsersController extends Controller
 
         return redirect()->back()->with('error', trans('general.pwd_reset_not_sent'));
     }
+
+
+    // My update
+    /////////////////////////////////////////////////////////////
+
+
+    /**
+     * Print inventoryAll
+     *
+     * @author Guillaume Debarsy
+     * @since [v1.8]
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function printInventoryAll()
+    {
+        $this->authorize('view', User::class);
+
+        $users = User::orderBy('last_name')
+        ->with('accessories')
+        ->with('assets')
+        ->with('licenses')
+        ->get();
+
+        return view('users/printall')->with('users', $users)
+            ->with('settings', Setting::getSettings());
+    }
 }
+

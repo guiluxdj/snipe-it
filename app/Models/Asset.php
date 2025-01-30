@@ -508,7 +508,11 @@ class Asset extends Depreciable
     {
         return $this->morphTo('assigned', 'assigned_type', 'assigned_to')->withTrashed();
     }
-
+    
+    public function assignedToUser()
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
+    }
     /**
      * Gets assets assigned to this asset
      *
@@ -1508,7 +1512,7 @@ class Asset extends Depreciable
      *
      * @return \Illuminate\Database\Query\Builder          Modified query builder
      */
-    public function scopeAssignedSearch($query, $search)
+    public function scopeAssignedSearch($query,  $search)
     {
         $search = explode(' OR ', $search);
 

@@ -86,7 +86,7 @@ class AccessoryPresenter extends Presenter
             ], [
                 'field' => 'remaining_qty',
                 'searchable' => false,
-                'sortable' => false,
+                'sortable' => true,
                 'visible' => false,
                 'title' => trans('admin/accessories/general.remaining'),
             ],[

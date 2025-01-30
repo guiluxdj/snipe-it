@@ -174,14 +174,14 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                     </a>
                                 </li>
                             @endcan
-                            @can('view', \App\Models\Component::class)
+                            {{-- @can('view', \App\Models\Component::class)
                                 <li aria-hidden="true"{!! (Request::is('components*') ? ' class="active"' : '') !!}>
                                     <a href="{{ route('components.index') }}" {{$snipeSettings->shortcuts_enabled == 1 ? "accesskey=5" : ''}} tabindex="-1" data-tooltip="true" data-placement="bottom" data-title="{{ trans('general.components') }}">
                                         <x-icon type="components" class="fa-fw" />
                                         <span class="sr-only">{{ trans('general.components') }}</span>
                                     </a>
                                 </li>
-                            @endcan
+                            @endcan --}}
 
                             @can('index', \App\Models\Asset::class)
                                 <li>
@@ -245,14 +245,14 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                                 </a>
                                             </li>
                                         @endcan
-                                        @can('create', \App\Models\Component::class)
+                                        {{-- @can('create', \App\Models\Component::class)
                                             <li {!! (Request::is('components/create') ? 'class="active"' : '') !!}>
                                                 <a href="{{ route('components.create') }}" tabindex="-1">
                                                     <x-icon type="components" />
                                                     {{ trans('general.component') }}
                                                 </a>
                                             </li>
-                                        @endcan
+                                        @endcan --}}
                                         @can('create', \App\Models\User::class)
                                             <li {!! (Request::is('users/create') ? 'class="active"' : '') !!}>
                                                 <a href="{{ route('users.create') }}" tabindex="-1">
@@ -617,14 +617,14 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                 </a>
                             </li>
                         @endcan
-                        @can('view', \App\Models\Component::class)
+                        {{-- @can('view', \App\Models\Component::class)
                             <li{!! (Request::is('components*') ? ' class="active"' : '') !!}>
                                 <a href="{{ route('components.index') }}">
                                     <x-icon type="components" class="fa-fw" />
                                     <span>{{ trans('general.components') }}</span>
                                 </a>
                             </li>
-                        @endcan
+                        @endcan --}}
                         @can('view', \App\Models\PredefinedKit::class)
                             <li{!! (Request::is('kits') ? ' class="active"' : '') !!}>
                                 <a href="{{ route('kits.index') }}">
@@ -873,8 +873,7 @@ dir="{{ Helper::determineLanguageDirection() }}">
 
                 <div class="1hidden-xs pull-left">
                     <div class="pull-left" >
-                        <a target="_blank" href="https://snipeitapp.com" rel="noopener">Snipe-IT</a> is open source software, made with <x-icon type="heart" style="color: #a94442; font-size: 10px" />
-                            <span class="sr-only">love</span> by <a href="https://bsky.app/profile/snipeitapp.com" rel="noopener">@snipeitapp</a>.
+                       <a target="_blank" href="http://walit.walcourt.local" rel="noopener">WAL-IT</a> Gestion des actifs </a>.
                     </div>
                     <div class="pull-right">
                     @if ($snipeSettings->version_footer!='off')
@@ -884,7 +883,7 @@ dir="{{ Helper::determineLanguageDirection() }}">
                         @endif
                     @endif
 
-                    @if ($snipeSettings->support_footer!='off')
+                    {{-- @if ($snipeSettings->support_footer!='off')
                         @if (($snipeSettings->support_footer=='on') || (($snipeSettings->support_footer=='admin') && (Auth::user()->isSuperUser()=='1')))
                             <a target="_blank" class="btn btn-default btn-xs"
                                href="https://snipe-it.readme.io/docs/overview"
@@ -898,7 +897,7 @@ dir="{{ Helper::determineLanguageDirection() }}">
                         <a target="_blank" class="btn btn-default btn-xs" rel="noopener"
                            href="{{  $snipeSettings->privacy_policy_link }}"
                            target="_new">{{ trans('admin/settings/general.privacy_policy') }}</a>
-                    @endif
+                    @endif --}}
                     </div>
                     <br>
                     @if ($snipeSettings->footer_text!='')

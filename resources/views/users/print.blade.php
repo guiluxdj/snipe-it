@@ -114,16 +114,15 @@
             data-cookie-id-table="AssetsAssigned">
             <thead>
                 <th data-field="asset_id" data-sortable="false" data-visible="true" data-switchable="false">#</th>
-                <th data-field="asset_image" data-sortable="true" data-visible="false" data-switchable="true">{{ trans('general.image') }}</th>
+                <th data-field="asset_image" data-sortable="true" data-visible="true" data-switchable="true">{{ trans('general.image') }}</th>
                 <th data-field="asset_tag" data-sortable="true" data-visible="true" data-switchable="false">{{ trans('admin/hardware/table.asset_tag') }}</th>
                 <th data-field="asset_name" data-sortable="true" data-visible="true">{{ trans('general.name') }}</th>
                 <th data-field="asset_category" data-sortable="true" data-visible="true">{{ trans('general.category') }}</th>
                 <th data-field="asset_model" data-sortable="true" data-visible="true">{{ trans('admin/hardware/form.model') }}</th>
-                <th data-field="rtd_location" data-sortable="true" data-visible="true">{{ trans('admin/hardware/form.default_location') }}</th>
                 <th data-field="asset_location" data-sortable="true" data-visible="false">{{ trans('general.location') }}</th>
                 <th data-field="asset_serial" data-sortable="true" data-visible="true">{{ trans('admin/hardware/form.serial') }}</th>
                 <th data-field="asset_checkout_date" data-sortable="true" data-visible="true">{{ trans('admin/hardware/table.checkout_date') }}</th>
-                <th data-field="signature" data-sortable="true" data-visible="true">{{ trans('general.signature') }}</th>
+                <th data-field="signature" data-sortable="false" data-visible="true">{{ trans('general.signature') }}</th>
             </thead>
             <tbody>
             @foreach ($show_user->assets as $asset)
@@ -141,7 +140,6 @@
                     <td>{{ $asset->name }}</td>
                     <td>{{ (($asset->model) && ($asset->model->category)) ? $asset->model->category->name : trans('general.invalid_category') }}</td>
                     <td>{{ ($asset->model) ? $asset->model->name : trans('general.invalid_model') }}</td>
-                    <td>{{ ($asset->defaultLoc) ? $asset->defaultLoc->name : '' }}</td>
                     <td>{{ ($asset->location) ? $asset->location->name : '' }}</td>
                     <td>{{ $asset->serial }}</td>
                     <td>
