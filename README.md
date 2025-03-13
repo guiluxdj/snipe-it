@@ -6,6 +6,10 @@
 
 ## MP3 Tag - Gestion des tags de fichiers mp3
 
+<<<<<<< HEAD
+=======
+It is built on [Laravel 11](http://laravel.com).
+>>>>>>> eb9cfbaed6fc830e9b114c625896a636842f2d1a
 
 
 -----
@@ -87,6 +91,8 @@ Since the release of the JSON REST API, several third-party developers have been
 - [Kandji2Snipe](https://github.com/grokability/kandji2snipe) by [@briangoldstein](https://github.com/briangoldstein) - Python script that synchronizes Kandji with Snipe-IT.
 - [SnipeAgent](https://github.com/ReticentRobot/SnipeAgent) by [@ReticentRobot](https://github.com/ReticentRobot) - Windows agent for Snipe-IT.
 - [Gate Pass Generator](https://github.com/cha7uraAE/snipe-it-gate-pass-system) by [@cha7uraAE](https://github.com/cha7uraAE) - A Streamlit application for generating gate passes based on hardware data from a Snipe-IT API.
+
+We also have a handful of [Google Apps scripts](https://github.com/grokability/google-apps-scripts-for-snipe-it) to help with various tasks.
 
 -----
 

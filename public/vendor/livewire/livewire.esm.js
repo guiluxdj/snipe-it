@@ -10463,10 +10463,15 @@ globalDirective("current", ({ el, directive: directive2, cleanup }) => {
   let refreshCurrent = (url) => {
     if (pathMatches(hrefUrl, url, options)) {
       el.classList.add(...classes);
+<<<<<<< HEAD
       el.setAttribute("data-current", "");
     } else {
       el.classList.remove(...classes);
       el.removeAttribute("data-current");
+=======
+    } else {
+      el.classList.remove(...classes);
+>>>>>>> eb9cfbaed6fc830e9b114c625896a636842f2d1a
     }
   };
   refreshCurrent(new URL(window.location.href));
