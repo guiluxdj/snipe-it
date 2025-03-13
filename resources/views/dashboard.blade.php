@@ -113,7 +113,7 @@
   </div><!-- ./col -->
 
 
- <div class="col-lg-2 col-xs-6">
+ <div class="col-lg-4 col-xs-6">
     <a href="{{ route('users.index') }}">
    <!-- small box -->
    <div class="dashboard small-box bg-light-blue">
