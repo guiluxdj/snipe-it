@@ -105,7 +105,8 @@ class LicensesController extends Controller
         session()->put(['redirect_option' => $request->get('redirect_option')]);
 
         if ($license->save()) {
-            return redirect()->to(Helper::getRedirectOption($request, $license->id, 'Licenses'))->with('success', trans('admin/licenses/message.create.success'));
+            return Helper::getRedirectOption($request, $license->id, 'Licenses')
+                ->with('success', trans('admin/licenses/message.create.success'));
         }
 
         return redirect()->back()->withInput()->withErrors($license->getErrors());
@@ -125,7 +126,7 @@ class LicensesController extends Controller
     {
 
         $this->authorize('update', $license);
-
+        session()->put('back_url', url()->previous());
         $maintained_list = [
             '' => 'Maintained',
             '1' => 'Yes',
@@ -181,7 +182,8 @@ class LicensesController extends Controller
         session()->put(['redirect_option' => $request->get('redirect_option')]);
 
         if ($license->save()) {
-            return redirect()->to(Helper::getRedirectOption($request, $license->id, 'Licenses'))->with('success', trans('admin/licenses/message.update.success'));
+            return Helper::getRedirectOption($request, $license->id, 'Licenses')
+                ->with('success', trans('admin/licenses/message.update.success'));
         }
         // If we can't adjust the number of seats, the error is flashed to the session by the event handler in License.php
         return redirect()->back()->withInput()->withErrors($license->getErrors());
@@ -302,13 +304,16 @@ class LicensesController extends Controller
         $response = new StreamedResponse(function () {
             // Open output stream
             $handle = fopen('php://output', 'w');
-            $licenses= License::with('company',
+            $licenses = License::with('company',
                           'manufacturer',
                           'category',
                           'supplier',
                           'adminuser',
-                          'assignedusers')
-                          ->orderBy('created_at', 'DESC');
+                          'assignedusers');
+            if (request()->filled('category_id')) {
+                $licenses = $licenses->where('category_id', request()->input('category_id'));
+            }
+            $licenses = $licenses->orderBy('created_at', 'DESC');
             Company::scopeCompanyables($licenses)
                 ->chunk(500, function ($licenses) use ($handle) {
                     $headers = [

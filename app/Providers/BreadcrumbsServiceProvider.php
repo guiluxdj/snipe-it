@@ -414,13 +414,13 @@ class BreadcrumbsServiceProvider extends ServiceProvider
         );
 
         Breadcrumbs::for('maintenances.show', fn (Trail $trail, AssetMaintenance $maintenance) =>
-        $trail->parent('maintenances.index', route('locations.index'))
+        $trail->parent('maintenances.index', route('maintenances.index'))
             ->push($maintenance->title, route('maintenances.show', $maintenance))
         );
 
-        Breadcrumbs::for('manufacturers.edit', fn (Trail $trail, Manufacturer $manufacturer) =>
-        $trail->parent('manufacturers.index', route('manufacturers.index'))
-            ->push(trans('general.breadcrumb_button_actions.edit_item', ['name' => $manufacturer->name]), route('manufacturers.edit', $manufacturer))
+        Breadcrumbs::for('maintenances.edit', fn (Trail $trail, AssetMaintenance $maintenance) =>
+        $trail->parent('maintenances.index', route('maintenances.index'))
+            ->push(trans('general.breadcrumb_button_actions.edit_item', ['name' => $maintenance->title]), route('maintenances.edit', $maintenance))
         );
 
 
@@ -538,6 +538,16 @@ class BreadcrumbsServiceProvider extends ServiceProvider
             Breadcrumbs::for('users.index', fn(Trail $trail) => $trail->parent('home', route('home'))
                 ->push(trans('general.users'), route('users.index'))
                 ->push(trans('general.deleted_users'), route('users.index'))
+            );
+        } elseif ((request()->is('users*')) && (request()->admins=='true')) {
+            Breadcrumbs::for('users.index', fn(Trail $trail) => $trail->parent('home', route('home'))
+                ->push(trans('general.users'), route('users.index'))
+                ->push(trans('general.show_admins'), route('users.index'))
+            );
+        } elseif ((request()->is('users*')) && (request()->superadmins=='true')) {
+            Breadcrumbs::for('users.index', fn(Trail $trail) => $trail->parent('home', route('home'))
+                ->push(trans('general.users'), route('users.index'))
+                ->push(trans('general.show_superadmins'), route('users.index'))
             );
         } else {
             Breadcrumbs::for('users.index', fn(Trail $trail) => $trail->parent('home', route('home'))

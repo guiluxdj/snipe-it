@@ -4,6 +4,10 @@
 
     @if (request('status')=='deleted')
         {{ trans('general.deleted') }}
+    @elseif (request('admins')=='true')
+        {{ trans('general.show_admins') }}
+    @elseif (request('superadmins')=='true')
+        {{ trans('general.show_superadmins') }}
     @else
         {{ trans('general.current') }}
     @endif
@@ -43,25 +47,25 @@
             @include('partials.users-bulk-actions')
 
             <table
-                    data-click-to-select="true"
                     data-columns="{{ \App\Presenters\UserPresenter::dataTableLayout() }}"
                     data-cookie-id-table="usersTable"
-                    data-pagination="true"
                     data-id-table="usersTable"
-                    data-search="true"
                     data-side-pagination="server"
-                    data-show-columns="true"
-                    data-show-fullscreen="true"
-                    data-show-export="true"
-                    data-show-refresh="true"
-                    data-sort-order="asc"
                     data-toolbar="#userBulkEditToolbar"
                     data-bulk-button-id="#bulkUserEditButton"
                     data-bulk-form-id="#usersBulkForm"
                     id="usersTable"
+                    data-buttons="userButtons"
                     class="table table-striped snipe-table"
                     data-url="{{ route('api.users.index',
-              array('deleted'=> (request('status')=='deleted') ? 'true' : 'false','company_id' => e(request('company_id')))) }}"
+                        [
+                            'status' => e(request('status')),
+                            'deleted'=> (request('status')=='deleted') ? 'true' : 'false',
+                            'company_id' => e(request('company_id')),
+                            'manager_id' => e(request('manager_id')),
+                            'admins' => e(request('admins')),
+                            'superadmins' => e(request('superadmins'))
+                       ]) }}"
                     data-export-options='{
                 "fileName": "export-users-{{ date('Y-m-d') }}",
                 "ignoreColumn": ["actions","image","change","checkbox","checkincheckout","icon"]
@@ -71,6 +75,7 @@
             </div><!-- /.box -->
         </div>
     </div>
+
 
 @stop
 
