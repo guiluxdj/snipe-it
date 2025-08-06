@@ -1456,24 +1456,24 @@
     });
     @endcan
 
-    @can('create', \App\Models\Component::class)
-    // Compoment table buttons
-    window.componentButtons = () => ({
-        btnAdd: {
-            text: '{{ trans('general.create') }}',
-            icon: 'fa fa-plus',
-            event () {
-                window.location.href = '{{ route('components.create') }}';
-            },
-            attributes: {
-                title: '{{ trans('general.create') }}',
-                @if ($snipeSettings->shortcuts_enabled == 1)
-                accesskey: 'n'
-                @endif
-            }
-        },
-    });
-    @endcan
+    // @can('create', \App\Models\Component::class)
+    // // Compoment table buttons
+    // window.componentButtons = () => ({
+    //     btnAdd: {
+    //         text: '{{ trans('general.create') }}',
+    //         icon: 'fa fa-plus',
+    //         event () {
+    //             window.location.href = '{{ route('components.create') }}';
+    //         },
+    //         attributes: {
+    //             title: '{{ trans('general.create') }}',
+    //             @if ($snipeSettings->shortcuts_enabled == 1)
+    //             accesskey: 'n'
+    //             @endif
+    //         }
+    //     },
+    // });
+    // @endcan
 
     @can('create', \App\Models\Consumable::class)
     // Consumable table buttons
