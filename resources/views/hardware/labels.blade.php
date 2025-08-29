@@ -263,9 +263,12 @@
 
                 @if ($asset->last_checkout)
                     <div class="pull-left">
-                        Livraison: <strong> 
-                           @if ($asset->assignedToUser)
+                        Livraison: <strong>  
+                           @if ($asset->assignedType () =="user")
                                 {{ $asset->assignedTouser->first_name . ' ' . $asset->assignedTouser->last_name}}
+                    
+                                @elseif ($asset->assignedType () == 'location')
+                         {{ $asset->assignedToLocation->name }}
                             @endif
                             ({{ \Carbon\Carbon::parse($asset->last_checkout)->format('d/m/Y') }})</strong>
                     </div>

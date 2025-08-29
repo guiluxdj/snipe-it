@@ -541,6 +541,10 @@ class Asset extends Depreciable
     {
         return $this->belongsTo(User::class, 'assigned_to');
     }
+    public function assignedToLocation()
+    {
+        return $this->belongsTo(Location::class, 'assigned_to');
+    }
     /**
      * Gets assets assigned to this asset
      *
