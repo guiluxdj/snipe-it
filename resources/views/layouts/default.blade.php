@@ -215,7 +215,7 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                         @can('create', \App\Models\Asset::class)
                                             <li{!! (request()->is('hardware/create') ? ' class="active"' : '') !!}>
                                                 <a href="{{ route('hardware.create') }}" tabindex="-1">
-                                                    <x-icon type="assets" />
+                                                    <x-icon type="assets" class="fa-fw" />
                                                     {{ trans('general.asset') }}
                                                 </a>
                                             </li>
@@ -223,7 +223,7 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                         @can('create', \App\Models\License::class)
                                             <li{!! (request()->is('licenses/create') ? ' class="active"' : '') !!}>
                                                 <a href="{{ route('licenses.create') }}" tabindex="-1">
-                                                    <x-icon type="licenses" />
+                                                    <x-icon type="licenses" class="fa-fw" />
                                                     {{ trans('general.license') }}
                                                 </a>
                                             </li>
@@ -231,7 +231,7 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                         @can('create', \App\Models\Accessory::class)
                                             <li {!! (request()->is('accessories/create') ? 'class="active"' : '') !!}>
                                                 <a href="{{ route('accessories.create') }}" tabindex="-1">
-                                                    <x-icon type="accessories" />
+                                                    <x-icon type="accessories" class="fa-fw" />
                                                     {{ trans('general.accessory') }}
                                                 </a>
                                             </li>
@@ -239,7 +239,7 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                         @can('create', \App\Models\Consumable::class)
                                             <li {!! (request()->is('consunmables/create') ? 'class="active"' : '') !!}>
                                                 <a href="{{ route('consumables.create') }}" tabindex="-1">
-                                                    <x-icon type="consumables" />
+                                                    <x-icon type="consumables" class="fa-fw" />
                                                     {{ trans('general.consumable') }}
                                                 </a>
                                             </li>
@@ -247,7 +247,7 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                         {{-- @can('create', \App\Models\Component::class)
                                             <li {!! (Request::is('components/create') ? 'class="active"' : '') !!}>
                                                 <a href="{{ route('components.create') }}" tabindex="-1">
-                                                    <x-icon type="components" />
+                                                    <x-icon type="components" class="fa-fw" />
                                                     {{ trans('general.component') }}
                                                 </a>
                                             </li>
@@ -255,7 +255,7 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                         @can('create', \App\Models\User::class)
                                             <li {!! (request()->is('users/create') ? 'class="active"' : '') !!}>
                                                 <a href="{{ route('users.create') }}" tabindex="-1">
-                                                    <x-icon type="users" />
+                                                    <x-icon type="users" class="fa-fw" />
                                                     {{ trans('general.user') }}
                                                 </a>
                                             </li>
@@ -279,48 +279,62 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                         @endif
                                     </a>
                                     <ul class="dropdown-menu">
-                                        @can('superadmin')
-                                            @if($deprecations)
-                                                @foreach ($deprecations as $key => $deprecation)
-                                                    @if ($deprecation['check'])
-                                                        <li class="header alert-warning">{!! $deprecation['message'] !!}</li>
-                                                    @endif
-                                                @endforeach
-                                            @endif
-                                        @endcan
-                                        @if($alert_items)
-                                        <li class="header">{{ trans_choice('general.quantity_minimum', count($alert_items)) }}</li>
-                                            <li>
-                                            <!-- inner menu: contains the actual data -->
-                                                <ul class="menu">
-                                                    @for($i = 0; count($alert_items) > $i; $i++)
 
-                                                        <li><!-- Task item -->
-                                                            <a href="{{ route($alert_items[$i]['type'].'.show', $alert_items[$i]['id'])}}">
-                                                                <h2 class="task_menu">{{ $alert_items[$i]['name'] }}
-                                                                    <small class="pull-right">
-                                                                        {{ $alert_items[$i]['remaining'] }} {{ trans('general.remaining') }}
-                                                                    </small>
-                                                                </h2>
-                                                                <div class="progress xs">
-                                                                    <div class="progress-bar progress-bar-yellow"
-                                                                         style="width: {{ $alert_items[$i]['percent'] }}%"
-                                                                         role="progressbar"
-                                                                         aria-valuenow="{{ $alert_items[$i]['percent'] }}"
-                                                                         aria-valuemin="0" aria-valuemax="100">
-                                                                        <span class="sr-only">{{ $alert_items[$i]['percent'] }}% Complete</span>
+                                        @if ((count($alert_items) + count($deprecations)) > 0)
+
+                                            @can('superadmin')
+                                                @if($deprecations)
+                                                    @foreach ($deprecations as $key => $deprecation)
+                                                        @if ($deprecation['check'])
+                                                            <li class="header alert-warning">{!! $deprecation['message'] !!}</li>
+                                                        @endif
+                                                    @endforeach
+                                                @endif
+                                            @endcan
+
+                                            @if($alert_items)
+                                                <li class="header">
+                                                    {{ trans_choice('general.quantity_minimum', count($alert_items)) }}
+                                                </li>
+                                                <li>
+                                                <!-- inner menu: contains the actual data -->
+                                                    <ul class="menu">
+                                                        @for($i = 0; count($alert_items) > $i; $i++)
+                                                            <!-- Task item -->
+                                                            <li>
+                                                                <a href="{{ route($alert_items[$i]['type'].'.show', $alert_items[$i]['id'])}}">
+                                                                    <h2 class="task_menu">{{ $alert_items[$i]['name'] }}
+                                                                        <small class="pull-right">
+                                                                            {{ $alert_items[$i]['remaining'] }} {{ trans('general.remaining') }}
+                                                                        </small>
+                                                                    </h2>
+                                                                    <div class="progress xs">
+                                                                        <div class="progress-bar progress-bar-yellow"
+                                                                             style="width: {{ $alert_items[$i]['percent'] }}%"
+                                                                             role="progressbar"
+                                                                             aria-valuenow="{{ $alert_items[$i]['percent'] }}"
+                                                                             aria-valuemin="0" aria-valuemax="100">
+                                                                            <span class="sr-only">
+                                                                                {{ $alert_items[$i]['percent'] }}%
+                                                                            </span>
+                                                                        </div>
                                                                     </div>
-                                                                </div>
-                                                            </a>
-                                                        </li>
-                                                        <!-- end task item -->
-                                                    @endfor
-                                                </ul>
+                                                                </a>
+                                                            </li>
+                                                            <!-- end task item -->
+                                                        @endfor
+                                                    </ul>
+                                                </li>
+                                            @endif
+                                        @else
+                                            <li class="header">
+                                                {{ trans_choice('general.quantity_minimum', 0) }}
                                             </li>
+
                                         @endif
-                                        {{-- <li class="footer">
-                                          <a href="#">{{ trans('general.tasks_view_all') }}</a>
-                                        </li> --}}
+{{--                                        <li class="footer">--}}
+{{--                                          <a href="#">{{ trans('general.tasks_view_all') }}</a>--}}
+{{--                                        </li>--}}
                                     </ul>
                                 </li>
                             @endcan
@@ -339,7 +353,7 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                         @endif
 
                                         <span class="hidden-xs">
-                                            {{ Auth::user()->getFullNameAttribute() }}
+                                            {{ Auth::user()->display_name }}
                                             <strong class="caret"></strong>
                                         </span>
                                     </a>
@@ -574,7 +588,7 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                         </li>
                                         <li {!! (request()->is('maintenances') ? ' class="active"' : '') !!}>
                                             <a href="{{ route('maintenances.index') }}">
-                                                {{ trans('general.asset_maintenances') }}
+                                                {{ trans('general.maintenances') }}
                                             </a>
                                         </li>
                                     @endcan
@@ -637,7 +651,7 @@ dir="{{ Helper::determineLanguageDirection() }}">
                         @endcan
 
                         @can('view', \App\Models\User::class)
-                                <li id="users-sidenav-option"{!! (request()->is('users*') ? ' class="active"' : '') !!}>
+                                <li class="treeview{{ (request()->is('users*') ? ' active' : '') }}" id="users-sidenav-option">
                                     <a href="#" {{$snipeSettings->shortcuts_enabled == 1 ? "accesskey=6" : ''}}>
                                         <x-icon type="users" class="fa-fw" />
                                         <span>{{ trans('general.people') }}</span>
@@ -645,28 +659,40 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                     </a>
 
                                     <ul class="treeview-menu">
-                                        <li {!! ((request()->is('users')  && (request()->input() == null)) ? ' class="active"' : '') !!}>
+                                        <li {!! ((request()->is('users')  && (request()->input() == null)) ? ' class="active"' : '') !!} id="users-sidenav-list-all">
                                             <a href="{{ route('users.index') }}">
-                                                <x-icon type="circle" class="text-grey fa-fw"/>
+                                                <x-icon type="circle" class="text-grey fa-fw fa-fw"/>
                                                 {{ trans('general.list_all') }}
                                             </a>
                                         </li>
-                                        <li class="{{ (request()->is('users') && request()->input('superadmins') == "true") ? 'active' : '' }}">
+                                        <li class="{{ (request()->is('users') && request()->input('superadmins') == "true") ? 'active' : '' }}" id="users-sidenav-superadmins">
                                             <a href="{{ route('users.index', ['superadmins' => 'true']) }}">
-                                                <x-icon type="superadmin" class="text-danger"/>
+                                                <x-icon type="superadmin" class="text-danger fa-fw"/>
                                                 {{ trans('general.show_superadmins') }}
                                             </a>
                                         </li>
-                                        <li class="{{ (request()->is('users') && request()->input('admins') == "true") ? 'active' : '' }}">
+                                        <li class="{{ (request()->is('users') && request()->input('admins') == "true") ? 'active' : '' }}" id="users-sidenav-list-admins">
                                             <a href="{{ route('users.index', ['admins' => 'true']) }}">
-                                                <x-icon type="admin" class="text-warning"/>
+                                                <x-icon type="admin" class="text-warning fa-fw"/>
                                                 {{ trans('general.show_admins') }}
                                             </a>
                                         </li>
-                                        <li class="{{ (request()->is('users') && request()->input('status') == "deleted") ? 'active' : '' }}">
+                                        <li class="{{ (request()->is('users') && request()->input('status') == "deleted") ? 'active' : '' }}" id="users-sidenav-deleted">
                                             <a href="{{ route('users.index', ['status' => 'deleted']) }}">
-                                                <x-icon type="x" class="text-danger"/>
+                                                <x-icon type="x" class="text-danger fa-fw"/>
                                                 {{ trans('general.deleted_users') }}
+                                            </a>
+                                        </li>
+                                        <li class="{{ (request()->is('users') && request()->input('activated') == "1") ? 'active' : '' }}" id="users-sidenav-activated">
+                                            <a href="{{ route('users.index', ['activated' => true]) }}">
+                                                <i class="fa-solid fa-person-circle-check text-success fa-fw"></i>
+                                                {{ trans('general.login_enabled') }}
+                                            </a>
+                                        </li>
+                                        <li class="{{ (request()->is('users') && request()->input('activated') == "0") ? 'active' : '' }}" id="users-sidenav-not-activated">
+                                            <a href="{{ route('users.index', ['activated' => false]) }}">
+                                                <i class="fa-solid fa-person-circle-xmark text-danger fa-fw"></i>
+                                                {{ trans('general.login_disabled') }}
                                             </a>
                                         </li>
                                     </ul>
@@ -806,8 +832,8 @@ dir="{{ Helper::determineLanguageDirection() }}">
                                             {{ trans('general.license_report') }}
                                         </a>
                                     </li>
-                                    <li {{!! (request()->is('reports/asset_maintenances') ? ' class="active"' : '') !!}}>
-                                        <a href="{{ url('reports/asset_maintenances') }}">
+                                    <li {{!! (request()->is('ui.reports.maintenances') ? ' class="active"' : '') !!}}>
+                                        <a href="{{ route('ui.reports.maintenances') }}">
                                             {{ trans('general.asset_maintenance_report') }}
                                         </a>
                                     </li>
@@ -1143,6 +1169,7 @@ dir="{{ Helper::determineLanguageDirection() }}">
                     $(inputElement).closest('.help-block').remove();
                 },
                 onfocusout: function(element) {
+                    $(element).parent().removeClass('has-error');
                     return $(element).valid();
                 },
 

@@ -338,6 +338,7 @@
                   'deployed': '{{ strtolower(trans('general.deployed')) }}',
                   'deployable': '{{ strtolower(trans('admin/hardware/general.deployable')) }}',
                   'archived': '{{ strtolower(trans('general.archived')) }}',
+                  'undeployable': '{{ strtolower(trans('general.undeployable')) }}',
                   'pending': '{{ strtolower(trans('general.pending')) }}'
                 }
 
@@ -368,19 +369,21 @@
 
                 // Add some overrides for any funny urls we have
                 var dest = destination;
-                var dpolymorphicItemFormatterest = '';
-                if (destination=='fieldsets') {
-                    var dpolymorphicItemFormatterest = 'fields/';
-                }
+                var polymorphicItemFormatterDest = '';
+                if (destination == 'fieldsets') {
+                    var polymorphicItemFormatterDest = 'fields/';
+                } 
 
-                return '<nobr><a href="{{ config('app.url') }}/' + dpolymorphicItemFormatterest + dest + '/' + value.id + '">' + value.name + '</a></span>';
+                return '<nobr><a href="{{ config('app.url') }}/' + polymorphicItemFormatterDest + dest + '/' + value.id + '">' + value.name + '</a></span>';
             }
         };
     }
 
 
     function licenseKeyFormatter(value, row) {
-        return '<code class="single-line"><span class="js-copy-link" data-clipboard-target=".js-copy-key-' + row.id + '" aria-hidden="true" data-tooltip="true" data-placement="top" title="{{ trans('general.copy_to_clipboard') }}"><span class="js-copy-key-' + row.id + '">' + value + '</span></span></code>';
+        if (value) {
+            return '<code class="single-line"><span class="js-copy-link" data-clipboard-target=".js-copy-key-' + row.id + '" aria-hidden="true" data-tooltip="true" data-placement="top" title="{{ trans('general.copy_to_clipboard') }}"><span class="js-copy-key-' + row.id + '">' + value + '</span></span></code>';
+        }
     }
 
 
@@ -436,8 +439,6 @@
 
                 if (row.name) {
                     var name_for_box = row.name
-                } else if (row.title) {
-                    var name_for_box = row.title
                 } else if (row.asset_tag) {
                     var name_for_box = row.asset_tag
                 }
@@ -501,6 +502,9 @@
             } else if (value.type == 'location') {
                 item_destination = 'locations'
                 item_icon = 'fas fa-map-marker-alt';
+            } else if (value.type == 'maintenance') {
+                item_destination = 'maintenances'
+                item_icon = 'fa-solid fa-screwdriver-wrench';
             } else if (value.type == 'model') {
                 item_destination = 'models'
                 item_icon = '';
@@ -552,16 +556,38 @@
         }
     }
 
+    function licenseInOutFormatter(value, row) {
 
+        // check that checkin is not disabled
+        if (row.user_can_checkout === false) {
+            return '<span class="btn btn-sm bg-maroon disabled" data-tooltip="true" title="{{ trans('admin/licenses/message.checkout.unavailable') }}">{{ trans('general.checkout') }}</span>';
+        } else if (row.disabled === true) {
+            return '<span class="btn btn-sm bg-maroon disabled" data-tooltip="true" title="{{ trans('admin/licenses/message.checkout.license_is_inactive') }}">{{ trans('general.checkout') }}</span>';
+
+        } else
+            // The user is allowed to check the license seat out and it's available
+        if ((row.available_actions.checkout === true) && (row.user_can_checkout === true) && (row.disabled === false)) {
+            return '<a href="{{ config('app.url') }}/licenses/' + row.id + '/checkout/" class="btn btn-sm bg-maroon" data-tooltip="true" title="{{ trans('general.checkout_tooltip') }}">{{ trans('general.checkout') }}</a>';
+        }
+    }
     // We need a special formatter for license seats, since they don't work exactly the same
     // Checkouts need the license ID, checkins need the specific seat ID
 
     function licenseSeatInOutFormatter(value, row) {
-        // The user is allowed to check the license seat out and it's available
-        if ((row.available_actions.checkout === true) && (row.user_can_checkout === true) && ((!row.asset_id) && (!row.assigned_to))) {
-            return '<a href="{{ config('app.url') }}/licenses/' + row.license_id + '/checkout/'+row.id+'" class="btn btn-sm bg-maroon" data-tooltip="true" title="{{ trans('general.checkout_tooltip') }}">{{ trans('general.checkout') }}</a>';
-        } else {
+        if (row.disabled && (row.assigned_user || row.assigned_asset)) {
             return '<a href="{{ config('app.url') }}/licenses/' + row.id + '/checkin" class="btn btn-sm bg-purple" data-tooltip="true" title="{{ trans('general.checkin_tooltip') }}">{{ trans('general.checkin') }}</a>';
+        }
+        if (row.disabled) {
+            return '<a href="{{ config('app.url') }}/licenses/' + row.id + '/checkin" class="btn btn-sm bg-maroon disabled" data-tooltip="true" title="{{ trans('general.checkin_tooltip') }}">{{ trans('general.checkout') }}</a>';
+        }
+        // The user is allowed to check the license seat out and it's available
+        if ((row.available_actions.checkout === true) && (row.user_can_checkout === true) && ((!row.assigned_asset) && (!row.assigned_user))) {
+            return '<a href="{{ config('app.url') }}/licenses/' + row.license_id + '/checkout/'+row.id+'" class="btn btn-sm bg-maroon" data-tooltip="true" title="{{ trans('general.checkout_tooltip') }}">{{ trans('general.checkout') }}</a>';
+        }
+
+        // The user is allowed to check the license seat in and it's available
+        if ((row.available_actions.checkin === true) && ((row.assigned_asset) || (row.assigned_user))) {
+            return '<a href="{{ config('app.url') }}/licenses/' + row.id + '/checkin/" class="btn btn-sm bg-purple" data-tooltip="true" title="{{ trans('general.checkin_tooltip') }}">{{ trans('general.checkin') }}</a>';
         }
 
     }
@@ -616,25 +642,25 @@
 
 
     var formatters = [
-        'hardware',
         'accessories',
-        'consumables',
-        'components',
-        'locations',
-        'users',
-        'manufacturers',
-        'maintenances',
-        'statuslabels',
-        'models',
-        'licenses',
         'categories',
-        'suppliers',
-        'departments',
         'companies',
+        'components',
+        'consumables',
+        'departments',
         'depreciations',
         'fieldsets',
         'groups',
-        'kits'
+        'hardware',
+        'kits',
+        'licenses',
+        'locations',
+        'maintenances',
+        'manufacturers',
+        'models',
+        'statuslabels',
+        'suppliers',
+        'users',
     ];
 
     for (var i in formatters) {
@@ -772,6 +798,13 @@
     function phoneFormatter(value) {
         if (value) {
             return  '<span style="white-space: nowrap;"><a href="tel:' + value + '" data-tooltip="true" title="{{ trans('general.call') }}"><x-icon type="phone" /> ' + value + '</a></span>';
+        }
+    }
+
+    // Create a linked phone number in the table list
+    function mobileFormatter(value) {
+        if (value) {
+            return  '<span style="white-space: nowrap;"><a href="tel:' + value + '" data-tooltip="true" title="{{ trans('general.call') }}"><x-icon type="mobile" /> ' + value + '</a></span>';
         }
     }
 
@@ -956,10 +989,14 @@
             var download_button = '<a href="' + download_url + '" class="btn btn-sm btn-default" data-tooltip="true" title="{{ trans('general.download') }}"><x-icon type="download" /></a>';
             var download_button_disabled = '<span data-tooltip="true" title="{{ trans('general.file_does_not_exist') }}"><a class="btn btn-sm btn-default disabled"><x-icon type="download" /></a></span>';
             var inline_button = '<a href="'+ download_url +'?inline=true" class="btn btn-sm btn-default" target="_blank" data-tooltip="true" title="{{ trans('general.open_new_window') }}"><x-icon type="external-link" /></a>';
-            var inline_button_disabled = '<span data-tooltip="true" title="{{ trans('general.file_does_not_exist') }}"><a class="btn btn-sm btn-default disabled" target="_blank" data-tooltip="true" title="{{ trans('general.file_does_not_exist') }}"><x-icon type="external-link" /></a></span>';
+            var inline_button_disabled = '<span data-tooltip="true" title="{{ trans('general.file_not_inlineable') }}"><a class="btn btn-sm btn-default disabled" target="_blank" data-tooltip="true" title="{{ trans('general.file_does_not_exist') }}"><x-icon type="external-link" /></a></span>';
 
             if (exists_on_disk === true) {
-                return '<span style="white-space: nowrap;">' + download_button + ' ' + inline_button + '</span>';
+                if (inlinable === true) {
+                    return '<span style="white-space: nowrap;">' + download_button + ' ' + inline_button + '</span>';
+                } else {
+                    return '<span style="white-space: nowrap;">' + download_button + ' ' + inline_button_disabled + '</span>';
+                }
             } else {
                 return '<span style="white-space: nowrap;">' + download_button_disabled + ' ' + inline_button_disabled + '</span>';
             }
@@ -1004,7 +1041,7 @@
                 destination = row.item.type;
             }
 
-            return '<a href="{{ config('app.url') }}/' + destination + '/' + row.item.id + '/showfile/' + row.id + '/delete" '
+            return '<a href="{{ config('app.url') }}/' + destination + '/' + row.item.id + '/files/' + row.id + '/delete" '
                 + ' data-target="#dataConfirmModal" class="actions btn btn-danger btn-sm delete-asset" data-tooltip="true"  '
                 + ' data-toggle="modal" data-icon="fa-trash"'
                 + ' data-content="{{ trans('general.file_upload_status.confirm_delete') }}: ' + row.filename + '?" '
@@ -1238,6 +1275,7 @@
             },
             attributes: {
                 title: '{{ trans('general.create') }}',
+                class: 'btn btn-primary',
                 @if ($snipeSettings->shortcuts_enabled == 1)
                 accesskey: 'n'
                 @endif
@@ -1270,7 +1308,7 @@
 
         btnShowDeleted: {
             text: '{{ (request()->input('status') == "deleted") ?trans('admin/users/table.show_current') : trans('admin/users/table.show_deleted') }}',
-            icon: 'fa-solid fa-user-slash {{ (request()->input('status') == "deleted") ? ' text-danger' : ' fa-user-slash' }}',
+            icon: 'fa-solid fa-trash {{ (request()->input('status') == "deleted") ? ' text-danger' : ' fa-user-trash' }}',
             event () {
                 window.location.href = '{{ (request()->input('status') == "deleted") ? route('users.index') : route('users.index', ['status' => 'deleted']) }}';
             },
@@ -1293,6 +1331,7 @@
                 window.location.href = '{{ route('companies.create') }}';
             },
             attributes: {
+                class: 'btn btn-primary',
                 title: '{{ trans('general.create') }}',
                 @if ($snipeSettings->shortcuts_enabled == 1)
                 accesskey: 'n'
@@ -1315,6 +1354,7 @@
             },
             attributes: {
                 title: '{{ trans('general.create') }}',
+                class: 'btn btn-primary',
                 @if ($snipeSettings->shortcuts_enabled == 1)
                 accesskey: 'n'
                 @endif
@@ -1330,7 +1370,7 @@
                 window.location.href = '{{ route('maintenances.create', ['asset_id' => (isset($asset)) ? $asset->id :'' ]) }}';
             },
             attributes: {
-                title: '{{ trans('general.create') }}',
+                title: '{{ trans('button.add_maintenance') }}',
             }
         },
         @endcan
@@ -1370,10 +1410,23 @@
                 window.location.href = '{{ route('locations.create') }}';
             },
             attributes: {
+                class: 'btn btn-primary',
                 title: '{{ trans('general.create') }}',
                 @if ($snipeSettings->shortcuts_enabled == 1)
                 accesskey: 'n'
                 @endif
+            }
+        },
+
+        btnShowDeleted: {
+            text: '{{ (request()->input('status') == "deleted") ? trans('admin/users/table.show_current') : trans('admin/users/table.show_deleted') }}',
+            icon: 'fa-solid fa-trash {{ (request()->input('status') == "deleted") ? ' text-danger' : ' fa-user-trash' }}',
+            event () {
+                window.location.href = '{{ (request()->input('status') == "deleted") ? route('locations.index') : route('locations.index', ['status' => 'deleted']) }}';
+            },
+            attributes: {
+                title: '{{ (request()->input('status') == "deleted") ? trans('admin/users/table.show_current') : trans('admin/users/table.show_deleted') }}',
+
             }
         },
     });
@@ -1389,6 +1442,7 @@
                 window.location.href = '{{ route('accessories.create') }}';
             },
             attributes: {
+                class: 'btn btn-primary',
                 title: '{{ trans('general.create') }}',
                 @if ($snipeSettings->shortcuts_enabled == 1)
                     accesskey: 'n'
@@ -1408,6 +1462,7 @@
                 window.location.href = '{{ route('depreciations.create') }}';
             },
             attributes: {
+                class: 'btn btn-primary',
                 title: '{{ trans('general.create') }}',
                 @if ($snipeSettings->shortcuts_enabled == 1)
                 accesskey: 'n'
@@ -1427,6 +1482,7 @@
                 window.location.href = '{{ route('fields.create') }}';
             },
             attributes: {
+                class: 'btn btn-primary',
                 title: '{{ trans('general.create') }}',
                 @if ($snipeSettings->shortcuts_enabled == 1)
                 accesskey: 'n'
@@ -1447,6 +1503,7 @@
                 window.location.href = '{{ route('fieldsets.create') }}';
             },
             attributes: {
+                class: 'btn btn-primary',
                 title: '{{ trans('general.create') }}',
                 @if ($snipeSettings->shortcuts_enabled == 1)
                 accesskey: 'n'
@@ -1468,6 +1525,7 @@
                 window.location.href = '{{ route('consumables.create') }}';
             },
             attributes: {
+                class: 'btn btn-primary',
                 title: '{{ trans('general.create') }}',
                 @if ($snipeSettings->shortcuts_enabled == 1)
                 accesskey: 'n'
@@ -1487,6 +1545,7 @@
                 window.location.href = '{{ route('manufacturers.create') }}';
             },
             attributes: {
+                class: 'btn btn-primary',
                 title: '{{ trans('general.create') }}',
                 @if ($snipeSettings->shortcuts_enabled == 1)
                 accesskey: 'n'
@@ -1518,6 +1577,7 @@
                 window.location.href = '{{ route('suppliers.create') }}';
             },
             attributes: {
+                class: 'btn btn-primary',
                 title: '{{ trans('general.create') }}',
                 @if ($snipeSettings->shortcuts_enabled == 1)
                 accesskey: 'n'
@@ -1537,6 +1597,7 @@
                 window.location.href = '{{ route('licenses.create') }}';
             },
             attributes: {
+                class: 'btn btn-primary',
                 title: '{{ trans('general.create') }}',
                 @if ($snipeSettings->shortcuts_enabled == 1)
                 accesskey: 'n'
@@ -1556,6 +1617,7 @@
                 window.location.href = '{{ route('departments.create') }}';
             },
             attributes: {
+                class: 'btn btn-primary',
                 title: '{{ trans('general.create') }}',
                 @if ($snipeSettings->shortcuts_enabled == 1)
                 accesskey: 'n'
@@ -1575,6 +1637,7 @@
                 window.location.href = '{{ route('departments.create') }}';
             },
             attributes: {
+                class: 'btn btn-primary',
                 title: '{{ trans('general.create') }}',
                 @if ($snipeSettings->shortcuts_enabled == 1)
                 accesskey: 'n'
@@ -1594,6 +1657,7 @@
                 window.location.href = '{{ route('maintenances.create', ['asset_id' => (isset($asset)) ? $asset->id :'' ]) }}';
             },
             attributes: {
+                class: 'btn btn-primary',
                 title: '{{ trans('general.create') }}',
                 @if ($snipeSettings->shortcuts_enabled == 1)
                 accesskey: 'n'
@@ -1613,6 +1677,7 @@
                 window.location.href = '{{ route('categories.create') }}';
             },
             attributes: {
+                class: 'btn btn-primary',
                 title: '{{ trans('general.create') }}',
                 @if ($snipeSettings->shortcuts_enabled == 1)
                 accesskey: 'n'
@@ -1632,6 +1697,7 @@
                 window.location.href = '{{ route('models.create') }}';
             },
             attributes: {
+                class: 'btn btn-primary',
                 title: '{{ trans('general.create') }}',
                 @if ($snipeSettings->shortcuts_enabled == 1)
                 accesskey: 'n'
@@ -1645,7 +1711,7 @@
                 window.location.href = '{{ (request()->input('status') == "deleted") ? route('models.index') : route('models.index', ['status' => 'deleted']) }}';
             },
             attributes: {
-                title: '{{ (request()->input('status') == "Deleted") ? trans('general.list_all') : trans('general.deleted') }}',
+                title: '{{ (request()->input('status') == "deleted") ? trans('general.list_all') : trans('general.deleted') }}',
 
             }
         },
@@ -1662,6 +1728,7 @@
                 window.location.href = '{{ route('statuslabels.create') }}';
             },
             attributes: {
+                class: 'btn btn-primary',
                 title: '{{ trans('general.create') }}',
                 @if ($snipeSettings->shortcuts_enabled == 1)
                 accesskey: 'n'
@@ -1682,6 +1749,7 @@
                 window.location.href = '{{ route('licenses.create') }}';
             },
             attributes: {
+                class: 'btn btn-primary',
                 title: '{{ trans('general.create') }}',
                 @if ($snipeSettings->shortcuts_enabled == 1)
                 accesskey: 'n'
@@ -1699,7 +1767,19 @@
             attributes: {
                 title: '{{ trans('general.export') }}'
             }
-        }
+        },
+
+        btnShowInactive: {
+            text: '{{ (request()->input('status') == "inactive") ? trans('general.list_all') : trans('general.show_inactive') }}',
+            icon: 'fas fa-clock {{ (request()->input('status') == "inactive") ? ' text-danger' : '' }}',
+            event () {
+                window.location.href = '{{ (request()->input('status') == "inactive") ? route('licenses.index') : route('licenses.index', ['status' => 'inactive']) }}';
+            },
+            attributes: {
+                title: '{{ (request()->input('status') == "inactive") ? trans('general.list_all') : trans('general.show_inactive') }}',
+
+            }
+        },
     });
 
 
