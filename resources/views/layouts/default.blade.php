@@ -1845,13 +1845,7 @@
                         @endif
                     @endif
 
-                    @if (isset($user) && ($user->isSuperUser()) && (app()->environment('local')))
-                       <a href="{{ url('telescope') }}" class="label label-default" rel="noopener">Open Telescope</a>
-                    @endif
-
-
-
-
+               
                     @if ($snipeSettings->support_footer!='off')
                         @if (($snipeSettings->support_footer=='on') || (($snipeSettings->support_footer=='admin') && (Auth::user()->isSuperUser()=='1')))
                             <a target="_blank" class="label label-default"
