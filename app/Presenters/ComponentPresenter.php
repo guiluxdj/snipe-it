@@ -21,6 +21,13 @@ class ComponentPresenter extends Presenter
                 'switchable' => true,
                 'title' => trans('general.id'),
                 'visible' => false,
+            ], [
+                'field' => 'name',
+                'searchable' => true,
+                'sortable' => true,
+                'title' => trans('general.name'),
+                'visible' => true,
+                'formatter' => 'componentsLinkFormatter',
             ],
             [
                 'field' => 'company',
@@ -31,14 +38,7 @@ class ComponentPresenter extends Presenter
                 'visible' => false,
                 'formatter' => 'companiesLinkObjFormatter',
             ],
-            [
-                'field' => 'name',
-                'searchable' => true,
-                'sortable' => true,
-                'title' => trans('general.name'),
-                'visible' => true,
-                'formatter' => 'componentsLinkFormatter',
-            ], [
+             [
                 'field' => 'image',
                 'searchable' => false,
                 'sortable' => true,
@@ -131,7 +131,7 @@ class ComponentPresenter extends Presenter
                 'class' => 'text-right',
             ], [
                 'field' => 'total_cost',
-                'searchable' => true,
+                'searchable' => false,
                 'sortable' => true,
                 'title' => trans('general.total_cost'),
                 'footerFormatter' => 'sumFormatterQuantity',
@@ -197,7 +197,11 @@ class ComponentPresenter extends Presenter
      */
     public function nameUrl()
     {
-        return (string) link_to_route('consumables.show', e($this->name), $this->id);
+        if (auth()->user()->can('view', ['\App\Models\Component', $this])) {
+            return (string)link_to_route('components.show', e($this->display_name), $this->id);
+        } else {
+            return e($this->display_name);
+        }
     }
 
     /**
@@ -206,6 +210,6 @@ class ComponentPresenter extends Presenter
      */
     public function viewUrl()
     {
-        return route('accessories.show', $this->id);
+        return route('components.show', $this->id);
     }
 }

@@ -3,7 +3,7 @@
 namespace App\Presenters;
 
 /**
- * Class LocationPresenter
+ * Class SupplierPresenter
  */
 class SupplierPresenter extends Presenter
 {
@@ -13,6 +13,11 @@ class SupplierPresenter extends Presenter
     public static function dataTableLayout()
     {
         $layout = [
+            [
+                'field'        => 'checkbox',
+                'checkbox'     => true,
+                'titleTooltip' => trans('general.select_all_none'),
+            ],
              [
                 'field' => 'id',
                 'searchable' => false,
@@ -151,6 +156,14 @@ class SupplierPresenter extends Presenter
                 'visible' => false,
                 'formatter'    => 'phoneFormatter',
             ], [
+                'field' => 'tag_color',
+                'searchable' => true,
+                'sortable' => true,
+                'switchable' => true,
+                'title' => trans('general.tag_color'),
+                'visible' => false,
+                'formatter' => 'colorTagFormatter',
+            ],[
                 'field' => 'notes',
                 'searchable' => true,
                 'sortable' => true,
@@ -194,7 +207,11 @@ class SupplierPresenter extends Presenter
      */
     public function nameUrl()
     {
-        return (string) link_to_route('suppliers.show', $this->name, $this->id);
+        if (auth()->user()->can('view', ['\App\Models\Supplier', $this])) {
+            return (string)link_to_route('suppliers.show', e($this->display_name), $this->id);
+        } else {
+            return e($this->display_name);
+        }
     }
 
     /**
@@ -212,7 +229,11 @@ class SupplierPresenter extends Presenter
      */
     public function viewUrl()
     {
-        return route('suppliers.show', $this->id);
+        if (auth()->user()->can('view', ['\App\Models\Supplier', $this])) {
+            return (string)link_to_route('suppliers.show', $this->display_name, $this->id);
+        } else {
+            return e($this->display_name);
+        }
     }
 
     public function glyph()
@@ -223,5 +244,14 @@ class SupplierPresenter extends Presenter
     public function fullName()
     {
         return $this->name;
+    }
+
+    public function formattedNameLink() {
+
+        if (auth()->user()->can('view', ['\App\Models\Supplier', $this])) {
+            return ($this->tag_color ? "<i class='fa-solid fa-square fa-fw' style='color: ".e($this->tag_color)."' aria-hidden='true'></i> " : '').'<a href="'.route('suppliers.show', e($this->id)).'">'.e($this->name).'</a>';
+        }
+
+        return ($this->tag_color ? "<i class='fa-solid fa-square fa-fw' style='color: ".e($this->tag_color)."' aria-hidden='true'></i> " : '').e($this->name);
     }
 }

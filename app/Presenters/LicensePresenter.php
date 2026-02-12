@@ -21,6 +21,13 @@ class LicensePresenter extends Presenter
                 'switchable' => true,
                 'title' => trans('general.id'),
                 'visible' => false,
+            ],  [
+                'field' => 'name',
+                'searchable' => true,
+                'sortable' => true,
+                'switchable' => false,
+                'title' => trans('general.name'),
+                'formatter' => 'licensesLinkFormatter',
             ], [
                 'field' => 'company',
                 'searchable' => true,
@@ -29,13 +36,6 @@ class LicensePresenter extends Presenter
                 'title' => trans('admin/companies/table.title'),
                 'visible' => false,
                 'formatter' => 'companiesLinkObjFormatter',
-            ], [
-                'field' => 'name',
-                'searchable' => true,
-                'sortable' => true,
-                'switchable' => false,
-                'title' => trans('general.name'),
-                'formatter' => 'licensesLinkFormatter',
             ], [
                 'field' => 'product_key',
                 'searchable' => true,
@@ -47,6 +47,13 @@ class LicensePresenter extends Presenter
                 'searchable' => true,
                 'sortable' => true,
                 'title' => trans('admin/licenses/form.expiration'),
+                'formatter' => 'dateDisplayFormatter',
+            ], [
+                'field' => 'termination_date',
+                'searchable' => true,
+                'sortable' => true,
+                'visible' => false,
+                'title' => trans('admin/licenses/form.termination_date'),
                 'formatter' => 'dateDisplayFormatter',
             ], [
                 'field' => 'license_email',
@@ -108,14 +115,6 @@ class LicensePresenter extends Presenter
                 'sortable' => true,
                 'visible' => false,
                 'title' => trans('general.purchase_date'),
-                'formatter' => 'dateDisplayFormatter',
-            ],
-            [
-                'field' => 'termination_date',
-                'searchable' => true,
-                'sortable' => true,
-                'visible' => false,
-                'title' => trans('admin/licenses/form.termination_date'),
                 'formatter' => 'dateDisplayFormatter',
             ],
             [
@@ -249,10 +248,20 @@ class LicensePresenter extends Presenter
                 'title' => trans('admin/users/table.email'),
                 'visible' => true,
                 'formatter' => 'emailFormatter',
-            ], [
-                'field' => 'department',
+            ],
+            [
+                'field' => 'assigned_user.company',
                 'searchable' => false,
-                'sortable' => true,
+                'sortable' => false,
+                'switchable' => true,
+                'title' => trans('general.company'),
+                'visible' => true,
+                'formatter' => 'companiesLinkObjFormatter',
+            ],
+            [
+                'field' => 'assigned_user.department',
+                'searchable' => false,
+                'sortable' => false,
                 'switchable' => true,
                 'title' => trans('general.department'),
                 'visible' => false,
@@ -310,7 +319,12 @@ class LicensePresenter extends Presenter
      */
     public function nameUrl()
     {
-        return (string) link_to_route('licenses.show', $this->name, $this->id);
+        if (auth()->user()->can('view', ['\App\Models\License', $this])) {
+            return (string)link_to_route('licenses.show', e($this->display_name), $this->id);
+        } else {
+            return e($this->display_name);
+        }
+        
     }
 
     /**

@@ -26,15 +26,23 @@
                     </div>
                     <div class="box-body">
                         {{csrf_field()}}
-                        @if ($asset->company && $asset->company->name)
+                        @if ($asset->company)
+                            <!-- accessory name -->
                             <div class="form-group">
-                                <label for="company" class="col-md-3 control-label">
-                                    {{ trans('general.company') }}
-                                </label>
-                                <div class="col-md-8">
-                                    <p class="form-control-static" style="padding-top: 7px;">
-                                        {{ $asset->company->name }}
-                                    </p>
+                                <label class="col-sm-3 control-label">{{ trans('general.company') }}</label>
+                                <div class="col-md-6">
+                                    <p class="form-control-static">{!! $asset->company->present()->formattedNameLink  !!}</p>
+                                </div>
+                            </div>
+                        @endif
+
+
+                        @if ($asset->model->category)
+                            <!-- category name -->
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">{{ trans('general.category') }}</label>
+                                <div class="col-md-6">
+                                    <p class="form-control-static">{!! $asset->model->category->present()->formattedNameLink  !!}</p>
                                 </div>
                             </div>
                         @endif
@@ -149,7 +157,7 @@
                                 {!! $errors->first('note', '<span class="alert-msg" aria-hidden="true"><i class="fas fa-times" aria-hidden="true"></i> :message</span>') !!}
                             </div>
                         </div>
-                        
+
                         <!-- Custom fields -->
                         @include("models/custom_fields_form", [
                                 'model' => $asset->model,
@@ -159,7 +167,8 @@
 
 
                         @if ($asset->requireAcceptance() || $asset->getEula() || ($snipeSettings->webhook_endpoint!=''))
-                            <div class="form-group notification-callout">
+                            <div class="row">
+                            <div class="notification-callout">
                                 <div class="col-md-8 col-md-offset-3">
                                     <div class="callout callout-info">
 
@@ -181,6 +190,7 @@
                                         @endif
                                     </div>
                                 </div>
+                            </div>
                             </div>
                         @endif
 
