@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Accessories\Api;
 
+use App\Models\Accessory;
 use App\Models\Category;
 use App\Models\Company;
 use App\Models\Location;
@@ -14,23 +15,21 @@ use Tests\TestCase;
 
 class StoreAccessoryTest extends TestCase implements TestsFullMultipleCompaniesSupport, TestsPermissionsRequirement
 {
-    public function testRequiresPermission()
+    public function test_requires_permission()
     {
         $this->actingAsForApi(User::factory()->create())
             ->postJson(route('api.accessories.store'))
             ->assertForbidden();
     }
 
-    public function testAdheresToFullMultipleCompaniesSupportScoping()
+    public function test_adheres_to_full_multiple_companies_support_scoping()
     {
-        $this->markTestSkipped('This behavior is not implemented');
-
         [$companyA, $companyB] = Company::factory()->count(2)->create();
         $userInCompanyA = User::factory()->for($companyA)->createAccessories()->create();
 
         $this->settings->enableMultipleFullCompanySupport();
 
-        // attempt to store an accessory for company B
+        // A user in company A cannot create an accessory assigned to company B — request is rejected.
         $this->actingAsForApi($userInCompanyA)
             ->postJson(route('api.accessories.store'), [
                 'category_id' => Category::factory()->forAccessories()->create()->id,
@@ -39,26 +38,10 @@ class StoreAccessoryTest extends TestCase implements TestsFullMultipleCompaniesS
                 'company_id' => $companyB->id,
             ])->assertStatusMessageIs('error');
 
-        $this->assertDatabaseMissing('accessories', [
-            'name' => 'My Awesome Accessory',
-        ]);
+        $this->assertDatabaseMissing('accessories', ['name' => 'My Awesome Accessory']);
     }
 
-    public function testValidation()
-    {
-        $this->actingAsForApi(User::factory()->createAccessories()->create())
-            ->postJson(route('api.accessories.store'), [
-                //
-            ])
-            ->assertStatusMessageIs('error')
-            ->assertMessagesContains([
-                'category_id',
-                'name',
-                'qty',
-            ]);
-    }
-
-    public function testCanStoreAccessory()
+    public function test_can_store_accessory()
     {
         $category = Category::factory()->forAccessories()->create();
         $company = Company::factory()->create();

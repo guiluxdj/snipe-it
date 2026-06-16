@@ -3,6 +3,7 @@
 namespace Tests\Feature\Accessories\Ui;
 
 use App\Models\Accessory;
+use App\Models\Actionlog;
 use App\Models\Category;
 use App\Models\Company;
 use App\Models\Location;
@@ -13,14 +14,14 @@ use Tests\TestCase;
 
 class UpdateAccessoryTest extends TestCase
 {
-    public function testRequiresPermissionToSeeEditAccessoryPage()
+    public function test_requires_permission_to_see_edit_accessory_page()
     {
         $this->actingAs(User::factory()->create())
             ->get(route('accessories.edit', Accessory::factory()->create()))
             ->assertForbidden();
     }
 
-    public function testEditAccessoryPageRenders()
+    public function test_edit_accessory_page_renders()
     {
         $this->actingAs(User::factory()->editAccessories()->create())
             ->get(route('accessories.edit', Accessory::factory()->create()->id))
@@ -28,7 +29,7 @@ class UpdateAccessoryTest extends TestCase
             ->assertViewIs('accessories.edit');
     }
 
-    public function testDoesNotShowEditAccessoryPageFromAnotherCompany()
+    public function test_does_not_show_edit_accessory_page_from_another_company()
     {
         $this->settings->enableMultipleFullCompanySupport();
 
@@ -41,7 +42,7 @@ class UpdateAccessoryTest extends TestCase
             ->assertRedirect(route('accessories.index'));
     }
 
-    public function testCannotSetQuantityToAmountLowerThanWhatIsCheckedOut()
+    public function test_cannot_set_quantity_to_amount_lower_than_what_is_checked_out()
     {
         $accessory = Accessory::factory()->create(['qty' => 2]);
         $accessory->checkouts()->create(['assigned_to' => User::factory()->create()->id, 'qty' => 1]);
@@ -70,7 +71,7 @@ class UpdateAccessoryTest extends TestCase
             ]);
     }
 
-    public function testCanUpdateAccessory()
+    public function test_can_update_accessory()
     {
         [$companyA, $companyB] = Company::factory()->count(2)->create();
         [$categoryA, $categoryB] = Category::factory()->count(2)->create();
@@ -86,7 +87,7 @@ class UpdateAccessoryTest extends TestCase
             ->for($locationA)
             ->create([
                 'min_amt' => 1,
-                'qty' => 5
+                'qty' => 5,
             ]);
 
         $this->actingAs(User::factory()->editAccessories()->create())
@@ -123,5 +124,68 @@ class UpdateAccessoryTest extends TestCase
             'min_amt' => '10',
             'notes' => 'A new note',
         ]);
+    }
+
+    public function test_update_logs_changed_fields_in_log_meta()
+    {
+        $accessory = Accessory::factory()->create([
+            'qty' => 5,
+            'name' => 'Old Name',
+            'model_number' => null,
+            'location_id' => null,
+        ]);
+
+        $this->actingAs(User::factory()->editAccessories()->create())
+            ->put(route('accessories.update', $accessory), [
+                'redirect_option' => 'index',
+                'name' => 'New Name',
+                'qty' => '10',
+                'category_id' => (string) $accessory->category_id,
+            ]);
+
+        $log = Actionlog::where('item_type', Accessory::class)
+            ->where('item_id', $accessory->id)
+            ->where('action_type', 'update')
+            ->latest()
+            ->first();
+
+        $this->assertNotNull($log, 'No update log entry was created');
+        $this->assertNotNull($log->log_meta, 'log_meta was not stored');
+
+        $meta = json_decode($log->log_meta, true);
+        $this->assertEquals('5', $meta['qty']['old']);
+        $this->assertEquals('10', $meta['qty']['new']);
+        $this->assertEquals('Old Name', $meta['name']['old']);
+        $this->assertEquals('New Name', $meta['name']['new']);
+    }
+
+    public function test_no_op_update_does_not_create_log_entry()
+    {
+        $accessory = Accessory::factory()->create([
+            'qty' => 5,
+            'name' => 'Same Name',
+            'model_number' => null,
+            'location_id' => null,
+        ]);
+
+        $before = Actionlog::where('item_type', Accessory::class)
+            ->where('item_id', $accessory->id)
+            ->where('action_type', 'update')
+            ->count();
+
+        $this->actingAs(User::factory()->editAccessories()->create())
+            ->put(route('accessories.update', $accessory), [
+                'redirect_option' => 'index',
+                'name' => 'Same Name',
+                'qty' => '5',
+                'category_id' => (string) $accessory->category_id,
+            ]);
+
+        $after = Actionlog::where('item_type', Accessory::class)
+            ->where('item_id', $accessory->id)
+            ->where('action_type', 'update')
+            ->count();
+
+        $this->assertEquals($before, $after, 'A spurious log entry was created for a no-op update');
     }
 }

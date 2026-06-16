@@ -4,8 +4,9 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\FilterRequest;
 use App\Http\Requests\ImageUploadRequest;
-use App\Http\Transformers\AccessoriesTransformer;
+use App\Http\Transformers\ActionlogsTransformer;
 use App\Http\Transformers\AssetsTransformer;
 use App\Http\Transformers\LocationsTransformer;
 use App\Http\Transformers\SelectlistTransformer;
@@ -17,6 +18,7 @@ use App\Models\Location;
 use App\Models\Setting;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 
@@ -26,10 +28,12 @@ class LocationsController extends Controller
      * Display a listing of the resource.
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
+     *
      * @since [v4.0]
-     * @return \Illuminate\Http\Response
+     *
+     * @return Response
      */
-    public function index(Request $request) : JsonResponse | array
+    public function index(FilterRequest $request): JsonResponse|array
     {
         $this->authorize('view', Location::class);
         $allowed_columns = [
@@ -61,9 +65,20 @@ class LocationsController extends Controller
             'zip',
             'tag_color',
             'notes',
-            ];
+        ];
 
-        $locations = Location::with('parent', 'manager', 'children')->select([
+        $locations = Location::with([
+            'parent',
+            'children',
+            'manager' => fn ($q) => $q->withCount([
+                'assets as assets_count',
+                'accessories as accessories_count',
+                'licenses as licenses_count',
+                'consumables as consumables_count',
+                'managesUsers as manages_users_count',
+                'managedLocations as manages_locations_count',
+            ]),
+        ])->select([
             'locations.id',
             'locations.name',
             'locations.address',
@@ -99,13 +114,16 @@ class LocationsController extends Controller
             ->withCount('components as components_count')
             ->with('adminuser');
 
-        // Only scope locations if the setting is enabled
+        // scope_locations_fmcs is required for location-level company scoping (locations may not
+        // have company_id assigned unless the compatibility check has been completed in Settings).
+        // Without it, locations are visible to all authenticated users regardless of FMCS state.
         if (Setting::getSettings()->scope_locations_fmcs) {
             $locations = Company::scopeCompanyables($locations);
         }
 
-        if ($request->filled('search')) {
-            $locations = $locations->TextSearch($request->input('search'));
+        // This invokes the Searchable model trait scopeTextSearch and will handle input by search or by advanced search filter
+        if ($request->filled('filter') || $request->filled('search')) {
+            $locations->TextSearch($request->input('filter') ? $request->input('filter') : $request->input('search'));
         }
 
         if ($request->filled('name')) {
@@ -152,14 +170,10 @@ class LocationsController extends Controller
             $locations->where('tag_color', '=', $request->input('locations.tag_color'));
         }
 
-        // Make sure the offset and limit are actually integers and do not exceed system limits
-        $offset = ($request->input('offset') > $locations->count()) ? $locations->count() : app('api_offset_value');
         $limit = app('api_limit_value');
 
         $order = $request->input('order') === 'asc' ? 'asc' : 'desc';
         $sort = in_array($request->input('sort'), $allowed_columns) ? $request->input('sort') : 'created_at';
-
-
 
         switch ($request->input('sort')) {
             case 'parent':
@@ -176,35 +190,41 @@ class LocationsController extends Controller
                 break;
         }
 
-
         $total = $locations->count();
+        $offset = ($request->input('offset') > $total) ? $total : app('api_offset_value');
         $locations = $locations->skip($offset)->take($limit)->get();
 
         return (new LocationsTransformer)->transformLocations($locations, $total);
     }
 
-
     /**
      * Store a newly created resource in storage.
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
+     *
      * @since [v4.0]
-     * @param  \App\Http\Requests\ImageUploadRequest  $request
      */
-    public function store(ImageUploadRequest $request) : JsonResponse
+    public function store(ImageUploadRequest $request): JsonResponse
     {
         $this->authorize('create', Location::class);
         $location = new Location;
         $location->fill($request->all());
         $location = $request->handleImages($location);
 
-        // Only scope location if the setting is enabled
         if (Setting::getSettings()->scope_locations_fmcs) {
             $location->company_id = Company::getIdForCurrentUser($request->input('company_id'));
-            // check if parent is set and has a different company
-            if ($location->parent_id && Location::find($location->parent_id)->company_id != $location->company_id) {
-                response()->json(Helper::formatStandardApiResponse('error', null, 'different company than parent'));
-            }    
+        }
+
+        // Parent company check applies whenever FMCS is on, independent of scope_locations_fmcs.
+        if (Setting::getSettings()->full_multiple_companies_support) {
+            $parent = $location->parent_id ? Location::find($location->parent_id) : null;
+            if ($parent && $parent->company_id != $location->company_id) {
+                return response()->json(Helper::formatStandardApiResponse('error', null, trans('general.error_location_parent_company', [
+                    'parent' => $parent->name,
+                    'parent_company' => $parent->company?->name ?? trans('general.unassigned'),
+                    'location_company' => $location->company?->name ?? trans('general.unassigned'),
+                ])));
+            }
         }
 
         if ($location->save()) {
@@ -218,13 +238,27 @@ class LocationsController extends Controller
      * Display the specified resource.
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
+     *
      * @since [v4.0]
+     *
      * @param  int  $id
      */
-    public function show($id) : JsonResponse | array
+    public function show($id): JsonResponse|array
     {
         $this->authorize('view', Location::class);
-        $location = Location::with('parent', 'manager', 'children', 'company')
+        $location = Location::with([
+            'parent',
+            'children',
+            'company',
+            'manager' => fn ($q) => $q->withCount([
+                'assets as assets_count',
+                'accessories as accessories_count',
+                'licenses as licenses_count',
+                'consumables as consumables_count',
+                'managesUsers as manages_users_count',
+                'managedLocations as manages_locations_count',
+            ]),
+        ])
             ->select([
                 'locations.id',
                 'locations.name',
@@ -258,16 +292,16 @@ class LocationsController extends Controller
         return (new LocationsTransformer)->transformLocation($location);
     }
 
-
     /**
      * Update the specified resource in storage.
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
+     *
      * @since [v4.0]
-     * @param  \App\Http\Requests\ImageUploadRequest  $request
+     *
      * @param  int  $id
      */
-    public function update(ImageUploadRequest $request, $id) : JsonResponse
+    public function update(ImageUploadRequest $request, $id): JsonResponse
     {
         $this->authorize('update', Location::class);
         $location = Location::findOrFail($id);
@@ -276,21 +310,40 @@ class LocationsController extends Controller
         $location = $request->handleImages($location);
 
         if ($request->filled('company_id')) {
-            // Only scope location if the setting is enabled
             if (Setting::getSettings()->scope_locations_fmcs) {
                 $location->company_id = Company::getIdForCurrentUser($request->input('company_id'));
                 // check if there are related objects with different company
-                if (Helper::test_locations_fmcs(false, $id, $location->company_id)) {
-                    return response()->json(Helper::formatStandardApiResponse('error', null, 'error scoped locations'));
-                }                
+                if ($mismatched = Helper::test_locations_fmcs(false, $id, $location->company_id)) {
+                    $first = $mismatched[0];
+
+                    return response()->json(Helper::formatStandardApiResponse('error', null, trans('general.error_location_scoped_items', [
+                        'item_type' => trans('general.'.strtolower($first[0])),
+                        'item_name' => $first[2],
+                        'item_company' => $first[5] ?? trans('general.unassigned'),
+                    ])));
+                }
             } else {
                 $location->company_id = $request->input('company_id');
+            }
+        }
+
+        // Parent company check applies whenever FMCS is on, independent of scope_locations_fmcs.
+        // Runs outside the company_id gate so a parent_id-only update is also validated.
+        if (Setting::getSettings()->full_multiple_companies_support) {
+            $parent = $location->parent_id ? Location::find($location->parent_id) : null;
+            if ($parent && $parent->company_id != $location->company_id) {
+                return response()->json(Helper::formatStandardApiResponse('error', null, trans('general.error_location_parent_company', [
+                    'parent' => $parent->name,
+                    'parent_company' => $parent->company?->name ?? trans('general.unassigned'),
+                    'location_company' => $location->company?->name ?? trans('general.unassigned'),
+                ])));
             }
         }
 
         if ($location->isValid()) {
 
             $location->save();
+
             return response()->json(
                 Helper::formatStandardApiResponse(
                     'success',
@@ -303,26 +356,27 @@ class LocationsController extends Controller
         return response()->json(Helper::formatStandardApiResponse('error', null, $location->getErrors()));
     }
 
-
-    public function assets(Request $request, Location $location) : JsonResponse | array
+    public function assets(Request $request, Location $location): JsonResponse|array
     {
         $this->authorize('view', Asset::class);
         $this->authorize('view', $location);
-        $assets = Asset::where('location_id', '=', $location->id)->with('model', 'model.category', 'assetstatus', 'location', 'company', 'defaultLoc');
+        $assets = Asset::where('location_id', '=', $location->id)->with('model', 'model.category', 'status', 'location', 'company', 'defaultLoc');
         $assets = $assets->get();
+
         return (new AssetsTransformer)->transformAssets($assets, $assets->count(), $request);
     }
 
-    public function assignedAssets(Request $request, Location $location) : JsonResponse | array
+    public function assignedAssets(Request $request, Location $location): JsonResponse|array
     {
         $this->authorize('view', Asset::class);
         $this->authorize('view', $location);
-        $assets = Asset::where('assigned_to', '=', $location->id)->where('assigned_type', '=', Location::class)->with('model', 'model.category', 'assetstatus', 'location', 'company', 'defaultLoc');
+        $assets = Asset::where('assigned_to', '=', $location->id)->where('assigned_type', '=', Location::class)->with('model', 'model.category', 'status', 'location', 'company', 'defaultLoc');
         $assets = $assets->get();
+
         return (new AssetsTransformer)->transformAssets($assets, $assets->count(), $request);
     }
 
-    public function assignedAccessories(Request $request, Location $location) : JsonResponse | array
+    public function assignedAccessories(Request $request, Location $location): JsonResponse|array
     {
         $this->authorize('view', Accessory::class);
         $this->authorize('view', $location);
@@ -333,6 +387,7 @@ class LocationsController extends Controller
 
         $total = $accessory_checkouts->count();
         $accessory_checkouts = $accessory_checkouts->skip($offset)->take($limit)->get();
+
         return (new LocationsTransformer)->transformCheckedoutAccessories($accessory_checkouts, $total);
     }
 
@@ -340,10 +395,12 @@ class LocationsController extends Controller
      * Remove the specified resource from storage.
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
+     *
      * @since [v4.0]
+     *
      * @param  int  $id
      */
-    public function destroy($id) : JsonResponse
+    public function destroy($id): JsonResponse
     {
         $this->authorize('delete', Location::class);
         $location = Location::withCount('assignedAssets as assigned_assets_count')
@@ -360,7 +417,7 @@ class LocationsController extends Controller
 
         if (! $location->isDeletable()) {
             return response()
-                    ->json(Helper::formatStandardApiResponse('error', null, trans('admin/locations/message.assoc_users')));
+                ->json(Helper::formatStandardApiResponse('error', null, trans('admin/locations/message.assoc_users')));
         }
         $this->authorize('delete', $location);
         $location->delete();
@@ -393,10 +450,11 @@ class LocationsController extends Controller
      * sea... this time.
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
+     *
      * @since [v4.0.16]
-     * @see \App\Http\Transformers\SelectlistTransformer
+     * @see SelectlistTransformer
      */
-    public function selectlist(Request $request) : array
+    public function selectlist(Request $request): array
     {
         // If a user is in the process of editing their profile, as determined by the referrer,
         // then we check that they have permission to edit their own location.
@@ -413,11 +471,6 @@ class LocationsController extends Controller
             'locations.tag_color',
         ]);
 
-        // Only scope locations if the setting is enabled
-        if (Setting::getSettings()->scope_locations_fmcs) {
-            $locations = Company::scopeCompanyables($locations);
-        }
-
         $page = 1;
         if ($request->filled('page')) {
             $page = $request->input('page');
@@ -425,6 +478,10 @@ class LocationsController extends Controller
 
         if ($request->filled('search')) {
             $locations = $locations->where('locations.name', 'LIKE', '%'.$request->input('search').'%');
+        }
+
+        if ($request->filled('excludeId')) {
+            $locations->where('locations.id', '!=', (int) $request->input('excludeId'));
         }
 
         $locations = $locations->orderBy('name', 'ASC')->get();
@@ -448,5 +505,17 @@ class LocationsController extends Controller
         $paginated_results = new LengthAwarePaginator($locations_formatted->forPage($page, 500), $locations_formatted->count(), 500, $page, []);
 
         return (new SelectlistTransformer)->transformSelectlist($paginated_results);
+    }
+
+    public function history(Request $request, Location $location): JsonResponse|array
+    {
+        $this->authorize('history', $location);
+        $historyQuery = $location->getHistory($request);
+        $total = (clone $historyQuery)->count();
+        $offset = ($request->input('offset') > $total) ? $total : app('api_offset_value');
+        $limit = app('api_limit_value');
+        $history = (clone $historyQuery)->skip($offset)->take($limit)->get();
+
+        return response()->json((new ActionlogsTransformer)->transformActionlogs($history, $total), 200, ['Content-Type' => 'application/json;charset=utf8'], JSON_UNESCAPED_UNICODE);
     }
 }

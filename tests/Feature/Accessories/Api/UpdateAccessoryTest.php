@@ -3,6 +3,7 @@
 namespace Tests\Feature\Accessories\Api;
 
 use App\Models\Accessory;
+use App\Models\Actionlog;
 use App\Models\Category;
 use App\Models\Company;
 use App\Models\Location;
@@ -15,7 +16,7 @@ use Tests\TestCase;
 
 class UpdateAccessoryTest extends TestCase implements TestsFullMultipleCompaniesSupport, TestsPermissionsRequirement
 {
-    public function testRequiresPermission()
+    public function test_requires_permission()
     {
         $accessory = Accessory::factory()->create();
 
@@ -24,7 +25,7 @@ class UpdateAccessoryTest extends TestCase implements TestsFullMultipleCompanies
             ->assertForbidden();
     }
 
-    public function testAdheresToFullMultipleCompaniesSupportScoping()
+    public function test_adheres_to_full_multiple_companies_support_scoping()
     {
         [$companyA, $companyB] = Company::factory()->count(2)->create();
 
@@ -55,7 +56,41 @@ class UpdateAccessoryTest extends TestCase implements TestsFullMultipleCompanies
         $this->assertEquals('New Name', $accessoryC->fresh()->name);
     }
 
-    public function testCanUpdateAccessoryViaPatch()
+    public function test_prevents_cross_tenant_company_reassignment_when_fmcs_enabled()
+    {
+        [$companyA, $companyB] = Company::factory()->count(2)->create();
+        $accessory = Accessory::factory()->for($companyA)->create();
+        $userInCompanyA = User::factory()->for($companyA)->editAccessories()->create();
+
+        $this->settings->enableMultipleFullCompanySupport();
+
+        $this->actingAsForApi($userInCompanyA)
+            ->patchJson(route('api.accessories.update', $accessory), [
+                'company_id' => $companyB->id,
+            ])
+            ->assertStatusMessageIs('error');
+
+        $this->assertSame($companyA->id, $accessory->fresh()->company_id);
+    }
+
+    public function test_allows_superuser_company_reassignment_when_fmcs_enabled()
+    {
+        [$companyA, $companyB] = Company::factory()->count(2)->create();
+        $accessory = Accessory::factory()->for($companyA)->create();
+        $superuser = User::factory()->superuser()->create(['company_id' => null]);
+
+        $this->settings->enableMultipleFullCompanySupport();
+
+        $this->actingAsForApi($superuser)
+            ->patchJson(route('api.accessories.update', $accessory), [
+                'company_id' => $companyB->id,
+            ])
+            ->assertStatusMessageIs('success');
+
+        $this->assertSame($companyB->id, $accessory->fresh()->company_id);
+    }
+
+    public function test_can_update_accessory_via_patch()
     {
         [$categoryA, $categoryB] = Category::factory()->count(2)->create();
         [$companyA, $companyB] = Company::factory()->count(2)->create();
@@ -102,5 +137,48 @@ class UpdateAccessoryTest extends TestCase implements TestsFullMultipleCompanies
         $this->assertEquals($locationB->id, $accessory->location_id);
         $this->assertEquals($manufacturerB->id, $accessory->manufacturer_id);
         $this->assertEquals($supplierB->id, $accessory->supplier_id);
+    }
+
+    public function test_update_logs_changed_fields_in_log_meta()
+    {
+        $accessory = Accessory::factory()->create(['qty' => 5, 'name' => 'Old Name']);
+
+        $this->actingAsForApi(User::factory()->editAccessories()->create())
+            ->patchJson(route('api.accessories.update', $accessory), ['qty' => 10, 'name' => 'New Name']);
+
+        $log = Actionlog::where('item_type', Accessory::class)
+            ->where('item_id', $accessory->id)
+            ->where('action_type', 'update')
+            ->latest()
+            ->first();
+
+        $this->assertNotNull($log, 'No update log entry was created');
+        $this->assertNotNull($log->log_meta, 'log_meta was not stored');
+
+        $meta = json_decode($log->log_meta, true);
+        $this->assertEquals('5', $meta['qty']['old']);
+        $this->assertEquals('10', $meta['qty']['new']);
+        $this->assertEquals('Old Name', $meta['name']['old']);
+        $this->assertEquals('New Name', $meta['name']['new']);
+    }
+
+    public function test_no_op_update_does_not_create_log_entry()
+    {
+        $accessory = Accessory::factory()->create(['qty' => 5, 'name' => 'Same Name']);
+
+        $before = Actionlog::where('item_type', Accessory::class)
+            ->where('item_id', $accessory->id)
+            ->where('action_type', 'update')
+            ->count();
+
+        $this->actingAsForApi(User::factory()->editAccessories()->create())
+            ->patchJson(route('api.accessories.update', $accessory), ['qty' => 5, 'name' => 'Same Name']);
+
+        $after = Actionlog::where('item_type', Accessory::class)
+            ->where('item_id', $accessory->id)
+            ->where('action_type', 'update')
+            ->count();
+
+        $this->assertEquals($before, $after, 'A spurious log entry was created for a no-op update');
     }
 }

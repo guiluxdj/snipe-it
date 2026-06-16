@@ -1,7 +1,6 @@
 @props([
     'box_style' => 'default',
     'header' => false,
-    'footer' => false,
 ])
 @aware(['name', 'route'])
 
@@ -19,16 +18,28 @@
 
     <div class="box-body">
 
+        @if (isset($table_header))
+            <h3 class="box-title{{ (!isset($bulkactions)) ? ' pull-left' : '' }}">
+                {{ $table_header }}
+            </h3>
+        @endif
+
+
         @if (isset($bulkactions))
             <div id="{{ Illuminate\Support\Str::camel($name) }}ToolBar" class="pull-left" style="min-width:500px !important; padding-top: 10px;">
                 {{ $bulkactions }}
             </div>
         @endif
 
-        {{ $slot }}
+            @if (($slot) && (!$slot->isEmpty()))
+                {{ $slot }}
+            @endif
+
     </div>
 
-    @if ($route)
+    @if (isset($customfooter))
+        {{ $customfooter }}
+    @elseif ($route)
         <x-box.footer />
     @endif
 </div>

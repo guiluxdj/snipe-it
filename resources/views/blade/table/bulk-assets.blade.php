@@ -1,3 +1,4 @@
+@props(['status_type' => null])
 @aware(['name'])
 
     <form
@@ -9,17 +10,17 @@
     >
         @csrf
 
-        <div style="width:100% !important;">
+        <div style="width:100% !important;" class="hidden-print">
             {{-- The sort and order will only be used if the cookie is actually empty (like on first-use) --}}
             <input name="sort" type="hidden" value="assets.id">
             <input name="order" type="hidden" value="asc">
-            <label for="bulk_actions">
+            <label>
             <span class="sr-only">
                 {{ trans('button.bulk_actions') }}
             </span>
-            </label>
+
             <select name="bulk_actions" class="form-control select2" aria-label="bulk_actions" style="width: 350px !important;">
-                @if ((isset($status)) && ($status == 'Deleted'))
+                @if ($status_type == 'Deleted')
                     @can('delete', \App\Models\Asset::class)
                         <option value="restore">{{trans('button.restore')}}</option>
                     @endcan
@@ -30,9 +31,15 @@
                         <option value="maintenance">{{ trans('button.add_maintenance') }}</option>
                     @endcan
 
-                    @if((!isset($status)) || (($status != 'Deployed') && ($status != 'Archived')))
+                    @if($status_type != 'Deployed' && $status_type != 'Archived')
                         @can('checkout', \App\Models\Asset::class)
                             <option value="checkout">{{ trans('general.bulk_checkout') }}</option>
+                        @endcan
+                    @endif
+
+                    @if(!$status_type || $status_type == 'Deployed')
+                        @can('checkin', \App\Models\Asset::class)
+                            <option value="checkin">{{ trans('admin/hardware/general.bulk_checkin') }}</option>
                         @endcan
                     @endif
 
@@ -45,5 +52,6 @@
             </select>
 
             <button class="btn btn-theme" id="{{ Illuminate\Support\Str::camel($name) }}Button" disabled>{{ trans('button.go') }}</button>
+            </label>
             </div>
     </form>

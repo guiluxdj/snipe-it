@@ -3,15 +3,14 @@
 namespace App\Http\Controllers\Components;
 
 use App\Events\CheckoutableCheckedOut;
-use App\Events\ComponentCheckedOut;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Models\Asset;
 use App\Models\Component;
-use App\Models\Setting;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Validator;
 
 class ComponentCheckoutController extends Controller
@@ -20,11 +19,14 @@ class ComponentCheckoutController extends Controller
      * Returns a view that allows the checkout of a component to an asset.
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
+     *
      * @see ComponentCheckoutController::store() method that stores the data.
      * @since [v3.0]
-     * @param int $id
-     * @return \Illuminate\Contracts\View\View
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     *
+     * @param  int  $id
+     * @return View
+     *
+     * @throws AuthorizationException
      */
     public function create($id)
     {
@@ -37,13 +39,14 @@ class ComponentCheckoutController extends Controller
             if ($component->category) {
 
                 // Make sure there is at least one available to checkout
-                if ($component->numRemaining() <= 0){
+                if ($component->numRemaining() <= 0) {
                     return redirect()->route('components.index')
                         ->with('error', trans('admin/components/message.checkout.unavailable'));
                 }
 
                 // Return the checkout view
-                return view('components/checkout', compact('component'));
+                return view('components/checkout', compact('component'))
+                    ->with('snipe_component', $component);
             }
 
             // Invalid category
@@ -60,17 +63,19 @@ class ComponentCheckoutController extends Controller
      * Validate and store checkout data.
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
+     *
      * @see ComponentCheckoutController::create() method that returns the form.
      * @since [v3.0]
-     * @param Request $request
-     * @param int $componentId
-     * @return \Illuminate\Http\RedirectResponse
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     *
+     * @param  int  $componentId
+     * @return RedirectResponse
+     *
+     * @throws AuthorizationException
      */
     public function store(Request $request, $componentId)
     {
         // Check if the component exists
-        if (!$component = Component::find($componentId)) {
+        if (! $component = Component::find($componentId)) {
             // Redirect to the component management page with error
             return redirect()->route('components.index')->with('error', trans('admin/components/message.not_found'));
         }
@@ -85,8 +90,8 @@ class ComponentCheckoutController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'asset_id'          => 'required|exists:assets,id',
-            'assigned_qty'      => "required|numeric|min:1|digits_between:1,$max_to_checkout",
+            'asset_id' => 'required|exists:assets,id',
+            'assigned_qty' => "required|numeric|min:1|digits_between:1,$max_to_checkout",
         ]);
 
         if ($validator->fails()) {
@@ -98,8 +103,12 @@ class ComponentCheckoutController extends Controller
         // Check if the asset exists
         $asset = Asset::find($request->input('asset_id'));
 
-        if ((Setting::getSettings()->full_multiple_companies_support) && $component->company_id !== $asset->company_id) {
-            return redirect()->route('components.checkout.show', $componentId)->with('error', trans('general.error_user_company'));
+        if (! $component->canCheckoutTo($asset)) {
+            return redirect()->route('components.checkout.show', $componentId)->with('error', trans('general.error_checkout_company_mismatch', [
+                'item' => trans('general.component').' "'.$component->name.'"',
+                'item_company' => $component->company?->name ?? trans('general.unassigned'),
+                'target' => trans('general.asset').' "'.$asset->display_name.'"',
+            ]));
         }
 
         $component->checkout_qty = $request->input('assigned_qty');

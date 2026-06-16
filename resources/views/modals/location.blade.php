@@ -16,8 +16,8 @@
                 </div>
 
                 <!-- Setup of default company, taken from asset creator if scoped locations are activated in the settings -->
-				@if (($snipeSettings->scope_locations_fmcs == '1') && ($user->company))
-					<input type="hidden" name="company_id" id='modal-company' value='{{ $user->company->id }}' class="form-control">
+				@if (($snipeSettings->scope_locations_fmcs == '1') && ($user->companies->isNotEmpty()))
+					<input type="hidden" name="company_id" id='modal-company' value='{{ $user->companies->first()->id }}' class="form-control">
 				@endif
 
 				<!-- Select company, only for users with multicompany access - replace default company -->
@@ -32,7 +32,13 @@
 
                 <div class="dynamic-form-row">
                     <div class="col-md-3 col-xs-12 country"><label for="modal-country">{{ trans('general.country') }}:</label></div>
-                    <div class="col-md-9 col-xs-12">{!! Form::countries('country', old('country'), 'select2 country',"modal-country") !!}</div>
+                    <div class="col-md-9 col-xs-12">
+                        <x-input.country-select
+                            name="country"
+                            :selected="old('country')"
+                            id="modal-country"
+                        />
+                    </div>
                 </div>
             </form>
         </div>

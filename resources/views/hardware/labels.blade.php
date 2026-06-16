@@ -214,11 +214,11 @@
         <?php $count++; ?>
         <div class="label">
 
-            @if ($settings->qr_code == '1')
-                <div class="qr_img">
-                    <img src="{{ config('app.url') }}/hardware/{{ $asset->id }}/qr_code" class="qr_img">
-                </div>
-            @endif
+        @if ($settings->qr_code=='1')
+            <div class="qr_img">
+                <img src="{{ route('qr_code/common', ['object_type' => 'hardware', 'id' => $asset->id]) }}" class="qr_img">
+            </div>
+        @endif
 
             <div class="qr_text">
                 @if ($settings->label_logo)
@@ -293,11 +293,12 @@
 
         </div>
 
-        @if ($count % $settings->labels_per_page == 0 && $count != count($assets))
-            <div class="page-break"></div>
-            <div class="next-padding">&nbsp;</div>
-        @endif
-    @endforeach
+    @if ($settings->labels_per_page > 0 && ($count % $settings->labels_per_page == 0) && $count != count($assets))
+    <div class="page-break"></div>
+    <div class="next-padding">&nbsp;</div>
+    @endif
+
+@endforeach
 
 
 </body>

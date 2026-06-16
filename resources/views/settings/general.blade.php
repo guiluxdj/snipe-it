@@ -61,6 +61,21 @@
                             </div>
                             <!-- /.form-group -->
 
+                            <!-- Null Company Is Floater -->
+                            <div class="form-group {{ $errors->has('null_company_is_floater') ? 'error' : '' }}">
+                                <div class="col-md-8 col-md-offset-3">
+                                    <label class="form-control">
+                                        <input type="checkbox" name="null_company_is_floater" value="1" @checked(old('null_company_is_floater', $setting->null_company_is_floater)) aria-label="null_company_is_floater" @disabled(! $setting->full_multiple_companies_support) />
+                                        {{ trans('admin/settings/general.null_company_is_floater_text') }}
+                                    </label>
+                                    {!! $errors->first('null_company_is_floater', '<span class="alert-msg" aria-hidden="true">:message</span>') !!}
+                                    <p class="help-block">
+                                        {{ trans('admin/settings/general.null_company_is_floater_help_text') }}
+                                    </p>
+                                </div>
+                            </div>
+                            <!-- /.form-group -->
+
                        </fieldset>
 
                        <fieldset>
@@ -102,7 +117,12 @@
                                <label for="username_format" class="col-md-3 control-label">{{ trans('admin/settings/general.username_formats.username_format') }}</label>
 
                                <div class="col-md-8">
-                                   {!! Form::username_format('username_format', old('username_format', $setting->username_format), 'select2') !!}
+                                   <x-input.username-select
+                                       name="username_format"
+                                       :selected="old('username_format', $setting->username_format)"
+                                       style="width: 100%"
+                                       aria-label="username_format"
+                                   />
                                    {!! $errors->first('username_format', '<span class="alert-msg" aria-hidden="true">:message</span>') !!}
 
                                    <p class="help-block">
@@ -258,7 +278,7 @@
                                <label for="login_note" class="col-md-3 control-label">{{trans('admin/settings/general.test_mail')}}</label>
 
                                <div class="col-md-8" id="mailtestrow">
-                                   <a class="btn btn-default btn-sm pull-left" id="mailtest" style="margin-right: 10px;">
+                                   <a class="btn btn-default btn-sm pull-left{{ (config('mail.reply_to.address') == '') ? ' disabled': '' }}" id="mailtest" style="margin-right: 10px;">
                                        {{ trans('admin/settings/general.mail_test') }}</a>
                                    <span id="mailtesticon"></span>
                                    <span id="mailtestresult"></span>
@@ -269,7 +289,15 @@
                                </div>
                                <div class="col-md-8 col-md-offset-3">
                                    <div class="help-block">
-                                       <p>{{ trans('admin/settings/general.mail_test_help', array('replyto' => config('mail.reply_to.address'))) }}</p>
+
+                                       @if (config('mail.reply_to.address') == '')
+                                           <p class="text-warning">
+                                               <x-icon type="warning"/> {{ trans('admin/settings/general.mail_test_no_email') }}
+                                           </p>
+                                       @else
+                                           <p>{{ trans('admin/settings/general.mail_test_help', array('replyto' => config('mail.reply_to.address'))) }}</p>
+                                       @endif
+
                                    </div>
                                </div>
 
@@ -291,7 +319,7 @@
                        </fieldset>
 
 
-                       <fieldset name="checkin-preferences"">
+                       <fieldset name="checkin-preferences">
                            <x-form.legend>
                                {{ trans('admin/settings/general.legends.checkin') }}
                            </x-form.legend>
@@ -368,7 +396,8 @@
                                        @endif
                                        <p class="help-block">
                                            {{ trans('admin/settings/general.dashboard_message_help') }}
-                                           {!!  trans('general.github_markdown') !!}</p>
+                                           <i class="fab fa-markdown" aria-hidden="true"></i> {!!  trans('general.github_markdown') !!}
+                                       </p>
                                    </div>
                                </div>
                        </fieldset>
