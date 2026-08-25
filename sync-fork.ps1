@@ -39,5 +39,7 @@ Write-Host "Merge successful." -ForegroundColor Green
 if ($Push) {
     Write-Host "Pushing master to origin..." -ForegroundColor Cyan
     git push origin master
+    Write-Host "Pushing master to prod..." -ForegroundColor Cyan
+    git push prod master
     Write-Host "Done." -ForegroundColor Green
 }
