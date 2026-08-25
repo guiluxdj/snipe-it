@@ -4,6 +4,8 @@ namespace App\Observers;
 
 use App\Models\Actionlog;
 use App\Models\Asset;
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Setting;
 use Carbon\Carbon;
 
@@ -20,6 +22,7 @@ class AssetObserver
         $attributesOriginal = $asset->getRawOriginal();
         $same_checkout_counter = false;
         $same_checkin_counter = false;
+        $same_requests_counter = false;
         $restoring_or_deleting = false;
 
         // This is a gross hack to prevent the double logging when restoring an asset
@@ -35,12 +38,21 @@ class AssetObserver
             $same_checkin_counter = (($attributes['checkin_counter'] == $attributesOriginal['checkin_counter']));
         }
 
+        // requests_counter is a denorm bump fired by CreateCheckoutRequestAction /
+        // CancelCheckoutRequestAction. The `requested` and `request canceled`
+        // actionlogs those actions write already cover the user-visible history;
+        // this gate keeps the counter save from adding a redundant `update` row
+        // for the same event.
+        if (array_key_exists('requests_counter', $attributes) && array_key_exists('requests_counter', $attributesOriginal)) {
+            $same_requests_counter = (($attributes['requests_counter'] == $attributesOriginal['requests_counter']));
+        }
+
         // If the asset isn't being checked out, log the update.
         // (Checkout/checkin/audit actions already create their own log entries; the audit
         // path uses unsetEventDispatcher() so it never reaches this observer.)
         if (array_key_exists('assigned_to', $attributes) && array_key_exists('assigned_to', $attributesOriginal)
             && ($attributes['assigned_to'] == $attributesOriginal['assigned_to'])
-            && ($same_checkout_counter) && ($same_checkin_counter)
+            && ($same_checkout_counter) && ($same_checkin_counter) && ($same_requests_counter)
             && ($attributes['last_checkout'] == $attributesOriginal['last_checkout']) && (! $restoring_or_deleting)) {
             $changed = [];
 
@@ -106,11 +118,63 @@ class AssetObserver
         $logAction->item_id = $asset->id;
         $logAction->action_date = date('Y-m-d H:i:s');
         $logAction->created_at = date('Y-m-d H:i:s');
-        $logAction->created_by = auth()->id();
+        // See AssetModelObserver::created for the seeder-friendly
+        // auth fallback rationale.
+        $logAction->created_by = auth()->id() ?? $asset->created_by;
         if ($asset->imported) {
             $logAction->setActionSource('importer');
         }
         $logAction->logaction('create');
+
+        // Every new asset is a transaction: supplier, price, currency,
+        // date. Record it as Order + OrderItem regardless of whether
+        // the operator typed an order_number. Only dedupe on the tuple
+        // when a real order_number label is present. A blank label is a
+        // distinct transaction each time. Skip if the AssetImporter
+        // already wrote the OrderItem for this row.
+        $existingLine = OrderItem::where('item_type', Asset::class)
+            ->where('item_id', $asset->id)
+            ->exists();
+
+        if (! $existingLine) {
+            $orderNumber = trim((string) ($asset->order_number ?? '')) ?: null;
+
+            if ($orderNumber !== null) {
+                $order = Order::firstOrNew(
+                    [
+                        'order_number' => $orderNumber,
+                        'supplier_id' => $asset->supplier_id,
+                        'company_id' => $asset->company_id,
+                    ],
+                    [
+                        'purchase_date' => $asset->purchase_date,
+                    ],
+                );
+                if (! $order->exists) {
+                    $order->created_by = auth()->id();
+                    $order->save();
+                }
+            } else {
+                $order = new Order([
+                    'order_number' => null,
+                    'supplier_id' => $asset->supplier_id,
+                    'company_id' => $asset->company_id,
+                    'purchase_date' => $asset->purchase_date,
+                ]);
+                $order->created_by = auth()->id();
+                $order->save();
+            }
+
+            $orderItem = new OrderItem([
+                'order_id' => $order->id,
+                'item_type' => Asset::class,
+                'item_id' => $asset->id,
+                'qty' => 1,
+                'price' => $asset->purchase_cost,
+            ]);
+            $orderItem->created_by = $asset->created_by ?? auth()->id();
+            $orderItem->save();
+        }
     }
 
     /**

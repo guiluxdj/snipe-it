@@ -1,9 +1,10 @@
 {
-    "/js/dist/all.js": "/js/dist/all.js?id=571ba00068523222c399e1ec11b89288",
-    "/css/build/overrides.css": "/css/build/overrides.css?id=9f70623c0b56ef8ecec6fb859344d279",
-    "/css/build/app.css": "/css/build/app.css?id=3cfdd1824004111aea48a50793be2518",
+    "/js/dist/all.js": "/js/dist/all.js?id=9ef93b037327525698cd37e3240b89c3",
+    "/js/dist/snipeit-calendar.js": "/js/dist/snipeit-calendar.js?id=e324cb036e683155a6d29581cd9e8c95",
+    "/css/build/overrides.css": "/css/build/overrides.css?id=ab3943f21f5009359510b688f6d1d593",
+    "/css/build/app.css": "/css/build/app.css?id=96305e105df3ec96e68ae055e9769f3d",
     "/css/build/AdminLTE.css": "/css/build/AdminLTE.css?id=bdf169bc2141f453390614c138cdce95",
-    "/css/dist/all.css": "/css/dist/all.css?id=144c0b82011f8e02e3f71ba389755549",
+    "/css/dist/all.css": "/css/dist/all.css?id=f7def450a45d1c6914c6cfc608554779",
     "/css/dist/signature-pad.css": "/css/dist/signature-pad.css?id=6a89d3cd901305e66ced1cf5f13147f7",
     "/css/dist/signature-pad.min.css": "/css/dist/signature-pad.min.css?id=6a89d3cd901305e66ced1cf5f13147f7",
     "/js/select2/i18n/af.js": "/js/select2/i18n/af.js?id=4f6fcd73488ce79fae1b7a90aceaecde",
@@ -77,6 +78,6 @@
     "/js/dist/bootstrap-table-locale-all.min.js": "/js/dist/bootstrap-table-locale-all.min.js?id=d300041b9e5038b45b68e036add83be4",
     "/js/dist/bootstrap-table-en-US.min.js": "/js/dist/bootstrap-table-en-US.min.js?id=6d0de12d91548ba2cd80b868838ce5fa",
     "/js/dist/Chart.min.js": "/js/dist/Chart.min.js?id=9b1ae20c4c7048d6e4a1b2e1aee7fb31",
-    "/css/dist/bootstrap-table.css": "/css/dist/bootstrap-table.css?id=82b56573f8098e439bf14ccb4530de6e",
-    "/js/dist/bootstrap-table.js": "/js/dist/bootstrap-table.js?id=3ca77183321168d36eb1fac73a64e6e5"
+    "/css/dist/bootstrap-table.css": "/css/dist/bootstrap-table.css?id=9def0b5d3b891ac3669b3b7aa7e805ce",
+    "/js/dist/bootstrap-table.js": "/js/dist/bootstrap-table.js?id=e11e0fff41162f5df87cfcb075f9e821"
 }

@@ -18,20 +18,13 @@
 
 @section('header_right')
 
-    @can('create', \App\Models\User::class)
-        @if ($snipeSettings->ldap_enabled == 1)
-            <a href="{{ route('ldap/user') }}" class="btn btn-theme pull-right"><i class="fas fa-sitemap"></i> {{trans('general.ldap_sync')}}</a>
-        @endif
-        <a href="{{ route('users.create') }}" {{$snipeSettings->shortcuts_enabled == 1 ? "n" : ''}} class="btn btn-primary pull-right" style="margin-right: 5px;">  {{ trans('general.create') }}</a>
-    @endcan
-
-    @if (request('status')=='deleted')
-        <a class="btn btn-default pull-right" href="{{ route('users.index') }}" style="margin-right: 5px;">{{ trans('admin/users/table.show_current') }}</a>
-    @else
-        <a class="btn btn-default pull-right" href="{{ route('users.index', ['status' => 'deleted']) }}" style="margin-right: 5px;">{{ trans('admin/users/table.show_deleted') }}</a>
+    {{-- LDAP sync surfaces users from across the entire directory
+         regardless of company scoping, so the button is superuser-only
+         to match LDAPImportController's authorization. --}}
+    @if (auth()->user()?->isSuperUser() && $snipeSettings->ldap_enabled == 1)
+        <a href="{{ route('ldap/user') }}" class="btn btn-theme pull-right"><i class="fas fa-sitemap"></i> {{trans('general.ldap_sync')}}</a>
     @endif
     @can('view', \App\Models\User::class)
-        <a class="btn btn-default pull-right" href="{{ route('users.export') }}" style="margin-right: 5px;">{{ trans('general.export') }}</a>
         <a class="btn btn-default pull-right" href="{{ route('users.printall') }}" style="margin-right: 5px;">Impression inventaire</a>
     @endcan
 @stop
@@ -51,6 +44,7 @@
                     'activated' => is_scalar(request('activated')) ? request('activated') : null,
                ])"/>
         </x-box>
+        <x-shiftclick/>
     </x-container>
 
 

@@ -216,7 +216,7 @@
 
         @if ($settings->qr_code=='1')
             <div class="qr_img">
-                <img src="{{ route('qr_code/common', ['object_type' => 'hardware', 'id' => $asset->id]) }}" class="qr_img">
+                <img src="{{ route('qr_code/common', ['object_type' => 'hardware', 'id' => $asset->id]) }}" class="qr_img" alt="">
             </div>
         @endif
 
@@ -285,7 +285,7 @@
 
         @if ((($settings->alt_barcode_enabled=='1') && $settings->alt_barcode!=''))
             <div class="barcode_container">
-                <img src="{{ config('app.url') }}/hardware/{{ $asset->id }}/barcode" class="barcode">
+                <img src="{{ config('app.url') }}/hardware/{{ $asset->id }}/barcode" class="barcode" alt="">
             </div>
         @endif
 
