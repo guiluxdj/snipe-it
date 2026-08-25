@@ -1,0 +1,370 @@
+diff --git a/app/Http/Controllers/Users/UsersController.php b/app/Http/Controllers/Users/UsersController.php
+index 3611cae3c0..c49b33c141 100755
+--- a/app/Http/Controllers/Users/UsersController.php
++++ b/app/Http/Controllers/Users/UsersController.php
+@@ -172,7 +172,7 @@ class UsersController extends Controller
+                 try {
+                     $user->notify(new WelcomeNotification($user));
+                 } catch (\Exception $e) {
+-                    Log::warning('Could not send welcome notification for user: '.$e->getMessage());
++                    Log::warning('Could not send welcome notification for user: ' . $e->getMessage());
+                 }
+ 
+             }
+@@ -694,7 +694,7 @@ class UsersController extends Controller
+             fclose($handle);
+         }, 200, [
+             'Content-Type' => 'text/csv; charset=UTF-8',
+-            'Content-Disposition' => 'attachment; filename="users-'.date('Y-m-d-his').'.csv"',
++            'Content-Disposition' => 'attachment; filename="users-' . date('Y-m-d-his') . '.csv"',
+         ]);
+ 
+         return $response;
+@@ -816,13 +816,13 @@ class UsersController extends Controller
+             ->with('assignedTo')
+             ->first();
+ 
+-        if (! $firstAcceptance) {
++        if (!$firstAcceptance) {
+             return redirect()->back()->with('warning', trans('admin/users/message.error.no_pending_acceptances'));
+         }
+ 
+         $mailable = new UnacceptedAssetReminderMail($firstAcceptance, $pendingItems->count());
+ 
+-        if (! empty($user->locale)) {
++        if (!empty($user->locale)) {
+             $mailable->locale($user->locale);
+         }
+ 
+@@ -865,11 +865,11 @@ class UsersController extends Controller
+     {
+         $this->authorize('update', $user);
+ 
+-        if (! $user->twoFactorResettable()) {
++        if (!$user->twoFactorResettable()) {
+             return redirect()->back()->with('error', trans('general.unauthorized'));
+         }
+ 
+-        if (! auth()->user()->can('canEditAuthFields', $user) || ! auth()->user()->can('editableOnDemo')) {
++        if (!auth()->user()->can('canEditAuthFields', $user) || !auth()->user()->can('editableOnDemo')) {
+             return redirect()->back()->with('error', trans('general.unauthorized'));
+         }
+ 
+@@ -896,4 +896,28 @@ class UsersController extends Controller
+                 ->with('error', trans('admin/settings/general.two_factor_reset_error'));
+         }
+     }
++
++    // My update
++    /////////////////////////////////////////////////////////////
++
++    /**
++     * Print inventoryAll
++     *
++     * @author Guillaume Debarsy
++     * @since [v1.8]
++     * @return \Illuminate\Http\RedirectResponse
++     */
++    public function printInventoryAll()
++    {
++        $this->authorize('view', User::class);
++
++        $users = User::orderBy('last_name')
++            ->with('accessories')
++            ->with('assets')
++            ->with('licenses')
++            ->get();
++
++        return view('users/printall')->with('users', $users)
++            ->with('settings', Setting::getSettings());
++    }
+ }
+diff --git a/resources/views/users/index.blade.php b/resources/views/users/index.blade.php
+index d8921dc4a0..462129cd24 100755
+--- a/resources/views/users/index.blade.php
++++ b/resources/views/users/index.blade.php
+@@ -24,6 +24,9 @@
+     @if (auth()->user()?->isSuperUser() && $snipeSettings->ldap_enabled == 1)
+         <a href="{{ route('ldap/user') }}" class="btn btn-theme pull-right"><i class="fas fa-sitemap"></i> {{trans('general.ldap_sync')}}</a>
+     @endif
++    @can('view', \App\Models\User::class)
++        <a class="btn btn-default pull-right" href="{{ route('users.printall') }}" style="margin-right: 5px;">Impression inventaire</a>
++    @endcan
+ @stop
+ 
+ {{-- Page content --}}
+diff --git a/resources/views/users/printall.blade.php b/resources/views/users/printall.blade.php
+new file mode 100644
+index 0000000000..f1af66e80a
+--- /dev/null
++++ b/resources/views/users/printall.blade.php
+@@ -0,0 +1,229 @@
++<!doctype html>
++<html lang="en">
++
++<head>
++    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
++    <title>Attribution du matériel</title>
++    <style>
++        body {
++            font-family: "Arial, Helvetica", sans-serif;
++        }
++
++        table.inventory {
++            border: solid #000;
++            border-width: 1px 1px 1px 1px;
++            width: 100%;
++        }
++
++        @page {
++            size: A4;
++        }
++
++        table.inventory th,
++        table.inventory td {
++            border: solid #000;
++            border-width: 0 1px 1px 0;
++            padding: 3px;
++            font-size: 12px;
++        }
++
++        .print-logo {
++            max-height: 40px;
++        }
++    </style>
++</head>
++
++<body>
++
++    @if ($snipeSettings->logo_print_assets == '1')
++        @if ($snipeSettings->brand == '3')
++
++            <h2>
++                @if ($snipeSettings->logo != '')
++                    <img class="print-logo" src="{{ url('/') }}/uploads/{{ $snipeSettings->logo }}">
++                @endif
++                {{ $snipeSettings->site_name }}
++            </h2>
++        @elseif ($snipeSettings->brand == '2')
++            @if ($snipeSettings->logo != '')
++                <img class="print-logo" src="{{ url('/') }}/uploads/{{ $snipeSettings->logo }}">
++            @endif
++        @else
++            <h2>{{ $snipeSettings->site_name }}</h2>
++        @endif
++    @endif
++
++    @foreach ($users as $user)
++
++        <h2 style="background-color: #243a58;padding: 15px;color: white;margin-bottom: 10px;">
++            {{ $user->last_name . ' ' . $user->first_name }}</h2>
++        <h6 style="margin-bottom: 3px;margin-top: 3px;">Email:
++            {{ $user->email ? $user->email : '' }}</h6>
++        <h6 style="margin-bottom: 3px;margin-top: 3px;">Service:
++            {{ $user->department ? $user->department->name : '/' }}</h6>
++
++
++        @if ($user->assets->count() > 0)
++            @php
++                $counter = 1;
++            @endphp
++            <table class="inventory">
++                <thead>
++                    <tr>
++                        <th colspan="11">{{ trans('general.assets') }}</th>
++                    </tr>
++                </thead>
++                <thead>
++                    <tr>
++                        <th style="width: 20px;"></th>
++                        <th></th>
++                        <th style="width: 10%;">{{ trans('general.asset_tag') }}</th>
++                        <th style="width: 10%;">{{ trans('general.name') }}</th>
++                        <th style="width: 10%;">{{ trans('general.category') }}</th>
++                        <th style="width: 20%;">Marque</th>
++                        <th style="width: 20%;">Modèle</th>
++                        <th style="width: 10%;">N° de série</th>
++                        <th style="width: 10%;">Garantie</th>
++                        <th style="width: 10%;">Date d'achat</th>
++                        <th style="width: 10%;">{{ trans('general.checked_out') }}</th>
++                        </th>
++                    </tr>
++                </thead>
++
++                @foreach ($user->assets as $asset)
++                    <tr>
++                        <td>{{ $counter }}</td>
++                        <td><img src="/uploads/models/{{ $asset->model->image }}" height="60px" /></td>
++                        <td>{{ $asset->asset_tag }}</td>
++                        <td>{{ $asset->name }}</td>
++                        <td>{{ $asset->model->category->name }}</td>
++                        <td>{{ $asset->model->manufacturer->name }}</td>
++                        <td>{{ $asset->model->name }}</td>
++                        <td>{{ $asset->serial }}</td>
++                        <td>
++                            {{-- {{ $asset->warranty_months ? $asset->warranty_months . ' mois' : '' }}
++                            <br>
++                            {{ $asset->warranty_months ? ' Fin le ' . date('d/m/Y', strtotime($asset->present()->warrantee_expires())) : '' }} --}}
++                        </td>
++
++                        <td>{!! date('d/m/Y', strtotime($asset->purchase_date)) !!}</td>
++                        <td>{!! date('d/m/Y', strtotime($asset->last_checkout)) !!}</td>
++
++                    </tr>
++                    @if ($settings->show_assigned_assets)
++                        @php
++                            $assignedCounter = 1;
++                        @endphp
++                        @foreach ($asset->assignedAssets as $asset)
++                            <tr>
++                                <td>{{ $counter }}.{{ $assignedCounter }}</td>
++                                <td>{{ $asset->asset_tag }}</td>
++                                <td>{{ $asset->name }}</td>
++                                <td>{{ $asset->model->category->name }}</td>
++                                <td>{{ $asset->model->name }}</td>
++                                <td>{{ $asset->serial }}</td>
++                                <td>
++                                    {{ $asset->last_checkout }}</td>
++                            </tr>
++                            @php
++                                $assignedCounter++;
++                            @endphp
++                        @endforeach
++                    @endif
++                    @php
++                        $counter++;
++                    @endphp
++                @endforeach
++            </table>
++        @endif
++
++        @if ($user->accessories->count() > 0)
++            <br><br>
++            <table class="inventory">
++                <thead>
++                    <tr>
++                        <th colspan="7">{{ trans('general.accessories') }}</th>
++                    </tr>
++                </thead>
++                <thead>
++                    <tr>
++                        <th style="width: 20px;"></th>
++                        <th></th>
++                        <th style="width: 30%;">{{ trans('general.name') }}</th>
++                        <th style="width: 30%;">{{ trans('general.category') }}</th>
++                        <th style="width: 10%;">Marque</th>
++                        <th style="width: 10%;">{{ trans('general.checked_out') }}</th>
++                        <th style="width: 20%;">Notes</th>
++                    </tr>
++                </thead>
++                @php
++                    $acounter = 1;
++                @endphp
++
++                @foreach ($user->accessories as $accessory)
++                    @if ($accessory)
++                        <tr>
++                            <td>{{ $acounter }}</td>
++                            <td><img src="/uploads/accessories/{{ $accessory->image }}" height="60px" /></td>
++                            <td>{{ $accessory->name }} {{ $accessory->model_number }}</td>
++                            <td>{{ $accessory->category->name }}</td>
++                            <td>{{ $accessory->manufacturer ? $accessory->manufacturer->name : '' }}</td>
++                            <td>{!! date('d/m/Y', strtotime($accessory->pivot->created_at)) !!}</td>
++                            <td>{{ $accessory->getOriginal('pivot_note') }}</td>
++                        </tr>
++                        @php
++                            $acounter++;
++                        @endphp
++                    @endif
++                @endforeach
++            </table>
++        @endif
++
++        @if ($user->licenses->count() > 0)
++            <br><br>
++            <table class="inventory">
++                <thead>
++                    <tr>
++                        <th colspan="4">{{ trans('general.licenses') }}</th>
++                    </tr>
++                </thead>
++                <thead>
++                    <tr>
++                        <th style="width: 20px;"></th>
++                        <th style="width: 40%;">{{ trans('general.name') }}</th>
++                        <th style="width: 50%;">{{ trans('general.license_serial') }}</th>
++                        <th style="width: 10%;">{{ trans('general.checked_out') }}</th>
++                    </tr>
++                </thead>
++                @php
++                    $lcounter = 1;
++                @endphp
++
++                @foreach ($user->licenses as $license)
++                    <tr>
++                        <td>{{ $lcounter }}</td>
++                        <td>{{ $license->name }}</td>
++                        <td>
++                            @can('viewKeys', $license)
++                                {{ $license->serial }}
++                            @else
++                                <i class="fa-lock" aria-hidden="true"></i> {{ str_repeat('x', 15) }}
++                            @endcan
++                        </td>
++                        <td>{!! date('d/m/Y', strtotime($license->assetlog->first()->created_at)) !!}</td>
++                    </tr>
++                    @php
++                        $lcounter++;
++                    @endphp
++                @endforeach
++            </table>
++        @endif
++        <DIV STYLE="page-break-before:always"></DIV>
++     
++    @endforeach
++    <br>
++
++
++</body>
++
++</html>
+diff --git a/routes/web/users.php b/routes/web/users.php
+index 3d879eef39..918eb6e04a 100644
+--- a/routes/web/users.php
++++ b/routes/web/users.php
+@@ -15,7 +15,7 @@ Route::group(['prefix' => 'users', 'middleware' => ['auth']], function () {
+             'create',
+         ]
+     )->name('ldap/user')
+-        ->breadcrumbs(fn (Trail $trail) => $trail->parent('users.index')
++        ->breadcrumbs(fn(Trail $trail) => $trail->parent('users.index')
+             ->push(trans('general.ldap_user_sync'), route('ldap/user')));
+ 
+     Route::post(
+@@ -168,7 +168,7 @@ Route::group(['prefix' => 'users', 'middleware' => ['auth']], function () {
+         '{user}/transfer',
+         [Users\UserItemTransferController::class, 'show'],
+     )->name('users.transfer.show')
+-        ->breadcrumbs(fn (Trail $trail, $user) => $trail
++        ->breadcrumbs(fn(Trail $trail, $user) => $trail
+             ->parent('users.show', $user)
+             ->push(trans('admin/users/general.transfer.title'), route('users.transfer.show', $user)));
+ 
+@@ -177,6 +177,17 @@ Route::group(['prefix' => 'users', 'middleware' => ['auth']], function () {
+         [Users\UserItemTransferController::class, 'store'],
+     )->name('users.transfer.store');
+ 
++    // My Update
++    /////////////////////////////////////////////
++
++    Route::get(
++        'printall',
++        [
++            Users\UsersController::class,
++            'printInventoryAll'
++        ]
++    )->name('users.printall');
++
+ });
+ 
+ Route::resource('users', Users\UsersController::class, [
