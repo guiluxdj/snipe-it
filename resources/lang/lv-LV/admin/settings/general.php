@@ -416,7 +416,7 @@ return [
     'two_factor_enter_code' => 'Ievadiet divu faktoru kodu',
     'two_factor_config_complete' => 'Iesniegt kodu',
     'two_factor_enabled_edit_not_allowed' => 'Jūsu administrators neatļauj mainīt šo iestatījumu.',
-    'two_factor_enrollment_text' => "Nepieciešama divu faktoru autentifikācija, tomēr jūsu ierīce vēl nav reģistrēta. Atveriet savu lietotni Google autentifikators un skenējiet zemāk redzamo QR kodu, lai reģistrētu savu ierīci. Kad esat reģistrējies savā ierīcē, ievadiet zemāk redzamo kodu",
+    'two_factor_enrollment_text' => 'Nepieciešama divu faktoru autentifikācija, tomēr jūsu ierīce vēl nav reģistrēta. Atveriet savu lietotni Google autentifikators un skenējiet zemāk redzamo QR kodu, lai reģistrētu savu ierīci. Kad esat reģistrējies savā ierīcē, ievadiet zemāk redzamo kodu',
     'require_accept_signature' => 'Pieprasīt parakstu',
     'require_accept_signature_help_text' => 'When enabled, users must provide a signature to accept an item, in addition to clicking accept. This only applies when the item\'s category has "Require acceptance" turned on. It does not send acceptance requests on its own.',
     'require_checkinout_notes' => 'Require Notes on Checkin/Checkout',

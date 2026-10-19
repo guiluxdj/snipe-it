@@ -30,11 +30,11 @@ class DatabaseSeeder extends Seeder
         // their own image dirs, but these four are one-per-event dirs
         // that grow indefinitely.
         foreach ([
-                     'private_uploads/eula-pdfs',
-                     'private_uploads/audits',
-                     'private_uploads/signatures',
-                     'private_uploads/imports',
-                 ] as $accumulatorDir) {
+            'private_uploads/eula-pdfs',
+            'private_uploads/audits',
+            'private_uploads/signatures',
+            'private_uploads/imports',
+        ] as $accumulatorDir) {
             if (Storage::exists($accumulatorDir)) {
                 Storage::deleteDirectory($accumulatorDir);
             }

@@ -6,7 +6,6 @@ use App\Rules\AssetTagPatternRule;
 use Illuminate\Support\Facades\Validator;
 use Tests\TestCase;
 
-
 class AssetTagPatternRuleTest extends TestCase
 {
     public function test_pattern_with_external_id_placeholder_passes()

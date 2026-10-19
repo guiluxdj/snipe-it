@@ -16,7 +16,7 @@ class SupplierSeeder extends Seeder
         // Wipe every item file in the public uploads dir.
         $disk = Storage::disk('public');
         foreach ($disk->files('suppliers') as $del_file) {
-            Log::debug('Deleting: ' . $del_file);
+            Log::debug('Deleting: '.$del_file);
             try {
                 $disk->delete($del_file);
             } catch (\Exception $e) {
@@ -26,7 +26,7 @@ class SupplierSeeder extends Seeder
 
         // Attached files on the private (default) disk.
         foreach (Storage::files('private_uploads/suppliers') as $del_file) {
-            Log::debug('Deleting: ' . $del_file);
+            Log::debug('Deleting: '.$del_file);
             try {
                 Storage::delete($del_file);
             } catch (\Exception $e) {

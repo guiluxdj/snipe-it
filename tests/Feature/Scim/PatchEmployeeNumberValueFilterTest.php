@@ -39,7 +39,7 @@ class PatchEmployeeNumberValueFilterTest extends TestCase
             'employee_num' => 'OLD-123',
         ]);
 
-        $response = $this->patchJson('/scim/v2/Users/' . $target->id, [
+        $response = $this->patchJson('/scim/v2/Users/'.$target->id, [
             'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
             'Operations' => [
                 [
@@ -67,7 +67,7 @@ class PatchEmployeeNumberValueFilterTest extends TestCase
         Passport::actingAs(User::factory()->superuser()->create());
         $target = User::factory()->create(['employee_num' => 'KEEP-999']);
 
-        $response = $this->patchJson('/scim/v2/Users/' . $target->id, [
+        $response = $this->patchJson('/scim/v2/Users/'.$target->id, [
             'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
             'Operations' => [
                 [
@@ -91,7 +91,7 @@ class PatchEmployeeNumberValueFilterTest extends TestCase
         Passport::actingAs(User::factory()->superuser()->create());
         $target = User::factory()->create(['employee_num' => null]);
 
-        $response = $this->patchJson('/scim/v2/Users/' . $target->id, [
+        $response = $this->patchJson('/scim/v2/Users/'.$target->id, [
             'schemas' => ['urn:ietf:params:scim:api:messages:2.0:PatchOp'],
             'Operations' => [
                 [

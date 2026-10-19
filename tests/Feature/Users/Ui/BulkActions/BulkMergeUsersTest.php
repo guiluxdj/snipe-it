@@ -155,7 +155,6 @@ class BulkMergeUsersTest extends TestCase
         $this->assertEquals($admin->id, $asset->fresh()->assigned_to);
     }
 
-
     public function test_scoped_actor_merging_shared_user_does_not_inherit_foreign_company_memberships()
     {
         $this->settings->enableMultipleFullCompanySupport();
@@ -184,7 +183,7 @@ class BulkMergeUsersTest extends TestCase
         $actorCompanyIds = DB::table('company_user')
             ->where('user_id', $actor->id)
             ->pluck('company_id')
-            ->map(fn($id) => (int) $id)
+            ->map(fn ($id) => (int) $id)
             ->sort()
             ->values()
             ->all();
@@ -223,7 +222,7 @@ class BulkMergeUsersTest extends TestCase
         $targetCompanyIds = DB::table('company_user')
             ->where('user_id', $target->id)
             ->pluck('company_id')
-            ->map(fn($id) => (int) $id)
+            ->map(fn ($id) => (int) $id)
             ->sort()
             ->values()
             ->all();

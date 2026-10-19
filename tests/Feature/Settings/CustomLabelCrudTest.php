@@ -187,7 +187,7 @@ class CustomLabelCrudTest extends TestCase
         $this->assertEquals(5, $label->config_snapshot['grid']['rows']);
         $this->assertEquals(4, $label->config_snapshot['grid']['columns']);
     }
-    
+
     public function test_update_persists_new_tape_dimensions(): void
     {
         $label = $this->makeCustomTapeLabel();

@@ -179,7 +179,7 @@ return [
         'duplicate' => 'Jūs jau turite galiojantį šio daikto užsakymą.',
         'no_active' => 'Neturite galiojančių šio daikto užsakymų, kuriuos galėtumėte atšaukti.',
         'insufficient_stock' => 'Turimų atsargų nepakanka šiam užsakymui įvykdyti. Pirmiausia papildykite atsargas.',
-        'confirm_cancel_by_admin' => "Atšaukti :user daikto :item užsakymą?",
+        'confirm_cancel_by_admin' => 'Atšaukti :user daikto :item užsakymą?',
         'no_selection' => 'Nepasirinkta jokių eilučių vykdymui.',
         'row_stale' => 'Užsakymas Nr. :id nebėra aktyvus, todėl buvo praleistas.',
         'row_qty_invalid' => 'Užsakymas Nr. :id praleistas: jame nurodytas neteisingas kiekis, todėl buvo praleistas.',

@@ -7,7 +7,6 @@ use App\Models\SyncAdapterInstance;
 use App\SyncAdapters\Fleet\FleetAdapter;
 use Tests\TestCase;
 
-
 class AdoptBySerialDefaultTest extends TestCase
 {
     public function test_defaults_on_for_never_saved_never_synced_instance()

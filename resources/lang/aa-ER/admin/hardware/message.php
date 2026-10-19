@@ -179,7 +179,7 @@ return [
         'duplicate' => 'crwdns15615:0crwdne15615:0',
         'no_active' => 'crwdns15617:0crwdne15617:0',
         'insufficient_stock' => 'crwdns16173:0crwdne16173:0',
-        'confirm_cancel_by_admin' => "crwdns16175:0crwdne16175:0",
+        'confirm_cancel_by_admin' => 'crwdns16175:0crwdne16175:0',
         'no_selection' => 'crwdns16177:0crwdne16177:0',
         'row_stale' => 'crwdns16179:0crwdne16179:0',
         'row_qty_invalid' => 'crwdns16181:0crwdne16181:0',

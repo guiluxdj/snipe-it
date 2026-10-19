@@ -147,7 +147,7 @@ class TransferUserItemsBehaviorTest extends TestCase
         $this->assertSame($target->id, $selectedAsset->assigned_to);
         $this->assertSame($source->id, $unselectedAsset->assigned_to);
     }
-    
+
     public function test_transfer_preserves_asset_name(): void
     {
         $source = User::factory()->create();

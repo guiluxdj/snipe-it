@@ -13,7 +13,7 @@ class CustomLabelImportValidator
     {
         $config = json_decode($rawJson, true);
 
-        if (json_last_error() !== JSON_ERROR_NONE || !is_array($config)) {
+        if (json_last_error() !== JSON_ERROR_NONE || ! is_array($config)) {
             throw ValidationException::withMessages([
                 'config_snapshot' => 'The imported label config must be valid JSON.',
             ]);
@@ -115,7 +115,7 @@ class CustomLabelImportValidator
     {
         return [
             'printable_area' => ['required', 'array'],
-            
+
             'dimensions' => ['required', 'array'],
             'dimensions.width' => ['required', 'numeric', 'gt:0'],
             'dimensions.height' => ['required', 'numeric', 'gt:0'],
@@ -199,16 +199,16 @@ class CustomLabelImportValidator
     public function normalizeFonts(array $config): array
     {
         foreach ([
-                     'tag_font',
-                     'title_font',
-                     'field_label_font',
-                     'field_value_font',
-                 ] as $key) {
+            'tag_font',
+            'title_font',
+            'field_label_font',
+            'field_value_font',
+        ] as $key) {
             $font = data_get($config, "content.{$key}");
 
             if (
                 $font !== null
-                && !in_array($font, CustomLabelFonts::ALLOWED, true)
+                && ! in_array($font, CustomLabelFonts::ALLOWED, true)
             ) {
                 data_set($config, "content.{$key}", 'freesans');
             }

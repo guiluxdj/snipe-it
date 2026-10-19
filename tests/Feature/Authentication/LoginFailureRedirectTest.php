@@ -47,7 +47,7 @@ class LoginFailureRedirectTest extends TestCase
     {
         User::factory()->create();
 
-        $safeReferer = config('app.url') . '/login';
+        $safeReferer = config('app.url').'/login';
 
         $this->from($safeReferer)
             ->post('/login', [

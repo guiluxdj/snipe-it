@@ -416,7 +416,7 @@ return [
     'two_factor_enter_code' => 'Nhập mã số hai nhân tố',
     'two_factor_config_complete' => 'Gửi Mã',
     'two_factor_enabled_edit_not_allowed' => 'Quản trị viên của bạn không cho phép bạn chỉnh sửa cài đặt này.',
-    'two_factor_enrollment_text' => "Yêu cầu xác thực hai yếu tố, tuy nhiên thiết bị của bạn chưa được đăng ký. Mở ứng dụng Google Authenticator của bạn và quét mã QR dưới đây để đăng ký thiết bị của bạn. Khi bạn đã đăng ký thiết bị của mình, hãy nhập mã dưới đây",
+    'two_factor_enrollment_text' => 'Yêu cầu xác thực hai yếu tố, tuy nhiên thiết bị của bạn chưa được đăng ký. Mở ứng dụng Google Authenticator của bạn và quét mã QR dưới đây để đăng ký thiết bị của bạn. Khi bạn đã đăng ký thiết bị của mình, hãy nhập mã dưới đây',
     'require_accept_signature' => 'Yêu cầu Chữ ký',
     'require_accept_signature_help_text' => 'When enabled, users must provide a signature to accept an item, in addition to clicking accept. This only applies when the item\'s category has "Require acceptance" turned on. It does not send acceptance requests on its own.',
     'require_checkinout_notes' => 'Require Notes on Checkin/Checkout',

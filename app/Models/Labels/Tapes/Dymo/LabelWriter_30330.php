@@ -100,7 +100,6 @@ class LabelWriter_30330 extends LabelWriter
         ];
     }
 
-
     public function write($pdf, $record)
     {
         $pa = $this->getPrintableArea();
@@ -170,10 +169,10 @@ class LabelWriter_30330 extends LabelWriter
         }
         foreach ($fields as $field) {
             $rawLabel = $field['label'] ?? null;
-            $value = (string)($field['value'] ?? '');
+            $value = (string) ($field['value'] ?? '');
 
             // No label: value takes the whole row
-            if (!is_string($rawLabel) || trim($rawLabel) === '') {
+            if (! is_string($rawLabel) || trim($rawLabel) === '') {
                 static::writeText(
                     $pdf, $value,
                     $currentX, $currentY,
@@ -186,7 +185,7 @@ class LabelWriter_30330 extends LabelWriter
                 continue;
             }
 
-            $labelText = rtrim($field['label'], ':') . ':';
+            $labelText = rtrim($field['label'], ':').':';
 
             static::writeText(
                 $pdf, $labelText,

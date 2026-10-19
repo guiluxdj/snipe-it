@@ -179,7 +179,7 @@ return [
         'duplicate' => 'Du har redan en aktiv begäran för denna tillgång.',
         'no_active' => 'Du har ingen aktiv begäran att avbryta för denna tillgång.',
         'insufficient_stock' => 'Det finns inte tillräckligt med lager för att uppfylla denna begäran. Fyll på lagret först.',
-        'confirm_cancel_by_admin' => "Avbryt begäran från :user om :item?",
+        'confirm_cancel_by_admin' => 'Avbryt begäran från :user om :item?',
         'no_selection' => 'Inga rader har markerats för bearbetning.',
         'row_stale' => 'Begäran #:id är inte längre väntande och har hoppat över.',
         'row_qty_invalid' => 'Begäran #:id har en ogiltig kvantitet och har hoppat över.',

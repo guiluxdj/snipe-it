@@ -43,7 +43,7 @@ class OrderByJobTitleTest extends TestCase
                 (int) $alphaAsset->id,
                 (int) $locationAsset->id,
             ],
-            $ordered->pluck('id')->map(fn($id) => (int) $id)->all(),
+            $ordered->pluck('id')->map(fn ($id) => (int) $id)->all(),
             'Location-assigned asset must sort as NULL (last on DESC), not borrow the jobtitle of the user whose id happens to match the location id.',
         );
     }
@@ -62,7 +62,7 @@ class OrderByJobTitleTest extends TestCase
 
         $this->assertSame(
             [(int) $titledAsset->id, (int) $untitledAsset->id],
-            $ordered->pluck('id')->map(fn($id) => (int) $id)->all(),
+            $ordered->pluck('id')->map(fn ($id) => (int) $id)->all(),
         );
     }
 
@@ -103,7 +103,7 @@ class OrderByJobTitleTest extends TestCase
                 (int) $alphaAsset->id,
                 (int) $locationAsset->id,
             ],
-            $ordered->pluck('id')->map(fn($id) => (int) $id)->all(),
+            $ordered->pluck('id')->map(fn ($id) => (int) $id)->all(),
             'Location-assigned asset must sort as NULL (last on DESC), not borrow the name of the user whose id happens to match the location id.',
         );
     }
@@ -116,9 +116,9 @@ class OrderByJobTitleTest extends TestCase
     private function firstFreeIdSharedBy(string $classA, string $classB): int
     {
         $candidate = max(
-                (int) $classA::max('id'),
-                (int) $classB::max('id'),
-            ) + 100;
+            (int) $classA::max('id'),
+            (int) $classB::max('id'),
+        ) + 100;
 
         while (
             $classA::whereKey($candidate)->exists()

@@ -38,7 +38,7 @@ class TrustedProxiesTest extends TestCase
 
         $request = $this->makeSpoofedRequest('203.0.113.9', '1.1.1.1');
 
-        $resolvedIp = (new TrustProxies())->handle($request, fn ($req) => $req->ip());
+        $resolvedIp = (new TrustProxies)->handle($request, fn ($req) => $req->ip());
 
         $this->assertSame('203.0.113.9', $resolvedIp);
     }
@@ -52,7 +52,7 @@ class TrustedProxiesTest extends TestCase
 
         $request = $this->makeSpoofedRequest('10.0.0.5', '203.0.113.42');
 
-        $resolvedIp = (new TrustProxies())->handle($request, fn ($req) => $req->ip());
+        $resolvedIp = (new TrustProxies)->handle($request, fn ($req) => $req->ip());
 
         $this->assertSame('203.0.113.42', $resolvedIp);
     }
@@ -66,7 +66,7 @@ class TrustedProxiesTest extends TestCase
 
         $request = $this->makeSpoofedRequest('203.0.113.9', '1.1.1.1');
 
-        $resolvedIp = (new TrustProxies())->handle($request, fn ($req) => $req->ip());
+        $resolvedIp = (new TrustProxies)->handle($request, fn ($req) => $req->ip());
 
         $this->assertSame('203.0.113.9', $resolvedIp);
     }
@@ -80,7 +80,7 @@ class TrustedProxiesTest extends TestCase
 
         $request = $this->makeSpoofedRequest('10.0.0.5', '203.0.113.42');
 
-        $resolvedIp = (new TrustProxies())->handle($request, fn ($req) => $req->ip());
+        $resolvedIp = (new TrustProxies)->handle($request, fn ($req) => $req->ip());
 
         $this->assertSame('203.0.113.42', $resolvedIp);
     }
@@ -98,7 +98,7 @@ class TrustedProxiesTest extends TestCase
         // default header set.
         $request = $this->makeSpoofedRequest('10.0.0.5', '203.0.113.42');
 
-        $resolvedIp = (new TrustProxies())->handle($request, fn ($req) => $req->ip());
+        $resolvedIp = (new TrustProxies)->handle($request, fn ($req) => $req->ip());
 
         $this->assertSame('10.0.0.5', $resolvedIp);
     }
@@ -112,7 +112,7 @@ class TrustedProxiesTest extends TestCase
 
         $request = $this->makeSpoofedRequest('10.0.0.5', '203.0.113.42');
 
-        $resolvedIp = (new TrustProxies())->handle($request, fn ($req) => $req->ip());
+        $resolvedIp = (new TrustProxies)->handle($request, fn ($req) => $req->ip());
 
         $this->assertSame('10.0.0.5', $resolvedIp);
     }

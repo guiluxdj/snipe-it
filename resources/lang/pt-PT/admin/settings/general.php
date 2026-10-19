@@ -416,7 +416,7 @@ return [
     'two_factor_enter_code' => 'Digite o código de autenticação de pois passos',
     'two_factor_config_complete' => 'Enviar codigo',
     'two_factor_enabled_edit_not_allowed' => 'O teu administrador não permite editar esta opção.',
-    'two_factor_enrollment_text' => "A autenticação de dois passos é obrigatória, mas se o teu dispositivo ainda não foi registado, abre o Google Authenticator e lê o QR Code para registar o teu dispositivo. Uma vez registado, introduz o código abaixo",
+    'two_factor_enrollment_text' => 'A autenticação de dois passos é obrigatória, mas se o teu dispositivo ainda não foi registado, abre o Google Authenticator e lê o QR Code para registar o teu dispositivo. Uma vez registado, introduz o código abaixo',
     'require_accept_signature' => 'Requer assinatura',
     'require_accept_signature_help_text' => 'When enabled, users must provide a signature to accept an item, in addition to clicking accept. This only applies when the item\'s category has "Require acceptance" turned on. It does not send acceptance requests on its own.',
     'require_checkinout_notes' => 'Require Notes on Checkin/Checkout',

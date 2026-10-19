@@ -30,7 +30,7 @@ Route::group(['prefix' => 'locations', 'middleware' => ['auth']], function () {
         'bulkeditsave',
         [BulkLocationsController::class, 'update']
     )->name('locations.bulkedit.store')
-        ->breadcrumbs(fn(Trail $trail) => $trail->parent('locations.index')
+        ->breadcrumbs(fn (Trail $trail) => $trail->parent('locations.index')
             ->push(trans('general.bulk_edit'), route('locations.index')));
 
     Route::post(

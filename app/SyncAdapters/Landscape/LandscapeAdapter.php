@@ -148,8 +148,8 @@ class LandscapeAdapter extends SyncAdapter
      */
     private function firstHardwareRecord(array $computer, string $category): ?array
     {
-        $entry = Arr::get($computer, 'grouped_hardware.' . $category);
-        if (!is_array($entry) || $entry === []) {
+        $entry = Arr::get($computer, 'grouped_hardware.'.$category);
+        if (! is_array($entry) || $entry === []) {
             return null;
         }
 

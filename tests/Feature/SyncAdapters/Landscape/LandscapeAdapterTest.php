@@ -240,7 +240,7 @@ class LandscapeAdapterTest extends TestCase
 
     public function test_does_not_adopt_when_toggle_is_off()
     {
-        
+
         $adapter = $this->configuredLandscapeAdapter();
         $instance = SyncAdapterInstance::where('slug', 'landscape')->firstOrFail();
         SyncAdapterConfig::put($instance->id, 'adopt_by_serial', '0');

@@ -16,7 +16,6 @@ use App\Notifications\CheckinAccessoryNotification;
 use App\Notifications\CheckinAssetNotification;
 use App\Notifications\CheckinComponentNotification;
 use App\Notifications\CheckinLicenseSeatNotification;
-use App\Notifications\CheckoutAssetNotification;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Notifications\Messages\SlackMessage;
@@ -253,7 +252,7 @@ class IntegrationNotificationsUponCheckinTest extends TestCase
     {
         return [
             'Asset' => [
-                fn($webhookSource) => new CheckinAssetNotification(
+                fn ($webhookSource) => new CheckinAssetNotification(
                     Asset::factory()->create(),
                     User::factory()->create(),
                     User::factory()->superuser()->create(),
@@ -263,7 +262,7 @@ class IntegrationNotificationsUponCheckinTest extends TestCase
             ],
 
             'Accessory' => [
-                fn($webhookSource) => new CheckinAccessoryNotification(
+                fn ($webhookSource) => new CheckinAccessoryNotification(
                     Accessory::factory()->create(),
                     User::factory()->create(),
                     User::factory()->superuser()->create(),
@@ -273,7 +272,7 @@ class IntegrationNotificationsUponCheckinTest extends TestCase
             ],
 
             'Component' => [
-                fn($webhookSource) => new CheckinComponentNotification(
+                fn ($webhookSource) => new CheckinComponentNotification(
                     Component::factory()->create(),
                     User::factory()->create(),
                     User::factory()->superuser()->create(),
@@ -283,7 +282,7 @@ class IntegrationNotificationsUponCheckinTest extends TestCase
             ],
 
             'License seat' => [
-                fn($webhookSource) => new CheckinLicenseSeatNotification(
+                fn ($webhookSource) => new CheckinLicenseSeatNotification(
                     LicenseSeat::factory()->create(),
                     User::factory()->create(),
                     User::factory()->superuser()->create(),

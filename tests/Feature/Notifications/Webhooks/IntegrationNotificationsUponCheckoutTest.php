@@ -20,14 +20,13 @@ use App\Notifications\CheckoutConsumableNotification;
 use App\Notifications\CheckoutLicenseSeatNotification;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\AnonymousNotifiable;
+use Illuminate\Notifications\Messages\SlackMessage;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
+use NotificationChannels\GoogleChat\GoogleChatMessage;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Tests\TestCase;
-use Illuminate\Notifications\Messages\SlackMessage;
-use NotificationChannels\GoogleChat\GoogleChatMessage;
-
 
 #[Group('notifications')]
 class IntegrationNotificationsUponCheckoutTest extends TestCase
@@ -289,7 +288,7 @@ class IntegrationNotificationsUponCheckoutTest extends TestCase
     {
         return [
             'Accessory' => [
-                fn($webhookSource) => new CheckoutAccessoryNotification(
+                fn ($webhookSource) => new CheckoutAccessoryNotification(
                     Accessory::factory()->create(),
                     User::factory()->create(),
                     User::factory()->superuser()->create(),
@@ -300,7 +299,7 @@ class IntegrationNotificationsUponCheckoutTest extends TestCase
             ],
 
             'Asset' => [
-                fn($webhookSource) => new CheckoutAssetNotification(
+                fn ($webhookSource) => new CheckoutAssetNotification(
                     Asset::factory()->create(),
                     User::factory()->create(),
                     User::factory()->superuser()->create(),
@@ -311,7 +310,7 @@ class IntegrationNotificationsUponCheckoutTest extends TestCase
             ],
 
             'Component' => [
-                fn($webhookSource) => new CheckoutComponentNotification(
+                fn ($webhookSource) => new CheckoutComponentNotification(
                     Component::factory()->create(),
                     User::factory()->create(),
                     User::factory()->superuser()->create(),
@@ -322,7 +321,7 @@ class IntegrationNotificationsUponCheckoutTest extends TestCase
             ],
 
             'Consumable' => [
-                fn($webhookSource) => new CheckoutConsumableNotification(
+                fn ($webhookSource) => new CheckoutConsumableNotification(
                     Consumable::factory()->create(),
                     User::factory()->create(),
                     User::factory()->superuser()->create(),
@@ -333,7 +332,7 @@ class IntegrationNotificationsUponCheckoutTest extends TestCase
             ],
 
             'License seat' => [
-                fn($webhookSource) => new CheckoutLicenseSeatNotification(
+                fn ($webhookSource) => new CheckoutLicenseSeatNotification(
                     LicenseSeat::factory()->create(),
                     User::factory()->create(),
                     User::factory()->superuser()->create(),

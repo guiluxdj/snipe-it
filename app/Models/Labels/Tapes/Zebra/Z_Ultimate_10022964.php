@@ -13,6 +13,7 @@ class Z_Ultimate_10022964 extends Z_Ultimate
     protected const BARCODE_MARGIN = 1.40;
 
     protected const TAG_SIZE = 2.80;
+
     protected const TAG_MARGIN = 1.5;
 
     protected const TITLE_SIZE = 2.80;
@@ -112,9 +113,10 @@ class Z_Ultimate_10022964 extends Z_Ultimate
             'logo_max_width' => static::LOGO_MAX_WIDTH,
             'logo_margin' => static::LOGO_MARGIN,
 
-            'text_render_mode' => 'vertical_stack'
+            'text_render_mode' => 'vertical_stack',
         ];
     }
+
     public function write($pdf, $record)
     {
         $pa = $this->getPrintableArea();

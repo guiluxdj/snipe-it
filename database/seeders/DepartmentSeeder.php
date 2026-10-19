@@ -18,7 +18,7 @@ class DepartmentSeeder extends Seeder
         // Wipe every item file in the public uploads dir.
         $disk = Storage::disk('public');
         foreach ($disk->files('departments') as $del_file) {
-            Log::debug('Deleting: ' . $del_file);
+            Log::debug('Deleting: '.$del_file);
             try {
                 $disk->delete($del_file);
             } catch (\Exception $e) {
@@ -28,7 +28,7 @@ class DepartmentSeeder extends Seeder
 
         // Attached files on the private (default) disk.
         foreach (Storage::files('private_uploads/departments') as $del_file) {
-            Log::debug('Deleting: ' . $del_file);
+            Log::debug('Deleting: '.$del_file);
             try {
                 Storage::delete($del_file);
             } catch (\Exception $e) {

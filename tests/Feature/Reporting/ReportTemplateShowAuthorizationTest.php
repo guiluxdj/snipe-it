@@ -30,7 +30,7 @@ class ReportTemplateShowAuthorizationTest extends TestCase
         $private = ReportTemplate::factory()
             ->for($creator, 'creator')
             ->notShared()
-            ->create(['name' => 'report-template-show-oracle-' . uniqid()]);
+            ->create(['name' => 'report-template-show-oracle-'.uniqid()]);
 
         $response = $this->actingAs($intruder)
             ->get(route('report-templates.show', $private->id));

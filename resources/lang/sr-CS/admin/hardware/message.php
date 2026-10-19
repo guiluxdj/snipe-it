@@ -179,7 +179,7 @@ return [
         'duplicate' => 'Već imate aktivan zahtev za ovu stavku.',
         'no_active' => 'Nemate aktivan zahtev za ovu stavku koji bi ste otkazali.',
         'insufficient_stock' => 'Nema dovoljno na raspolaganju da se izvrši ovaj zahtev. Prvo dopunite.',
-        'confirm_cancel_by_admin' => "Otkazati :user zahtev za :item?",
+        'confirm_cancel_by_admin' => 'Otkazati :user zahtev za :item?',
         'no_selection' => 'Nijedan red nije izabran za ispunjavanje.',
         'row_stale' => 'Zahtev #:id više nije na čekanju i preskočen je.',
         'row_qty_invalid' => 'Zahtev #:id ima neispravnu količinu i preskočen je.',

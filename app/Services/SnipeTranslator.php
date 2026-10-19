@@ -36,7 +36,7 @@ class SnipeTranslator extends Translator
             $number = count($number);
         }
 
-        if (!isset($replace['count'])) {
+        if (! isset($replace['count'])) {
             $replace['count'] = $number;
         }
 
@@ -48,7 +48,7 @@ class SnipeTranslator extends Translator
         // picks the singular form. Strip the informal marker before mapping
         // dashes to underscores so the base language's plural rule kicks in
         // for the choice, without disturbing the actual locale used for
-        // file lookup. 
+        // file lookup.
         $plural_locale = preg_replace('/-if$/', '', $locale);
         $underscored_locale = str_replace('-', '_', $plural_locale); // OUR CHANGE.
 

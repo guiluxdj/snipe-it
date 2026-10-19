@@ -179,7 +179,7 @@ return [
         'duplicate' => 'Bu öğe için zaten etkin bir talebiniz var.',
         'no_active' => 'Bu öğe için iptal edebileceğiniz etkin bir talebiniz yok.',
         'insufficient_stock' => 'Bu talebi karşılamak için stok yeterli değil. Önce stoğu yenileyin.',
-        'confirm_cancel_by_admin' => ":user kullanıcısının :item talebini iptal et?",
+        'confirm_cancel_by_admin' => ':user kullanıcısının :item talebini iptal et?',
         'no_selection' => 'Karşılanacak hiçbir satır seçilmedi.',
         'row_stale' => '#:id numaralı talep artık beklemede değil ve atlandı.',
         'row_qty_invalid' => '#:id numaralı talepte geçersiz miktar var; talep atlandı.',

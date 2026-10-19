@@ -9,7 +9,6 @@ use Illuminate\Support\Str;
 /**
  * Seed one row in sync_adapter_instances per shipped adapter type
  * (Fleet, Kandji, etc.) at test-setup time.
- *
  */
 trait SeedsShippedSyncAdapters
 {

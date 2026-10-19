@@ -95,8 +95,7 @@ class Continuous_Landscape_0_59in_A extends Continuous_Landscape_0_59in
         ];
     }
 
-
-    public function preparePDF(TCPDF $pdf) : void
+    public function preparePDF(TCPDF $pdf): void
     {
         $pdf->SetAutoPageBreak(false);
     }

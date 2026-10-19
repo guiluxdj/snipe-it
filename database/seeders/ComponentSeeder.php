@@ -27,7 +27,7 @@ class ComponentSeeder extends Seeder
         // Wipe every item file in the public uploads dir.
         $disk = Storage::disk('public');
         foreach ($disk->files('components') as $del_file) {
-            Log::debug('Deleting: ' . $del_file);
+            Log::debug('Deleting: '.$del_file);
             try {
                 $disk->delete($del_file);
             } catch (\Exception $e) {
@@ -37,7 +37,7 @@ class ComponentSeeder extends Seeder
 
         // Attached files on the private (default) disk.
         foreach (Storage::files('private_uploads/components') as $del_file) {
-            Log::debug('Deleting: ' . $del_file);
+            Log::debug('Deleting: '.$del_file);
             try {
                 Storage::delete($del_file);
             } catch (\Exception $e) {

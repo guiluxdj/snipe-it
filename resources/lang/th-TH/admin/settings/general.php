@@ -416,7 +416,7 @@ return [
     'two_factor_enter_code' => 'ป้อนรหัสสองปัจจัย',
     'two_factor_config_complete' => 'ส่งรหัส',
     'two_factor_enabled_edit_not_allowed' => 'ผู้ดูแลระบบของคุณไม่อนุญาตให้คุณแก้ไขการตั้งค่านี้',
-    'two_factor_enrollment_text' => "จำเป็นต้องมีการตรวจสอบสิทธิ์สองปัจจัย แต่อุปกรณ์ของคุณยังไม่ได้ลงทะเบียน เปิดแอป Google Authenticator และสแกนโค้ด QR ด้านล่างเพื่อลงทะเบียนอุปกรณ์ของคุณ เมื่อคุณลงทะเบียนอุปกรณ์แล้วให้ป้อนรหัสด้านล่าง",
+    'two_factor_enrollment_text' => 'จำเป็นต้องมีการตรวจสอบสิทธิ์สองปัจจัย แต่อุปกรณ์ของคุณยังไม่ได้ลงทะเบียน เปิดแอป Google Authenticator และสแกนโค้ด QR ด้านล่างเพื่อลงทะเบียนอุปกรณ์ของคุณ เมื่อคุณลงทะเบียนอุปกรณ์แล้วให้ป้อนรหัสด้านล่าง',
     'require_accept_signature' => 'ต้องการลายเซ็น',
     'require_accept_signature_help_text' => 'When enabled, users must provide a signature to accept an item, in addition to clicking accept. This only applies when the item\'s category has "Require acceptance" turned on. It does not send acceptance requests on its own.',
     'require_checkinout_notes' => 'Require Notes on Checkin/Checkout',

@@ -121,7 +121,7 @@ class LdapTest extends TestCase
     private function useTempStoragePath(): void
     {
         $this->originalStoragePath = storage_path();
-        $this->tempStoragePath = sys_get_temp_dir() . '/snipeit-ldap-' . uniqid('', true);
+        $this->tempStoragePath = sys_get_temp_dir().'/snipeit-ldap-'.uniqid('', true);
         mkdir($this->tempStoragePath, 0755, true);
         $this->app->useStoragePath($this->tempStoragePath);
     }
@@ -134,7 +134,7 @@ class LdapTest extends TestCase
             $this->app->useStoragePath($this->originalStoragePath);
 
             if ($this->tempStoragePath !== null && is_dir($this->tempStoragePath)) {
-                foreach (glob($this->tempStoragePath . '/*') as $file) {
+                foreach (glob($this->tempStoragePath.'/*') as $file) {
                     @unlink($file);
                 }
                 @rmdir($this->tempStoragePath);

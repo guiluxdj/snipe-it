@@ -48,7 +48,7 @@ class AcceptanceStorageFailureTest extends TestCase
 
         return [
             'asset_acceptance' => 'accepted',
-            'signature_output' => 'data:image/png;base64,' . base64_encode($signaturePng),
+            'signature_output' => 'data:image/png;base64,'.base64_encode($signaturePng),
         ];
     }
 

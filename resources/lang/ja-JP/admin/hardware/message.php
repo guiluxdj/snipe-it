@@ -179,7 +179,7 @@ return [
         'duplicate' => 'このアイテムはすでに申請中です。',
         'no_active' => 'キャンセルできる申請はありません。',
         'insufficient_stock' => '在庫が足りないため、この申請に対応できません。先に補充してください。',
-        'confirm_cancel_by_admin' => ":userさんの:itemの申請をキャンセルしますか？",
+        'confirm_cancel_by_admin' => ':userさんの:itemの申請をキャンセルしますか？',
         'no_selection' => '対応する行が選択されていません。',
         'row_stale' => '申請 #:id はすでに保留中ではないため、スキップしました。',
         'row_qty_invalid' => '申請 #:id の数量が正しくないため、スキップしました。',

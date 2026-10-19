@@ -1,4 +1,5 @@
 <?php
+
 return [
 
     'sections' => [
@@ -98,6 +99,5 @@ return [
     'label_deleted_successfully' => 'Etiketė sėkmingai ištrinta',
     'created_successfully' => ' :item sėkmingai sukurtas',
     'updated_successfully' => ':item sėkmingai atnaujintas',
-
 
 ];

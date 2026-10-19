@@ -416,7 +416,7 @@ return [
     'two_factor_enter_code' => 'הזן קוד שני פקטורים',
     'two_factor_config_complete' => 'שלח קוד',
     'two_factor_enabled_edit_not_allowed' => 'מנהל המערכת אינו מאפשר לך לערוך הגדרה זו.',
-    'two_factor_enrollment_text' => "יש צורך באימות שני גורמים, אך המכשיר עדיין לא נרשם. פתח את אפליקציית המאמת של Google וסרוק את קוד QR שלהלן כדי לרשום את המכשיר שלך. לאחר שתירשם את המכשיר, הזן את הקוד הבא",
+    'two_factor_enrollment_text' => 'יש צורך באימות שני גורמים, אך המכשיר עדיין לא נרשם. פתח את אפליקציית המאמת של Google וסרוק את קוד QR שלהלן כדי לרשום את המכשיר שלך. לאחר שתירשם את המכשיר, הזן את הקוד הבא',
     'require_accept_signature' => 'דרוש חתימה',
     'require_accept_signature_help_text' => 'When enabled, users must provide a signature to accept an item, in addition to clicking accept. This only applies when the item\'s category has "Require acceptance" turned on. It does not send acceptance requests on its own.',
     'require_checkinout_notes' => 'Require Notes on Checkin/Checkout',

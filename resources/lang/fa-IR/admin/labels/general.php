@@ -1,4 +1,5 @@
 <?php
+
 return [
 
     'sections' => [
@@ -100,6 +101,5 @@ return [
     'label_deleted_successfully' => 'Label deleted successfully',
     'created_successfully' => ' :item created successfully',
     'updated_successfully' => ':item updated successfully',
-
 
 ];

@@ -8,7 +8,6 @@ use App\Models\User;
 use Tests\TestCase;
 
 /**
- *
  * The uploaded-file `note` reaches the browser through the API's
  * UploadedFilesTransformer. The client-side gallery custom view concatenates
  * it into the `data-footer` attribute of a bootstrap-table lightbox anchor,

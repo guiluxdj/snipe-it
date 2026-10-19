@@ -79,22 +79,18 @@ class LabelWriter_2112284 extends LabelWriter
             'barcode1D_v_align' => 'B',
             'barcode1D_placement' => 'text_column',
 
-
             'barcode_2d_size' => $this->getPrintableArea()->h - self::TAG_SIZE,
             'barcode2D_h_align' => 'L',
             'barcode2D_v_align' => 'T',
-
 
             'tag_font_size' => self::TAG_SIZE,
             'tag_alignment' => 'C',
             'tag_position_mode' => 'under_barcode',
             'tag_font' => 'freesans',
 
-
             'title_font_size' => self::TITLE_SIZE,
             'title_margin' => self::TITLE_MARGIN,
             'title_font' => 'freesans',
-
 
             'field_label_font_size' => self::LABEL_SIZE,
             'field_label_margin' => self::LABEL_MARGIN,

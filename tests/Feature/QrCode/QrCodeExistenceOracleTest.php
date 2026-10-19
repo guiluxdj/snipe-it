@@ -7,7 +7,6 @@ use App\Models\Setting;
 use App\Models\User;
 use Tests\TestCase;
 
-
 class QrCodeExistenceOracleTest extends TestCase
 {
     protected function setUp(): void

@@ -416,7 +416,7 @@ return [
     'two_factor_enter_code' => 'இரு காரணி குறியீடு உள்ளிடவும்',
     'two_factor_config_complete' => 'கோட் சமர்ப்பிக்கவும்',
     'two_factor_enabled_edit_not_allowed' => 'இந்த அமைப்பைத் திருத்த உங்கள் நிர்வாகி அனுமதிக்கவில்லை.',
-    'two_factor_enrollment_text' => "இரண்டு காரணி அங்கீகாரம் தேவைப்படுகிறது, ஆனால் உங்கள் சாதனம் இதுவரை பதிவுசெய்யப்படவில்லை. உங்கள் Google Authenticator பயன்பாட்டைத் திறந்து உங்கள் சாதனத்தை சேர்ப்பதற்கு கீழே உள்ள QR குறியீட்டை ஸ்கேன் செய்யவும். உங்கள் சாதனத்தை நீங்கள் சேர்ந்தவுடன், கீழே உள்ள குறியீட்டை உள்ளிடுக",
+    'two_factor_enrollment_text' => 'இரண்டு காரணி அங்கீகாரம் தேவைப்படுகிறது, ஆனால் உங்கள் சாதனம் இதுவரை பதிவுசெய்யப்படவில்லை. உங்கள் Google Authenticator பயன்பாட்டைத் திறந்து உங்கள் சாதனத்தை சேர்ப்பதற்கு கீழே உள்ள QR குறியீட்டை ஸ்கேன் செய்யவும். உங்கள் சாதனத்தை நீங்கள் சேர்ந்தவுடன், கீழே உள்ள குறியீட்டை உள்ளிடுக',
     'require_accept_signature' => 'கையொப்பம் தேவை',
     'require_accept_signature_help_text' => 'When enabled, users must provide a signature to accept an item, in addition to clicking accept. This only applies when the item\'s category has "Require acceptance" turned on. It does not send acceptance requests on its own.',
     'require_checkinout_notes' => 'Require Notes on Checkin/Checkout',

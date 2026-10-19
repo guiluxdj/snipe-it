@@ -9,7 +9,6 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
-
 class BulkCheckinAccessoryCrossTenantDeleteFmcsTest extends TestCase
 {
     public function test_bulk_checkin_does_not_delete_foreign_company_accessory_checkout_rows_for_floater_target(): void

@@ -273,8 +273,8 @@ class Ldap extends Model
     public static function shouldUseSaslExternal(object $config): bool
     {
         return self::saslExternalAvailable()
-            && !empty($config->ldap_client_tls_cert)
-            && !empty($config->ldap_client_tls_key)
+            && ! empty($config->ldap_client_tls_cert)
+            && ! empty($config->ldap_client_tls_key)
             && empty($config->ldap_uname)
             && empty($config->ldap_pword);
     }

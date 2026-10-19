@@ -149,7 +149,7 @@ class RequestableAssetModelsApiTest extends TestCase
         $this->assertTrue($rowWith['available_actions']['view']);
         $this->assertFalse($rowWithout['available_actions']['view']);
     }
-    
+
     public function test_remaining_reflects_deployable_asset_count(): void
     {
         $model = AssetModel::factory()->create(['requestable' => 1]);

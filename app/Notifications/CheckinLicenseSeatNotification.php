@@ -26,8 +26,11 @@ class CheckinLicenseSeatNotification extends Notification implements ShouldQueue
     use Queueable;
 
     public $target;
+
     public License $item;
+
     public User $admin;
+
     public $note;
 
     /**
@@ -115,7 +118,7 @@ class CheckinLicenseSeatNotification extends Notification implements ShouldQueue
         $admin = $this->admin;
         $item = $this->item;
         $note = $this->note;
-        if (!Str::contains($this->webhookSource->webhook_endpoint, 'workflows')) {
+        if (! Str::contains($this->webhookSource->webhook_endpoint, 'workflows')) {
             return MicrosoftTeamsMessage::create()
                 ->to($this->webhookSource->webhook_endpoint)
                 ->type('success')

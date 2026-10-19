@@ -1,4 +1,5 @@
 <?php
+
 return [
 
     'sections' => [
@@ -98,6 +99,5 @@ return [
     'label_deleted_successfully' => 'Etikett erfolgreich gelöscht',
     'created_successfully' => ' :item erfolgreich erstellt',
     'updated_successfully' => ':item erfolgreich aktualisiert',
-
 
 ];

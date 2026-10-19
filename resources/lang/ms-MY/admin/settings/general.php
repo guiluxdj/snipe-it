@@ -416,7 +416,7 @@ return [
     'two_factor_enter_code' => 'Masukkan Kod Dua Faktor',
     'two_factor_config_complete' => 'Hantar Kod',
     'two_factor_enabled_edit_not_allowed' => 'Pentadbir anda tidak membenarkan anda mengedit tetapan ini.',
-    'two_factor_enrollment_text' => "Dua faktor pengesahan diperlukan, namun peranti anda belum lagi mendaftar. Buka apl Google Authenticator anda dan imbas kod QR di bawah untuk mendaftarkan peranti anda. Sebaik sahaja anda telah mendaftarkan peranti anda, masukkan kod di bawah",
+    'two_factor_enrollment_text' => 'Dua faktor pengesahan diperlukan, namun peranti anda belum lagi mendaftar. Buka apl Google Authenticator anda dan imbas kod QR di bawah untuk mendaftarkan peranti anda. Sebaik sahaja anda telah mendaftarkan peranti anda, masukkan kod di bawah',
     'require_accept_signature' => 'Memerlukan Tandatangan',
     'require_accept_signature_help_text' => 'When enabled, users must provide a signature to accept an item, in addition to clicking accept. This only applies when the item\'s category has "Require acceptance" turned on. It does not send acceptance requests on its own.',
     'require_checkinout_notes' => 'Require Notes on Checkin/Checkout',

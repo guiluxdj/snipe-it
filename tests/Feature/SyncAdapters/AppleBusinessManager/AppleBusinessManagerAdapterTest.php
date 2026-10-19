@@ -369,7 +369,6 @@ class AppleBusinessManagerAdapterTest extends TestCase
         $this->assertSame(1, \App\Models\Asset::query()->count());
     }
 
-
     public function test_retries_on_429_and_honors_retry_after_header()
     {
         $adapter = $this->configuredAdapter();
@@ -393,7 +392,7 @@ class AppleBusinessManagerAdapterTest extends TestCase
 
         $mdmServerHits = 0;
         Http::assertSent(function ($request) use (&$mdmServerHits) {
-            if (str_contains($request->url(), '/v1/mdmServers') && !str_contains($request->url(), 'relationships')) {
+            if (str_contains($request->url(), '/v1/mdmServers') && ! str_contains($request->url(), 'relationships')) {
                 $mdmServerHits++;
             }
 

@@ -179,7 +179,7 @@ return [
         'duplicate' => 'Hai già una richiesta attiva per questo elemento.',
         'no_active' => 'Non hai richieste attive da annullare per questo elemento.',
         'insufficient_stock' => 'Disponibilità insufficiente per questa richiesta. Prima rifornisci.',
-        'confirm_cancel_by_admin' => "Annullare la richiesta di :user per :item?",
+        'confirm_cancel_by_admin' => 'Annullare la richiesta di :user per :item?',
         'no_selection' => 'Nessuna riga selezionata da evadere.',
         'row_stale' => 'La richiesta #:id non è più in attesa ed è stata saltata.',
         'row_qty_invalid' => 'La richiesta #:id ha una quantità non valida ed è stata saltata.',

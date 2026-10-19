@@ -29,7 +29,7 @@ class OidcUserResolver
             ->whereNull('deleted_at')
             ->where('activated', '=', '1')
             ->first();
-        
+
         $verified = User::verifyExactUsernameMatch($user, $username);
 
         if ($verified !== null) {

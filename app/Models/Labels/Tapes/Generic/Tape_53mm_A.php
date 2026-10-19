@@ -103,6 +103,7 @@ class Tape_53mm_A extends Tape_53mm
             'text_render_mode' => 'vertical_stack',
         ];
     }
+
     public function preparePDF(TCPDF $pdf): void
     {
         $pdf->SetAutoPageBreak(false);

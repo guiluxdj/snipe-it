@@ -179,7 +179,7 @@ return [
         'duplicate' => 'You already have an active request for this item.',
         'no_active' => 'You have no active request to cancel for this item.',
         'insufficient_stock' => 'Not enough on hand to fulfill this request. Replenish first.',
-        'confirm_cancel_by_admin' => "Annuler la demande de :user pour :item?",
+        'confirm_cancel_by_admin' => 'Annuler la demande de :user pour :item?',
         'no_selection' => 'Aucune ligne n\'a été sélectionnée pour être remplie.',
         'row_stale' => 'La requête #:id n\'est plus en attente et a été ignorée.',
         'row_qty_invalid' => 'Request #:id has an invalid quantity and was skipped.',

@@ -34,7 +34,7 @@ return [
     'backups_help' => 'បង្កើត ទាញយក និងស្ដារការបម្រុងទុក ',
     'backups_restoring' => 'ការស្ដារឡើងវិញពីការបម្រុងទុក',
     'backups_clean' => 'សម្អាតមូលដ្ឋានទិន្នន័យដែលបានបម្រុងទុកមុនពេលស្តារឡើងវិញ',
-    'backups_clean_helptext' => "វាអាចមានប្រយោជន៍ប្រសិនបើអ្នកកំពុងផ្លាស់ប្តូររវាងកំណែមូលដ្ឋានទិន្នន័យ",
+    'backups_clean_helptext' => 'វាអាចមានប្រយោជន៍ប្រសិនបើអ្នកកំពុងផ្លាស់ប្តូររវាងកំណែមូលដ្ឋានទិន្នន័យ',
     'backups_upload' => 'ផ្ទុកឡើងការបម្រុងទុក',
     'backups_path' => 'ការបម្រុងទុកនៅលើម៉ាស៊ីនមេត្រូវបានរក្សាទុកក្នុង <code>:path</code>',
     'backups_restore_warning' => 'Use the restore button <small><span class="btn btn-xs btn-warning"><i class="text-white fa-solid fa-trash-arrow-up" aria-hidden="true"></i></span></small> to restore from a previous backup. (This does not currently work with S3 file storage.)<br><br>Your <strong>entire :app_name database and any uploaded files will be completely replaced</strong> by what\'s in the backup file  ',

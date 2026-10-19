@@ -40,7 +40,7 @@ class CheckoutAssetNotification extends Notification implements ShouldQueue
         public $target,
         public User $admin,
         public $acceptance, // ???? what is this? (doesn't seem used)
-        public                 $note,
+        public $note,
         public Company|Setting $webhookSource,
     ) {
         if ($this->item->last_checkout) {
@@ -126,7 +126,7 @@ class CheckoutAssetNotification extends Notification implements ShouldQueue
         $item = $this->item;
         $note = $this->note;
 
-        if (!Str::contains($this->webhookSource->webhook_endpoint, 'workflows')) {
+        if (! Str::contains($this->webhookSource->webhook_endpoint, 'workflows')) {
             return MicrosoftTeamsMessage::create()
                 ->to($this->webhookSource->webhook_endpoint)
                 ->type('success')

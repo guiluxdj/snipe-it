@@ -338,29 +338,27 @@ namespace App\Models{
  * @property int|null $depreciate
  * @property int|null $supplier_id
  * @property int|null $rtd_location_id
+ * @property string|null $_snipeit_mac_address_1
  * @property string|null $accepted
  * @property \Illuminate\Support\Carbon|null $last_checkout
  * @property \Illuminate\Support\Carbon|null $expected_checkin
  * @property string|null $assigned_type
  * @property int $checkin_counter
- * @property int $requests_counter
  * @property int $checkout_counter
+ * @property int $requests_counter
+ * @property string|null $_snipeit_ram_2
+ * @property string|null $_snipeit_cpu_3
+ * @property string|null $_snipeit_imei_4
+ * @property string|null $_snipeit_os_5
+ * @property string|null $_snipeit_taille_decran_6
  * @property int|null $byod
- * @property string|null $_snipeit_imei_1
- * @property string|null $_snipeit_phone_number_2
- * @property string|null $_snipeit_ram_3
- * @property string|null $_snipeit_cpu_4
- * @property string|null $_snipeit_mac_address_5
- * @property string|null $_snipeit_test_encrypted_6
- * @property string|null $_snipeit_test_checkbox_7
- * @property string|null $_snipeit_test_radio_8
- * @property string|null $_snipeit_notes_9
- * @property string|null $_snipeit_sample_date_10
- * @property string|null $_snipeit_sample_datetime_11
- * @property string|null $_snipeit__12
- * @property string|null $_snipeit_dscsdaffds_13
- * @property string|null $_snipeit_last_seen_network_heartbeat_14
- * @property string|null $_snipeit_disk_encryption_15
+ * @property string|null $_snipeit_disque_dur_7
+ * @property string|null $_snipeit_entrees_video_8
+ * @property string|null $_snipeit_bitlocker_9
+ * @property string|null $_snipeit_imei_2_10
+ * @property string|null $_snipeit_wifi_11
+ * @property string|null $_snipeit_reseau_lan_12
+ * @property string|null $_snipeit_impression_13
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Accessory> $accessories
  * @property-read int|null $accessories_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Actionlog> $actionlog
@@ -373,6 +371,8 @@ namespace App\Models{
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Asset> $assignedAssets
  * @property-read int|null $assigned_assets_count
  * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent|null $assignedTo
+ * @property-read \App\Models\Location|null $assignedToLocation
+ * @property-read \App\Models\User|null $assignedToUser
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CalendarEvent> $calendarEvents
  * @property-read int|null $calendar_events_count
  * @property-read \App\Models\Category|null $category
@@ -524,21 +524,19 @@ namespace App\Models{
  * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereRequestsCounter($value)
  * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereRtdLocationId($value)
  * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSerial($value)
- * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeit12($value)
- * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitCpu4($value)
- * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitDiskEncryption15($value)
- * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitDscsdaffds13($value)
- * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitImei1($value)
- * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitLastSeenNetworkHeartbeat14($value)
- * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitMacAddress5($value)
- * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitNotes9($value)
- * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitPhoneNumber2($value)
- * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitRam3($value)
- * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitSampleDate10($value)
- * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitSampleDatetime11($value)
- * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitTestCheckbox7($value)
- * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitTestEncrypted6($value)
- * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitTestRadio8($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitBitlocker9($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitCpu3($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitDisqueDur7($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitEntreesVideo8($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitImei210($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitImei4($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitImpression13($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitMacAddress1($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitOs5($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitRam2($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitReseauLan12($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitTailleDecran6($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitWifi11($value)
  * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereStatusId($value)
  * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSupplierId($value)
  * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereUpdatedAt($value)
@@ -606,9 +604,7 @@ namespace App\Models{
  * @version v1.0
  * @property int $id
  * @property string $name
- * @property string|null $tag_slug
  * @property string|null $model_number
- * @property string|null $hardware_identifier
  * @property int|null $min_amt
  * @property int|null $manufacturer_id
  * @property int|null $category_id
@@ -694,7 +690,6 @@ namespace App\Models{
  * @method static \App\Models\Builders\AssetModelQueryBuilder<static>|AssetModel whereDepreciationId($value)
  * @method static \App\Models\Builders\AssetModelQueryBuilder<static>|AssetModel whereEol($value)
  * @method static \App\Models\Builders\AssetModelQueryBuilder<static>|AssetModel whereFieldsetId($value)
- * @method static \App\Models\Builders\AssetModelQueryBuilder<static>|AssetModel whereHardwareIdentifier($value)
  * @method static \App\Models\Builders\AssetModelQueryBuilder<static>|AssetModel whereId($value)
  * @method static \App\Models\Builders\AssetModelQueryBuilder<static>|AssetModel whereImage($value)
  * @method static \App\Models\Builders\AssetModelQueryBuilder<static>|AssetModel whereManufacturerId($value)
@@ -704,7 +699,6 @@ namespace App\Models{
  * @method static \App\Models\Builders\AssetModelQueryBuilder<static>|AssetModel whereNotes($value)
  * @method static \App\Models\Builders\AssetModelQueryBuilder<static>|AssetModel whereRequestable($value)
  * @method static \App\Models\Builders\AssetModelQueryBuilder<static>|AssetModel whereRequireSerial($value)
- * @method static \App\Models\Builders\AssetModelQueryBuilder<static>|AssetModel whereTagSlug($value)
  * @method static \App\Models\Builders\AssetModelQueryBuilder<static>|AssetModel whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetModel withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AssetModel withoutTrashed()
@@ -771,7 +765,6 @@ namespace App\Models{
  * @version v1.0
  * @property int $id
  * @property string $name
- * @property string|null $tag_slug
  * @property string|null $tag_color
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -847,7 +840,6 @@ namespace App\Models{
  * @method static \App\Models\Builders\CategoryQueryBuilder<static>|Category whereNotes($value)
  * @method static \App\Models\Builders\CategoryQueryBuilder<static>|Category whereRequireAcceptance($value)
  * @method static \App\Models\Builders\CategoryQueryBuilder<static>|Category whereTagColor($value)
- * @method static \App\Models\Builders\CategoryQueryBuilder<static>|Category whereTagSlug($value)
  * @method static \App\Models\Builders\CategoryQueryBuilder<static>|Category whereUpdatedAt($value)
  * @method static \App\Models\Builders\CategoryQueryBuilder<static>|Category whereUseDefaultEula($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Category withTrashed(bool $withTrashed = true)
@@ -986,7 +978,6 @@ namespace App\Models{
  * @version v1.8
  * @property int $id
  * @property string $name
- * @property string|null $tag_slug
  * @property int|null $parent_id
  * @property string|null $tag_color
  * @property string|null $fax
@@ -995,9 +986,9 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $image
- * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property int|null $created_by
  * @property string|null $notes
+ * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property string|null $webhook_selected
  * @property string|null $webhook_endpoint
  * @property string|null $webhook_channel
@@ -1072,7 +1063,6 @@ namespace App\Models{
  * @method static \App\Models\Builders\CompanyQueryBuilder<static>|Company whereParentId($value)
  * @method static \App\Models\Builders\CompanyQueryBuilder<static>|Company wherePhone($value)
  * @method static \App\Models\Builders\CompanyQueryBuilder<static>|Company whereTagColor($value)
- * @method static \App\Models\Builders\CompanyQueryBuilder<static>|Company whereTagSlug($value)
  * @method static \App\Models\Builders\CompanyQueryBuilder<static>|Company whereUpdatedAt($value)
  * @method static \App\Models\Builders\CompanyQueryBuilder<static>|Company whereWebhookBotname($value)
  * @method static \App\Models\Builders\CompanyQueryBuilder<static>|Company whereWebhookChannel($value)
@@ -2082,8 +2072,8 @@ namespace App\Models{
  * @property string|null $ldap_ou
  * @property int|null $manager_id
  * @property string|null $image
- * @property int|null $company_id
  * @property string|null $notes
+ * @property int|null $company_id
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Accessory> $accessories
  * @property-read int|null $accessories_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Actionlog> $actionlog
@@ -2364,7 +2354,6 @@ namespace App\Models{
 /**
  * @property int $id
  * @property string $name
- * @property string|null $tag_slug
  * @property string|null $tag_color
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
@@ -2434,7 +2423,6 @@ namespace App\Models{
  * @method static \App\Models\Builders\ManufacturerQueryBuilder<static>|Manufacturer whereSupportPhone($value)
  * @method static \App\Models\Builders\ManufacturerQueryBuilder<static>|Manufacturer whereSupportUrl($value)
  * @method static \App\Models\Builders\ManufacturerQueryBuilder<static>|Manufacturer whereTagColor($value)
- * @method static \App\Models\Builders\ManufacturerQueryBuilder<static>|Manufacturer whereTagSlug($value)
  * @method static \App\Models\Builders\ManufacturerQueryBuilder<static>|Manufacturer whereUpdatedAt($value)
  * @method static \App\Models\Builders\ManufacturerQueryBuilder<static>|Manufacturer whereUrl($value)
  * @method static \App\Models\Builders\ManufacturerQueryBuilder<static>|Manufacturer whereWarrantyLookupUrl($value)
@@ -2974,7 +2962,6 @@ namespace App\Models{
  * @property int|null $display_eol
  * @property int $auto_increment_assets
  * @property string|null $auto_increment_prefix
- * @property int $scope_counters_by_company
  * @property int $load_remote
  * @property string|null $logo
  * @property string|null $header_color
@@ -3109,9 +3096,11 @@ namespace App\Models{
  * @property string|null $saml_sp_x509certNew
  * @property string|null $digit_separator
  * @property string|null $ldap_client_tls_cert
- * @property int $ldap_use_sasl_external_bind
  * @property string|null $ldap_client_tls_key
  * @property string|null $dash_chart_type
+ * @property int|null $google_login
+ * @property string|null $google_client_id
+ * @property string|null $google_client_secret
  * @property int $label2_enable
  * @property string|null $label2_template
  * @property string|null $label2_title
@@ -3122,17 +3111,12 @@ namespace App\Models{
  * @property string $label2_2d_target
  * @property string $label2_fields
  * @property int $label2_empty_row_count
- * @property int|null $google_login
- * @property string|null $google_client_id
- * @property string|null $google_client_secret
  * @property int|null $profile_edit
- * @property bool|null $require_checkinout_notes
  * @property int $shortcuts_enabled
  * @property int|null $due_checkin_days
+ * @property bool|null $require_checkinout_notes
  * @property int $ldap_invert_active_flag
  * @property bool $manager_view_enabled Allow managers to view assets assigned to their subordinates
- * @property string|null $fleet_url
- * @property string|null $fleet_token
  * @property-read string $label2_template_display
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
@@ -3179,8 +3163,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereEmailFormat($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereEmailLogo($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereFavicon($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereFleetToken($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereFleetUrl($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereFooterText($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereFullMultipleCompaniesSupport($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereGoogleClientId($value)
@@ -3248,7 +3230,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereLdapState($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereLdapTls($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereLdapUname($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereLdapUseSaslExternalBind($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereLdapUsernameField($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereLdapVersion($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereLdapZip($value)
@@ -3288,7 +3269,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereSamlSpPrivatekey($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereSamlSpX509cert($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereSamlSpX509certNew($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereScopeCountersByCompany($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereScopeLocationsFmcs($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereShortcutsEnabled($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereShowAlertsInMenu($value)

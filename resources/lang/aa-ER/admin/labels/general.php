@@ -1,4 +1,5 @@
 <?php
+
 return [
 
     'sections' => [
@@ -98,6 +99,5 @@ return [
     'label_deleted_successfully' => 'crwdns17521:0crwdne17521:0',
     'created_successfully' => 'crwdns17523:0crwdne17523:0',
     'updated_successfully' => 'crwdns17525:0crwdne17525:0',
-
 
 ];

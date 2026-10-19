@@ -6,7 +6,6 @@ use App\Models\User;
 use Laravel\Passport\Passport;
 use Tests\TestCase;
 
-
 class MeEndpointTest extends TestCase
 {
     public function test_scim_me_returns_the_authenticated_user()

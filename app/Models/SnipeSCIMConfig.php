@@ -246,7 +246,7 @@ class SnipeRootComplex extends Complex
     {
         if ($path !== null && $path->isNotEmpty()) {
             $valuePathAttributes = $path->getValuePathAttributes();
-            if (!empty($valuePathAttributes) && $this->parent === null) {
+            if (! empty($valuePathAttributes) && $this->parent === null) {
                 $attrName = $valuePathAttributes[0];
                 $attribute = $this->getSubNode($attrName);
 

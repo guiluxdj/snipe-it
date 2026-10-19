@@ -3,9 +3,9 @@
 namespace App\Notifications;
 
 use App\Models\Accessory;
+use App\Models\Company;
 use App\Models\Setting;
 use App\Models\User;
-use App\Models\Company;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -36,10 +36,9 @@ class CheckoutAccessoryNotification extends Notification implements ShouldQueue
         public $target,
         public User $admin,
         public $acceptance,
-        public                 $note,
+        public $note,
         public Company|Setting $webhookSource,
-    )
-    {
+    ) {
         $this->checkout_qty = $item->checkout_qty;
     }
 
@@ -136,7 +135,7 @@ class CheckoutAccessoryNotification extends Notification implements ShouldQueue
         $item = $this->item;
         $note = $this->note;
 
-        if (!Str::contains($this->webhookSource->webhook_endpoint, 'workflows')) {
+        if (! Str::contains($this->webhookSource->webhook_endpoint, 'workflows')) {
             return MicrosoftTeamsMessage::create()
                 ->to($this->webhookSource->webhook_endpoint)
                 ->type('success')

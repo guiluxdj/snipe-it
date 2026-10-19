@@ -14,7 +14,7 @@ class SendExpirationAlertsTest extends TestCase
 {
     public function test_command_suppresses_alerts_when_alert_interval_is_null(): void
     {
-       
+
         $this->settings->set([
             'alerts_enabled' => 1,
             'alert_email' => 'ops@example.test',

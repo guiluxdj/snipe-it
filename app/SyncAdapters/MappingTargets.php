@@ -101,8 +101,8 @@ class MappingTargets
 
         return match ($type) {
             'native' => match ($id) {
-                'purchase_date', 'order_number' => trans('general.' . $id),
-                default => trans('admin/settings/sync_adapters.target_native_' . $id),
+                'purchase_date', 'order_number' => trans('general.'.$id),
+                default => trans('admin/settings/sync_adapters.target_native_'.$id),
             },
             'external' => trans('admin/settings/sync_adapters.target_external_'.$id),
             'custom' => trans('admin/settings/sync_adapters.target_custom_prefix').': '
@@ -153,7 +153,7 @@ class MappingTargets
         // slots).
         if ($type !== 'boolean' && ! $adminDefined) {
             foreach (['asset_tag', 'model', 'notes', 'purchase_date', 'order_number'] as $nativeColumn) {
-                $options['native:' . $nativeColumn] = self::labelFor('native:' . $nativeColumn);
+                $options['native:'.$nativeColumn] = self::labelFor('native:'.$nativeColumn);
             }
         }
 

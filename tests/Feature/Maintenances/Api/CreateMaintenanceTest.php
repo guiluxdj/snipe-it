@@ -72,7 +72,7 @@ class CreateMaintenanceTest extends TestCase
 
         $this->assertHasTheseActionLogs($maintenance, ['create']);
     }
-    
+
     public function test_create_maintenance_action_log_carries_notes()
     {
         $actor = User::factory()->superuser()->create();

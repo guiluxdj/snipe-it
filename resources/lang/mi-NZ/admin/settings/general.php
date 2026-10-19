@@ -416,7 +416,7 @@ return [
     'two_factor_enter_code' => 'Tāuruhia te Waehere Tuarua-Wae',
     'two_factor_config_complete' => 'Tukuna Waehere',
     'two_factor_enabled_edit_not_allowed' => 'Kaore to kaiwhakahaere e tuku ki a koe kia whakatika i tenei tautuhinga.',
-    'two_factor_enrollment_text' => "E rua nga tohu motuhake e hiahiatia ana, ahakoa kuaore i whakauruhia to whakaaro. Whakatūwherahia tō taupānga Authenticator Google me te matawai i te waehere QR i raro nei hei whakauru i tō pūrere. I te wa i whakauruhia e koe to whakaaro, uruhia te waehere i raro nei",
+    'two_factor_enrollment_text' => 'E rua nga tohu motuhake e hiahiatia ana, ahakoa kuaore i whakauruhia to whakaaro. Whakatūwherahia tō taupānga Authenticator Google me te matawai i te waehere QR i raro nei hei whakauru i tō pūrere. I te wa i whakauruhia e koe to whakaaro, uruhia te waehere i raro nei',
     'require_accept_signature' => 'Me tono Waitohu',
     'require_accept_signature_help_text' => 'When enabled, users must provide a signature to accept an item, in addition to clicking accept. This only applies when the item\'s category has "Require acceptance" turned on. It does not send acceptance requests on its own.',
     'require_checkinout_notes' => 'Require Notes on Checkin/Checkout',

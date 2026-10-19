@@ -14,15 +14,25 @@ class AcceptanceItemDeclinedNotification extends Notification implements ShouldQ
     use Queueable;
 
     public $item_name;
+
     public $item_tag;
+
     public $item_model;
+
     public $item_serial;
+
     public $item_status;
+
     public $declined_date;
+
     public $note;
+
     public $assigned_to;
+
     public $company_name;
+
     public $qty;
+
     public $admin;
 
     /**
@@ -63,7 +73,7 @@ class AcceptanceItemDeclinedNotification extends Notification implements ShouldQ
     {
         $settings = Setting::getSettings();
 
-        return ($settings->alerts_enabled && !empty($settings->admin_cc_email));
+        return $settings->alerts_enabled && ! empty($settings->admin_cc_email);
     }
 
     /**

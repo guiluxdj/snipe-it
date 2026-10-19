@@ -152,7 +152,7 @@ class UserSeeder extends Seeder
         // Wipe every item file in the public uploads dir.
         $disk = Storage::disk('public');
         foreach ($disk->files(rtrim($dst, '/')) as $del_file) {
-            Log::debug('Deleting: ' . $del_file);
+            Log::debug('Deleting: '.$del_file);
             try {
                 $disk->delete($del_file);
             } catch (\Exception $e) {
@@ -162,7 +162,7 @@ class UserSeeder extends Seeder
 
         // Attached files on the private (default) disk.
         foreach (Storage::files('private_uploads/users') as $del_file) {
-            Log::debug('Deleting: ' . $del_file);
+            Log::debug('Deleting: '.$del_file);
             try {
                 Storage::delete($del_file);
             } catch (\Exception $e) {

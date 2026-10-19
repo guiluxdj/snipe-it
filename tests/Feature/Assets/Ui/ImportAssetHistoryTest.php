@@ -478,7 +478,7 @@ class ImportAssetHistoryTest extends TestCase
         );
         $response->assertStatus(500);
         $this->assertEquals('import-errors', $response->json('status'));
-        $this->assertArrayHasKey('Asset ' . $asset->asset_tag, $response->json('messages'));
+        $this->assertArrayHasKey('Asset '.$asset->asset_tag, $response->json('messages'));
 
         $asset->refresh();
         $this->assertNull($asset->assigned_to);
@@ -522,7 +522,7 @@ class ImportAssetHistoryTest extends TestCase
         );
         $response->assertStatus(500);
         $this->assertEquals('import-errors', $response->json('status'));
-        $this->assertArrayHasKey('Asset ' . $asset->asset_tag, $response->json('messages'));
+        $this->assertArrayHasKey('Asset '.$asset->asset_tag, $response->json('messages'));
 
         $asset->refresh();
         $this->assertNull($asset->assigned_to);

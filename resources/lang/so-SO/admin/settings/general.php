@@ -416,7 +416,7 @@ return [
     'two_factor_enter_code' => 'Geli Koodhka Laba-Armood',
     'two_factor_config_complete' => 'Soo gudbi Koodhka',
     'two_factor_enabled_edit_not_allowed' => 'Maamulahaagu kuma ogola inaad wax ka beddesho qeybtan.',
-    'two_factor_enrollment_text' => "Xaqiijinta laba arrimood ayaa loo baahan yahay, si kastaba ha ahaatee qalabkaagu weli lama diiwaan gelin. Fur app kaaga Google Authenticator oo iska sawir summada QR ee hoose si aad u diiwaan geliso qalabkaaga. Marka aad ku qorto qalabkaaga, geli koodka hoose",
+    'two_factor_enrollment_text' => 'Xaqiijinta laba arrimood ayaa loo baahan yahay, si kastaba ha ahaatee qalabkaagu weli lama diiwaan gelin. Fur app kaaga Google Authenticator oo iska sawir summada QR ee hoose si aad u diiwaan geliso qalabkaaga. Marka aad ku qorto qalabkaaga, geli koodka hoose',
     'require_accept_signature' => 'U baahan Saxeexa',
     'require_accept_signature_help_text' => 'When enabled, users must provide a signature to accept an item, in addition to clicking accept. This only applies when the item\'s category has "Require acceptance" turned on. It does not send acceptance requests on its own.',
     'require_checkinout_notes' => 'Require Notes on Checkin/Checkout',

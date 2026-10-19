@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Tests\Feature\Companies\Api;
 
 use App\Models\Company;
