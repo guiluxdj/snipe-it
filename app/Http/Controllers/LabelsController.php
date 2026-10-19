@@ -13,7 +13,6 @@ use App\Models\Labels\Label;
 use App\Models\Labels\LabelPreviewAsset;
 use App\Models\Labels\RectangleSheet;
 use App\Models\Setting;
-use App\Rules\LabelGeometryRules;
 use App\Services\CustomLabelImportValidator;
 use App\View\Label as LabelView;
 use Illuminate\Http\Request;
@@ -33,10 +32,10 @@ class LabelsController extends Controller
 
         if (str_starts_with($labelName, 'custom:')) {
 
-            $id = (int)str_replace('custom:', '', $labelName);
+            $id = (int) str_replace('custom:', '', $labelName);
             $customLabel = CustomUserLabel::find($id);
 
-            if (!$customLabel) {
+            if (! $customLabel) {
                 $template = new DefaultLabel;
             } else {
                 $baseTemplateName = data_get(
@@ -137,7 +136,7 @@ class LabelsController extends Controller
             ?? 'sheet';
 
         if ($selectedType === 'tape') {
-            $previewLabel = (new PreviewTapeLabel())->applyEditorConfig($config);
+            $previewLabel = (new PreviewTapeLabel)->applyEditorConfig($config);
 
             $config['dimensions'] = [
                 'width' => $previewLabel->getWidth(),
@@ -145,7 +144,7 @@ class LabelsController extends Controller
                 'label_gap' => $previewLabel->getLabelGap(),
             ];
         } else {
-            $previewLabel = (new PreviewSheetLabel())->applyEditorConfig($config);
+            $previewLabel = (new PreviewSheetLabel)->applyEditorConfig($config);
         }
 
         return view('settings.label-edit', [
@@ -167,23 +166,21 @@ class LabelsController extends Controller
         $type = $validated['type'];
         $isTape = $type === 'tape';
 
-
-
         $supports = collect($validated['supports'])
             ->map(function ($value, $key) {
                 if ($key === 'fields') {
-                    return (int)$value;
+                    return (int) $value;
                 }
 
                 return in_array($key, ['asset_tag', 'barcode_1d', 'barcode_2d', 'logo', 'title'], true)
-                    ? (bool)$value
+                    ? (bool) $value
                     : $value;
             })
             ->toArray();
 
         $castNumeric = function ($array) {
             return collect($array)->map(function ($value) {
-                return is_numeric($value) ? (float)$value : $value;
+                return is_numeric($value) ? (float) $value : $value;
             })->toArray();
         };
 
@@ -195,7 +192,7 @@ class LabelsController extends Controller
             );
         }
 
-        if (!$baseLabel) {
+        if (! $baseLabel) {
             return redirect()->back()
                 ->with(
                     'error',
@@ -205,7 +202,7 @@ class LabelsController extends Controller
 
         $previewLabelClass = $isTape ? new PreviewTapeLabel : new PreviewSheetLabel;
 
-        $baseWorkingLabel = new $previewLabelClass();
+        $baseWorkingLabel = new $previewLabelClass;
         $baseWorkingLabel->seedFromTemplate($baseLabel);
 
         $baseConfig = $baseWorkingLabel->getEditorConfigSections();
@@ -230,7 +227,7 @@ class LabelsController extends Controller
 
         $mergedConfig = array_replace_recursive($baseConfig, $submittedConfig);
 
-        $workingLabel = new $previewLabelClass();
+        $workingLabel = new $previewLabelClass;
         $workingLabel->seedFromTemplate($baseLabel);
         $workingLabel->applyEditorConfig($mergedConfig);
 
@@ -264,22 +261,21 @@ class LabelsController extends Controller
 
         $type = $validated['type'];
 
-
         $supports = collect($validated['supports'])
             ->map(function ($value, $key) {
                 if ($key === 'fields') {
-                    return (int)$value;
+                    return (int) $value;
                 }
 
                 return in_array($key, ['asset_tag', 'barcode_1d', 'barcode_2d', 'logo', 'title'], true)
-                    ? (bool)$value
+                    ? (bool) $value
                     : $value;
             })
             ->toArray();
 
         $castNumeric = function ($array) {
             return collect($array)->map(function ($value) {
-                return is_numeric($value) ? (float)$value : $value;
+                return is_numeric($value) ? (float) $value : $value;
             })->toArray();
         };
 
@@ -293,7 +289,7 @@ class LabelsController extends Controller
             $baseLabel = CustomUserLabel::makeBaseLabel($template);
         }
 
-        if (!$baseLabel) {
+        if (! $baseLabel) {
             return redirect()->back()
                 ->with('error', trans('admin/labels/general.base_label_missing'));
         }
@@ -364,36 +360,36 @@ class LabelsController extends Controller
 
         $validated = $request->validate([
             'type' => ['required', 'in:sheet,tape'],
-            'page_size' => ['required_if:type,sheet', 'nullable', Rule::in(array_keys(RectangleSheet::supportedPageSizes())),],
+            'page_size' => ['required_if:type,sheet', 'nullable', Rule::in(array_keys(RectangleSheet::supportedPageSizes()))],
             'label_gap' => ['nullable', 'numeric', 'min:0'],
             'rows' => ['required_if:type,sheet', 'numeric', 'min:1'],
             'columns' => ['required_if:type,sheet', 'numeric', 'min:1'],
             'label_width' => ['required', 'numeric', 'gt:0'],
             'label_height' => ['required', 'numeric', 'gt:0'],
         ]);
-        //A new label will seed the DefaultLabel values
+        // A new label will seed the DefaultLabel values
         if ($validated['type'] === 'sheet') {
 
             $selectedLabel = 'DefaultLabel';
             $page = RectangleSheet::supportedPageSize($validated['page_size']);
-            $label = (new PreviewSheetLabel())->seedFromTemplate(new DefaultLabel());
+            $label = (new PreviewSheetLabel)->seedFromTemplate(new DefaultLabel);
             $config = $label->toEditorConfig();
 
             $config['page']['width'] = $page['width'];
             $config['page']['height'] = $page['height'];
-            $config['label']['width'] = (float)$validated['label_width'];
-            $config['label']['height'] = (float)$validated['label_height'];
-            $config['grid']['rows'] = (int)$validated['rows'];
-            $config['grid']['columns'] = (int)$validated['columns'];
+            $config['label']['width'] = (float) $validated['label_width'];
+            $config['label']['height'] = (float) $validated['label_height'];
+            $config['grid']['rows'] = (int) $validated['rows'];
+            $config['grid']['columns'] = (int) $validated['columns'];
 
             $label->applyEditorConfig($config);
         } else {
             $selectedLabel = 'StandardTape';
 
             $label = new PreviewTapeLabel(
-                width: (float)$validated['label_width'],
-                height: (float)$validated['label_height'],
-                labelGap: (float)($validated['label_gap'] ?? 0),
+                width: (float) $validated['label_width'],
+                height: (float) $validated['label_height'],
+                labelGap: (float) ($validated['label_gap'] ?? 0),
             );
         }
         $config = $label->toEditorConfig();
@@ -423,16 +419,16 @@ class LabelsController extends Controller
 
         return redirect()
             ->route('settings.labels.index')
-            ->with('success', $labelName . ' ' . trans('admin/labels/general.label_deleted_successfully'));
+            ->with('success', $labelName.' '.trans('admin/labels/general.label_deleted_successfully'));
     }
 
     public function customLabelPreview(Request $request, string $labelName)
     {
         $request->validate([
-            'content.tag_font' => ['nullable', 'string', Rule::in(CustomLabelFonts::ALLOWED),],
-            'content.title_font' => ['nullable', 'string', Rule::in(CustomLabelFonts::ALLOWED),],
-            'content.field_label_font' => ['nullable', 'string', Rule::in(CustomLabelFonts::ALLOWED),],
-            'content.field_value_font' => ['nullable', 'string', Rule::in(CustomLabelFonts::ALLOWED),],
+            'content.tag_font' => ['nullable', 'string', Rule::in(CustomLabelFonts::ALLOWED)],
+            'content.title_font' => ['nullable', 'string', Rule::in(CustomLabelFonts::ALLOWED)],
+            'content.field_label_font' => ['nullable', 'string', Rule::in(CustomLabelFonts::ALLOWED)],
+            'content.field_value_font' => ['nullable', 'string', Rule::in(CustomLabelFonts::ALLOWED)],
         ]);
         $labelName = str_replace('/', '\\', $labelName);
 
@@ -466,7 +462,7 @@ class LabelsController extends Controller
 
         $template->applyEditorConfig($editorConfig);
 
-        $exampleAsset = LabelPreviewAsset::make();;
+        $exampleAsset = LabelPreviewAsset::make();
 
         $customFieldColumns = CustomField::where('field_encrypted', 0)->pluck('db_column');
 
@@ -521,7 +517,7 @@ class LabelsController extends Controller
                 json_encode($config)
             );
 
-            $config['name'] = 'Copy of ' . $customLabel->name;
+            $config['name'] = 'Copy of '.$customLabel->name;
 
             $previewLabel = $customLabel->type === 'tape'
                 ? new PreviewTapeLabel
@@ -567,7 +563,7 @@ class LabelsController extends Controller
             $template = null;
         }
 
-        if (!$template) {
+        if (! $template) {
             $template = new DefaultLabel;
             $selectedLabel = 'DefaultLabel';
         }
@@ -589,8 +585,8 @@ class LabelsController extends Controller
                 : 'sheet';
         }
 
-        if (!$importedConfig) {
-            $config['name'] = 'Copy of ' . class_basename($selectedLabel);
+        if (! $importedConfig) {
+            $config['name'] = 'Copy of '.class_basename($selectedLabel);
         }
 
         return view('settings.label-edit', [
@@ -604,6 +600,7 @@ class LabelsController extends Controller
             'formAction' => route('settings.labels.store'),
         ]);
     }
+
     protected function previewLabelForTemplate($template)
     {
         if ($template instanceof PreviewTapeLabel) {

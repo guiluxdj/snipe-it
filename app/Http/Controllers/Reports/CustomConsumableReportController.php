@@ -293,7 +293,7 @@ class CustomConsumableReportController extends Controller
                 'orderItems.order.supplier',
             ]);
 
-        $request->whenFilled('include_assignments', fn() => $query->with('users.companies'));
+        $request->whenFilled('include_assignments', fn () => $query->with('users.companies'));
 
         $query = $this->appendLocalConstraints($query, $request, [
             'by_model_number' => 'consumables.model_number',

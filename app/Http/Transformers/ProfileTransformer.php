@@ -89,7 +89,7 @@ class ProfileTransformer
      */
     private function transformAssetCustomFields(Asset $asset): object|array
     {
-        if (!$asset->model || !$asset->model->fieldset) {
+        if (! $asset->model || ! $asset->model->fieldset) {
             return new \stdClass;
         }
 
@@ -98,7 +98,7 @@ class ProfileTransformer
             if ($field->field_encrypted) {
                 continue;
             }
-            if (!$field->display_in_user_view) {
+            if (! $field->display_in_user_view) {
                 continue;
             }
             $value = $asset->{$field->db_column};

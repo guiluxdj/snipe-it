@@ -239,7 +239,7 @@ class ComponentsController extends Controller
     public function postRestore($id): RedirectResponse
     {
         if ($component = Component::withTrashed()->find($id)) {
-           
+
             $this->authorize('delete', $component);
 
             if ($component->deleted_at == '') {

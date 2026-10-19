@@ -14,7 +14,7 @@ trait SeedsCustomLabelFromTemplate
             }
 
             return $sourceUnit === 'in' && is_numeric($value)
-                ? (float)$value * 25.4
+                ? (float) $value * 25.4
                 : $value;
         };
     }
@@ -59,7 +59,7 @@ trait SeedsCustomLabelFromTemplate
 
         foreach ($measurementMap as $property => $method) {
             if (method_exists($template, $method)) {
-                $this->{$property} = (float)$convert($template->{$method}());
+                $this->{$property} = (float) $convert($template->{$method}());
             }
         }
     }
@@ -67,11 +67,11 @@ trait SeedsCustomLabelFromTemplate
     protected function seedSheetGrid($template): void
     {
         if (method_exists($template, 'getRows')) {
-            $this->rows = (int)$template->getRows();
+            $this->rows = (int) $template->getRows();
         }
 
         if (method_exists($template, 'getColumns')) {
-            $this->columns = (int)$template->getColumns();
+            $this->columns = (int) $template->getColumns();
         }
     }
 
@@ -120,7 +120,7 @@ trait SeedsCustomLabelFromTemplate
             }
         }
 
-        if (method_exists($template, 'getLogoSize') && !method_exists($template, 'getLogoMaxWidth')) {
+        if (method_exists($template, 'getLogoSize') && ! method_exists($template, 'getLogoMaxWidth')) {
             $logoSize = $template->getLogoSize();
 
             $this->logoMaxWidth = isset($logoSize[0])
@@ -132,12 +132,12 @@ trait SeedsCustomLabelFromTemplate
             $textSize = $convert($template->getTextSize());
 
             foreach ([
-                         'tagSize' => 'getTagSize',
-                         'titleSize' => 'getTitleSize',
-                         'labelSize' => 'getLabelSize',
-                         'fieldSize' => 'getFieldSize',
-                     ] as $property => $method) {
-                if (!method_exists($template, $method)) {
+                'tagSize' => 'getTagSize',
+                'titleSize' => 'getTitleSize',
+                'labelSize' => 'getLabelSize',
+                'fieldSize' => 'getFieldSize',
+            ] as $property => $method) {
+                if (! method_exists($template, $method)) {
                     $this->{$property} = $textSize;
                 }
             }
@@ -147,11 +147,11 @@ trait SeedsCustomLabelFromTemplate
             $textMargin = $convert($template->getTextMargin());
 
             foreach ([
-                         'titleMargin' => 'getTitleMargin',
-                         'labelMargin' => 'getLabelMargin',
-                         'fieldMargin' => 'getFieldMargin',
-                     ] as $property => $method) {
-                if (!method_exists($template, $method)) {
+                'titleMargin' => 'getTitleMargin',
+                'labelMargin' => 'getLabelMargin',
+                'fieldMargin' => 'getFieldMargin',
+            ] as $property => $method) {
+                if (! method_exists($template, $method)) {
                     $this->{$property} = $textMargin;
                 }
             }
@@ -172,7 +172,7 @@ trait SeedsCustomLabelFromTemplate
 
         foreach ($this->editorStringContentMap() as $key => $property) {
             if (array_key_exists($key, $content)) {
-                $this->{$property} = (string)$content[$key];
+                $this->{$property} = (string) $content[$key];
             }
         }
     }
@@ -183,7 +183,7 @@ trait SeedsCustomLabelFromTemplate
             'barcode_size' => 'barcodeSize',
             'barcode_margin' => 'barcodeMargin',
             'barcode_2d_size' => 'barcode2DSize',
-            'barcode_2d_margin' => 'barcode2DMargin', //Tape only
+            'barcode_2d_margin' => 'barcode2DMargin', // Tape only
 
             'tag_font_size' => 'tagSize',
             'tag_offset_x' => 'tagOffsetX',

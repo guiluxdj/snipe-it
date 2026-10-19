@@ -146,10 +146,10 @@ class AssetHistoryImporter extends Importer
             if ($target_type_raw === 'location') {
                 $lookupLocation = true;
             } else {
-                $this->log('Unrecognized target_type "' . $target_type_raw . '" for asset ' . $asset_tag);
+                $this->log('Unrecognized target_type "'.$target_type_raw.'" for asset '.$asset_tag);
                 $this->recordSkipped();
                 $this->addRowError(
-                    trans('general.asset') . ' ' . $asset_tag,
+                    trans('general.asset').' '.$asset_tag,
                     trans('general.import-history'),
                     'target_type',
                     trans('admin/hardware/message.import.history.invalid_target_type_message', [
@@ -165,9 +165,9 @@ class AssetHistoryImporter extends Importer
             ? $this->resolveTargetLocation($name)
             : $this->resolveTargetUser($name);
 
-        if (!$target) {
+        if (! $target) {
             $missingLabel = $lookupLocation ? 'Location' : 'User';
-            $this->log($missingLabel . ' "' . $name . '" does not exist so no checkin log was created for asset ' . $asset_tag);
+            $this->log($missingLabel.' "'.$name.'" does not exist so no checkin log was created for asset '.$asset_tag);
             $this->recordSkipped();
             $this->addRowError(
                 trans('general.asset').' '.$asset_tag,
@@ -186,7 +186,7 @@ class AssetHistoryImporter extends Importer
         $csvNote = trim((string) $this->findCsvMatch($row, 'notes'));
         $checkoutNote = $csvNote !== ''
             ? $csvNote
-            : 'Checkout imported by ' . (auth()->user()?->display_name ?? 'CSV importer') . ' from history importer';
+            : 'Checkout imported by '.(auth()->user()?->display_name ?? 'CSV importer').' from history importer';
 
         Actionlog::firstOrCreate([
             'item_id' => $asset->id,
@@ -236,7 +236,7 @@ class AssetHistoryImporter extends Importer
 
         if ($asset->save()) {
             $identity = $target instanceof User ? $target->username : $target->name;
-            $this->log('Asset history imported for ' . $asset_tag . ' -> ' . $identity . ' at ' . $checkout_date);
+            $this->log('Asset history imported for '.$asset_tag.' -> '.$identity.' at '.$checkout_date);
             $this->recordCreated();
         } else {
             $this->recordErrored();

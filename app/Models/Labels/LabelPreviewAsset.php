@@ -16,7 +16,7 @@ class LabelPreviewAsset
 {
     public static function make(): Asset
     {
-        $asset = new Asset();
+        $asset = new Asset;
 
         $asset->id = 999999;
         $asset->name = 'JEN-867-5309';
@@ -51,12 +51,12 @@ class LabelPreviewAsset
             'phone' => '1-555-555-5555',
         ]));
 
-        $model = new AssetModel();
+        $model = new AssetModel;
         $model->id = 999999;
         $model->name = trans('admin/labels/table.example_model');
         $model->model_number = 'MDL5678';
 
-        $manufacturer = new Manufacturer();
+        $manufacturer = new Manufacturer;
         $manufacturer->id = 999999;
         $manufacturer->name = trans('admin/labels/table.example_manufacturer');
         $manufacturer->support_email = 'support@test.com';
@@ -65,7 +65,7 @@ class LabelPreviewAsset
 
         $model->setRelation('manufacturer', $manufacturer);
 
-        $category = new Category();
+        $category = new Category;
         $category->id = 999999;
         $category->name = trans('admin/labels/table.example_category');
 

@@ -135,7 +135,7 @@ class _5520_B extends _5520
             'field_label_margin' => $this->getLabelMargin(),
             'field_value_font_size' => 0.1106299,
             'field_value_margin' => $this->getFieldMargin(),
-            'text_render_mode' => 'vertical_stack'
+            'text_render_mode' => 'vertical_stack',
         ];
     }
 

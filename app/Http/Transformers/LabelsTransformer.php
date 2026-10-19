@@ -84,8 +84,8 @@ class LabelsTransformer
             ? 'dimensions'
             : 'label';
 
-        $width = (float)data_get($snapshot, "{$dimensionPath}.width", 0);
-        $height = (float)data_get($snapshot, "{$dimensionPath}.height", 0);
+        $width = (float) data_get($snapshot, "{$dimensionPath}.width", 0);
+        $height = (float) data_get($snapshot, "{$dimensionPath}.height", 0);
 
         return [
             'custom_label_id' => $label->id,

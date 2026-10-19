@@ -59,6 +59,7 @@ class TZe_24mm_A extends TZe_24mm
     {
         return self::FIELD_MARGIN;
     }
+
     public function getUnit()
     {
         return 'mm';

@@ -2,7 +2,6 @@
 
 namespace App\Models\Labels\CustomLabels\Concerns;
 
-
 trait HasCustomLabelEditorSections
 {
     public function getEditorSections(): array
@@ -193,7 +192,7 @@ trait HasCustomLabelEditorSections
                                 'label' => trans('admin/labels/general.fields.title_offset_x'),
                             ],
 
-                            'title_position' => !$this->isTapeLabel()
+                            'title_position' => ! $this->isTapeLabel()
                                 ? [
                                     'type' => 'select',
                                     'label' => trans('admin/labels/general.fields.title_position'),

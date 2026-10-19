@@ -14,8 +14,6 @@ class TrustProxies extends TrustedProxyMiddleware
      * empty or entirely invalid APP_TRUSTED_HEADERS results in trusting *no*
      * headers, rather than silently falling back to the framework's default
      * header set. See headers().
-     *
-     * @var int
      */
     protected int $headerBitmask = 0;
 
@@ -23,17 +21,17 @@ class TrustProxies extends TrustedProxyMiddleware
     {
         $header_bitmask = 0;
 
-        foreach (explode(",", config('trustedproxy.headers')) as $header) {
+        foreach (explode(',', config('trustedproxy.headers')) as $header) {
             $header = trim($header);
 
-            if (!$header) {
+            if (! $header) {
                 continue;
             }
 
             try {
-                $header_bitmask |= constant(Request::class . "::$header"); // once we get to PHP 8.3, this can become Request::{$header}
+                $header_bitmask |= constant(Request::class."::$header"); // once we get to PHP 8.3, this can become Request::{$header}
             } catch (\Throwable $e) {
-                \Log::error("Error parsing APP_TRUSTED_HEADERS: " . $header . " is not a valid setting, ignoring");
+                \Log::error('Error parsing APP_TRUSTED_HEADERS: '.$header.' is not a valid setting, ignoring');
             }
         }
 

@@ -5,10 +5,15 @@ namespace App\Models\Labels\CustomLabels\Concerns;
 trait HasCustomLabelSupports
 {
     protected bool $supportAssetTag = true;
+
     protected bool $support1DBarcode = true;
+
     protected bool $support2DBarcode = false;
+
     protected int $supportFields = 1;
+
     protected bool $supportLogo = false;
+
     protected bool $supportTitle = false;
 
     public function getSupportAssetTag(): bool
@@ -43,11 +48,11 @@ trait HasCustomLabelSupports
 
     protected function hydrateSupports(array $supports): void
     {
-        $this->supportFields = isset($supports['fields']) ? (int)$supports['fields'] : $this->supportFields;
-        $this->supportAssetTag = (bool)($supports['asset_tag'] ?? $this->supportAssetTag);
-        $this->support1DBarcode = (bool)($supports['barcode_1d'] ?? $this->support1DBarcode);
-        $this->support2DBarcode = (bool)($supports['barcode_2d'] ?? $this->support2DBarcode);
-        $this->supportLogo = (bool)($supports['logo'] ?? $this->supportLogo);
-        $this->supportTitle = (bool)($supports['title'] ?? $this->supportTitle);
+        $this->supportFields = isset($supports['fields']) ? (int) $supports['fields'] : $this->supportFields;
+        $this->supportAssetTag = (bool) ($supports['asset_tag'] ?? $this->supportAssetTag);
+        $this->support1DBarcode = (bool) ($supports['barcode_1d'] ?? $this->support1DBarcode);
+        $this->support2DBarcode = (bool) ($supports['barcode_2d'] ?? $this->support2DBarcode);
+        $this->supportLogo = (bool) ($supports['logo'] ?? $this->supportLogo);
+        $this->supportTitle = (bool) ($supports['title'] ?? $this->supportTitle);
     }
 }

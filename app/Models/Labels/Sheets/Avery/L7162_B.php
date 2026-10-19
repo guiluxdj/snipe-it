@@ -135,6 +135,7 @@ class L7162_B extends L7162
     {
         return 'vertical_stack';
     }
+
     protected function getContentEditorConfig(): array
     {
         return [

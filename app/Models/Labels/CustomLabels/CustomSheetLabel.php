@@ -15,15 +15,16 @@ use TCPDF;
 
 abstract class CustomSheetLabel extends RectangleSheet
 {
+    use BuildsCustomLabelLayout;
     use HasCustomLabelContentProperties;
-    use RenderCustomLabelContent;
     use HasCustomLabelEditorConfig {
         getContentEditorConfig as getBaseContentEditorConfig;
     }
     use HasCustomLabelEditorSections;
     use HasCustomLabelSupports;
+    use RenderCustomLabelContent;
     use SeedsCustomLabelFromTemplate;
-    use BuildsCustomLabelLayout;
+
     protected array $editorConfig = [];
 
     protected string $unit = 'mm';
@@ -34,10 +35,15 @@ abstract class CustomSheetLabel extends RectangleSheet
 |--------------------------------------------------------------------------
 */
     protected ?float $pageWidth = 210.0;
+
     protected ?float $pageHeight = 297.0;
+
     protected ?float $pageMarginTop = 0.0;
+
     protected ?float $pageMarginRight = 0.0;
+
     protected ?float $pageMarginBottom = 0.0;
+
     protected ?float $pageMarginLeft = 0.0;
 
     /*
@@ -46,8 +52,11 @@ abstract class CustomSheetLabel extends RectangleSheet
     |--------------------------------------------------------------------------
     */
     protected int $rows = 9;
+
     protected int $columns = 3;
+
     protected float $labelRowSpacing = 0.0;
+
     protected float $labelColumnSpacing = 0.0;
 
     /*
@@ -56,10 +65,15 @@ abstract class CustomSheetLabel extends RectangleSheet
     |--------------------------------------------------------------------------
     */
     protected ?float $labelWidth = 50.0;
+
     protected ?float $labelHeight = 25.0;
+
     protected float $labelMarginTop = 0.0;
+
     protected float $labelMarginRight = 0.0;
+
     protected float $labelMarginBottom = 0.0;
+
     protected float $labelMarginLeft = 0.0;
 
     /*
@@ -68,8 +82,9 @@ abstract class CustomSheetLabel extends RectangleSheet
     |--------------------------------------------------------------------------
     */
     protected string $tagHAlign = 'R';
+
     protected string $tagVAlign = 'B';
-    
+
     public function getUnit()
     {
         return $this->unit;
@@ -479,6 +494,7 @@ abstract class CustomSheetLabel extends RectangleSheet
     {
         if ($this->getTextRenderMode() === 'vertical_stack') {
             $this->renderVerticalStackedTextBlock($pdf, $record, $layout);
+
             return;
         }
 

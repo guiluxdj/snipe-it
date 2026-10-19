@@ -24,6 +24,7 @@ class TZe_18mm_A extends TZe_18mm
     {
         return self::TEXT_SIZE_MOD;
     }
+
     public function getUnit()
     {
         return 'mm';

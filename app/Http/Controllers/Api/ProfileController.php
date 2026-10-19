@@ -164,7 +164,7 @@ class ProfileController extends Controller
         $sort = in_array($request->input('sort'), $allowed_columns, true) ? $request->input('sort') : 'asset_tag';
 
         $total = $assets->count();
-        $assets = $assets->orderBy('assets.' . $sort, $order)->skip($offset)->take($limit)->get();
+        $assets = $assets->orderBy('assets.'.$sort, $order)->skip($offset)->take($limit)->get();
 
         return $transformer->transformAssets($assets, $total);
     }

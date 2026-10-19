@@ -19,8 +19,11 @@ class _3490_A extends _3490
     private const FIELD_SIZE = 0.150;
 
     private const FIELD_MARGIN = 0.012;
+
     protected string $titleFont = 'freesans';
+
     protected string $fieldLabelFont = 'freesans';
+
     protected string $fieldValueFont = 'freemono';
 
     public function getBarcodeMargin()

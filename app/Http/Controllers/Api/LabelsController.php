@@ -25,8 +25,8 @@ class LabelsController extends Controller
         $this->authorize('view', Label::class);
 
         $baseLabels = Label::find()
-            ->reject(fn(Label $label) => $label instanceof PreviewSheetLabel)
-            ->reject(fn(Label $label) => $label instanceof PreviewTapeLabel)
+            ->reject(fn (Label $label) => $label instanceof PreviewSheetLabel)
+            ->reject(fn (Label $label) => $label instanceof PreviewTapeLabel)
             ->map(function (Label $label) {
                 return [
                     'source' => 'base',
@@ -78,7 +78,7 @@ class LabelsController extends Controller
     public function show(string $labelName): JsonResponse|array
     {
         if (str_starts_with($labelName, 'custom:')) {
-            $customLabelId = (int)str_replace('custom:', '', $labelName);
+            $customLabelId = (int) str_replace('custom:', '', $labelName);
 
             $customLabel = CustomUserLabel::find($customLabelId);
 

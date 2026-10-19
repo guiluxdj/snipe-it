@@ -3,9 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Models\Asset;
+use App\Models\AssetModel;
 use App\Models\CustomField;
 use App\Models\CustomFieldset;
-use App\Models\AssetModel;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -31,7 +31,7 @@ class CleanUnreferencedCustomFields extends Command
      */
     public function handle()
     {
-        if (!$this->option('force') && !$this->confirm('This will blank out *ALL* custom fields in your assets that are not referenced by their model\'s fieldset. Are you sure you want to continue?')) {
+        if (! $this->option('force') && ! $this->confirm('This will blank out *ALL* custom fields in your assets that are not referenced by their model\'s fieldset. Are you sure you want to continue?')) {
             $this->fail('Command was canceled');
         }
         // first, we get a 'master fieldmap' of db fieldnames => null
@@ -55,14 +55,14 @@ class CleanUnreferencedCustomFields extends Command
             // and boom! the 'null' payoff - we get a pre-formatted list of unused keys => null
             $fields_to_blank = array_diff_assoc($master_fieldmap, $fieldset_fields);
             $assets_updated_count = Asset::whereIn('model_id', $model_ids)->withTrashed()->update($fields_to_blank);
-            $this->info('Fieldset "' . $fieldset->name . '" (' . $fieldset->id . ') - updated ' . $assets_updated_count);
+            $this->info('Fieldset "'.$fieldset->name.'" ('.$fieldset->id.') - updated '.$assets_updated_count);
             $update_count += $assets_updated_count;
         }
 
-        //finally, we need to handle the 'empty fieldset' models
-        $model_ids = AssetModel::select('id')->whereNull('fieldset_id')->withTrashed(); //note: no ->get() because this should end up being a subquery (we hope!)
+        // finally, we need to handle the 'empty fieldset' models
+        $model_ids = AssetModel::select('id')->whereNull('fieldset_id')->withTrashed(); // note: no ->get() because this should end up being a subquery (we hope!)
         $assets_updated_count = Asset::whereIn('model_id', $model_ids)->withTrashed()->update($master_fieldmap);
-        $this->info('No Fieldset - updated ' . $assets_updated_count);
+        $this->info('No Fieldset - updated '.$assets_updated_count);
         $update_count += $assets_updated_count;
         $this->info("Finished cleaning unreferenced custom fields, total updated assets are: $update_count");
     }

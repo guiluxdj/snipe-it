@@ -532,7 +532,7 @@ class AcceptanceController extends Controller
         // output buffer did not produce a string. Previously fell back
         // to the original bytes, which bypassed the canonicalization
         // guarantee the caller is relying on.
-        if ($encoded === false || !is_string($output) || $output === '') {
+        if ($encoded === false || ! is_string($output) || $output === '') {
             return null;
         }
 

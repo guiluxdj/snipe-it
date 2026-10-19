@@ -42,6 +42,7 @@ class ImportLabel extends Component
 
         return $rules;
     }
+
     public function setImportMethod(string $method)
     {
         $this->importMethod = $method;
@@ -49,12 +50,14 @@ class ImportLabel extends Component
         $this->resetValidation();
         $this->validationMessages = [];
     }
+
     protected function rawConfigJson(): ?string
     {
         return $this->importMethod === 'json'
             ? $this->configFile->get()
             : $this->configSnapshot;
     }
+
     public function import(CustomLabelImportValidator $importValidator)
     {
         $this->validate();

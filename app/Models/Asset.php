@@ -147,8 +147,8 @@ class Asset extends Depreciable
     protected function locationId(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => ($value === null || (int) $value === 0) ? null : (int) $value,
-            set: fn($value) => ($value === '' || $value === null || (int) $value === 0) ? null : (int) $value,
+            get: fn ($value) => ($value === null || (int) $value === 0) ? null : (int) $value,
+            set: fn ($value) => ($value === '' || $value === null || (int) $value === 0) ? null : (int) $value,
         );
     }
 
@@ -158,8 +158,8 @@ class Asset extends Depreciable
     protected function companyId(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => ($value === null || (int) $value === 0) ? null : (int) $value,
-            set: fn($value) => ($value === '' || $value === null || (int) $value === 0) ? null : (int) $value,
+            get: fn ($value) => ($value === null || (int) $value === 0) ? null : (int) $value,
+            set: fn ($value) => ($value === '' || $value === null || (int) $value === 0) ? null : (int) $value,
         );
     }
 
@@ -187,7 +187,7 @@ class Asset extends Depreciable
         'order_number' => ['nullable', 'string', 'max:191'],
         'notes' => ['nullable', 'string', 'max:65535'],
         'assigned_to' => ['nullable', 'integer', 'required_with:assigned_type'],
-        'assigned_type' => ['nullable', 'required_with:assigned_to', 'in:' . User::class . ',' . Location::class . ',' . Asset::class],
+        'assigned_type' => ['nullable', 'required_with:assigned_to', 'in:'.User::class.','.Location::class.','.Asset::class],
         'requestable' => ['nullable', 'boolean'],
         'assigned_user' => ['integer', 'nullable', 'exists:users,id,deleted_at,NULL'],
         'assigned_location' => ['integer', 'nullable', 'exists:locations,id,deleted_at,NULL', 'fmcs_location'],
@@ -303,7 +303,7 @@ class Asset extends Depreciable
             // and-when survives even after the parent is gone.
             if ($asset->image) {
                 try {
-                    Storage::disk('public')->delete(FileStorage::Assets->publicPath() . $asset->image);
+                    Storage::disk('public')->delete(FileStorage::Assets->publicPath().$asset->image);
                 } catch (\Exception $e) {
                     Log::info($e->getMessage());
                 }
@@ -339,7 +339,7 @@ class Asset extends Depreciable
                 // maintenance regardless of the saving context's auth
                 // state (CLI, system jobs, cross-tenant admin saves).
                 $asset->maintenances()->withoutGlobalScopes()->get()->each(
-                    fn(Maintenance $m) => $m->forceSyncCalendarEvents(),
+                    fn (Maintenance $m) => $m->forceSyncCalendarEvents(),
                 );
             }
         });
@@ -374,7 +374,7 @@ class Asset extends Depreciable
                 // adding !$field->field_encrypted because when the encrypted value comes through it
                 // screws things up for the encrypted validation rules (and the encrypted string
                 // is not a valid boolean type)
-                if ($field->format == 'BOOLEAN' && !$field->field_encrypted) {
+                if ($field->format == 'BOOLEAN' && ! $field->field_encrypted) {
                     $this->{$field->db_column} = filter_var($this->{$field->db_column}, FILTER_VALIDATE_BOOLEAN);
                 }
             }
@@ -397,7 +397,7 @@ class Asset extends Depreciable
 
         if ($this->model_id && $this->model && (string) $this->model->require_serial === '1') {
             $this->rules['serial'] = array_merge(
-                array_filter($this->rules['serial'] ?? [], fn($r) => $r !== 'nullable'),
+                array_filter($this->rules['serial'] ?? [], fn ($r) => $r !== 'nullable'),
                 ['required'],
             );
         }
@@ -426,7 +426,7 @@ class Asset extends Depreciable
     protected function warrantyExpires(): Attribute
     {
         return Attribute::make(
-            get: fn(mixed $value, array $attributes) => (!empty($attributes['warranty_months']) && !empty($attributes['purchase_date'])) ? Carbon::parse($attributes['purchase_date'])->addMonths((int) $attributes['warranty_months']) : null,
+            get: fn (mixed $value, array $attributes) => (! empty($attributes['warranty_months']) && ! empty($attributes['purchase_date'])) ? Carbon::parse($attributes['purchase_date'])->addMonths((int) $attributes['warranty_months']) : null,
         );
     }
 
@@ -437,7 +437,7 @@ class Asset extends Depreciable
     {
 
         return Attribute::make(
-            get: fn(mixed $value, array $attributes) => Helper::getFormattedDateObject($this->warrantyExpires, 'date', false)
+            get: fn (mixed $value, array $attributes) => Helper::getFormattedDateObject($this->warrantyExpires, 'date', false)
         );
     }
 
@@ -447,7 +447,7 @@ class Asset extends Depreciable
     protected function warrantyExpiresDiff(): Attribute
     {
         return Attribute::make(
-            get: fn(mixed $value, array $attributes) => $this->warrantyExpires ? round((Carbon::now()->diffInDays($this->warrantyExpires))) : null,
+            get: fn (mixed $value, array $attributes) => $this->warrantyExpires ? round((Carbon::now()->diffInDays($this->warrantyExpires))) : null,
         );
 
     }
@@ -458,7 +458,7 @@ class Asset extends Depreciable
     protected function warrantyExpiresDiffForHumans(): Attribute
     {
         return Attribute::make(
-            get: fn(mixed $value, array $attributes) => $this->warrantyExpires ? Carbon::parse($this->warrantyExpires)->diffForHumans() : null,
+            get: fn (mixed $value, array $attributes) => $this->warrantyExpires ? Carbon::parse($this->warrantyExpires)->diffForHumans() : null,
         );
 
     }
@@ -470,7 +470,7 @@ class Asset extends Depreciable
     {
 
         return Attribute::make(
-            get: fn(mixed $value, array $attributes) => Helper::getFormattedDateObject($this->last_audit_date, 'datetime', false)
+            get: fn (mixed $value, array $attributes) => Helper::getFormattedDateObject($this->last_audit_date, 'datetime', false)
         );
     }
 
@@ -480,7 +480,7 @@ class Asset extends Depreciable
     protected function lastAuditDiff(): Attribute
     {
         return Attribute::make(
-            get: fn(mixed $value, array $attributes) => $this->warrantyExpires ? round((Carbon::now()->diffInDays($this->warrantyExpires))) : null,
+            get: fn (mixed $value, array $attributes) => $this->warrantyExpires ? round((Carbon::now()->diffInDays($this->warrantyExpires))) : null,
         );
 
     }
@@ -491,7 +491,7 @@ class Asset extends Depreciable
     protected function lastAuditDiffForHumans(): Attribute
     {
         return Attribute::make(
-            get: fn(mixed $value, array $attributes) => $attributes['last_audit_date'] ? Carbon::parse($attributes['last_audit_date'])->diffForHumans() : null,
+            get: fn (mixed $value, array $attributes) => $attributes['last_audit_date'] ? Carbon::parse($attributes['last_audit_date'])->diffForHumans() : null,
         );
 
     }
@@ -503,7 +503,7 @@ class Asset extends Depreciable
     {
 
         return Attribute::make(
-            get: fn(mixed $value, array $attributes) => Helper::getFormattedDateObject($this->next_audit_date, 'date', false)
+            get: fn (mixed $value, array $attributes) => Helper::getFormattedDateObject($this->next_audit_date, 'date', false)
         );
     }
 
@@ -513,7 +513,7 @@ class Asset extends Depreciable
     protected function nextAuditDiffInDays(): Attribute
     {
         return Attribute::make(
-            get: fn(mixed $value, array $attributes) => $attributes['next_audit_date'] ? Carbon::now()->diffInDays($attributes['next_audit_date']) : null,
+            get: fn (mixed $value, array $attributes) => $attributes['next_audit_date'] ? Carbon::now()->diffInDays($attributes['next_audit_date']) : null,
         );
     }
 
@@ -523,7 +523,7 @@ class Asset extends Depreciable
     protected function nextAuditDiffForHumans(): Attribute
     {
         return Attribute::make(
-            get: fn(mixed $value, array $attributes) => $attributes['next_audit_date'] ? Carbon::parse($attributes['next_audit_date'])->diffForHumans() : null,
+            get: fn (mixed $value, array $attributes) => $attributes['next_audit_date'] ? Carbon::parse($attributes['next_audit_date'])->diffForHumans() : null,
         );
 
     }
@@ -554,7 +554,7 @@ class Asset extends Depreciable
     protected function eolFormattedDate(): Attribute
     {
         return Attribute::make(
-            get: fn(mixed $value, array $attributes) => $this->eolDate ? Helper::getFormattedDateObject($this->eolDate, 'date', false) : null,
+            get: fn (mixed $value, array $attributes) => $this->eolDate ? Helper::getFormattedDateObject($this->eolDate, 'date', false) : null,
         );
     }
 
@@ -564,7 +564,7 @@ class Asset extends Depreciable
     protected function eolDiffInDays(): Attribute
     {
         return Attribute::make(
-            get: fn(mixed $value, array $attributes) => $this->eolDate ? round((Carbon::now()->diffInDays(Carbon::parse($this->eolDate), false, 1))) : null,
+            get: fn (mixed $value, array $attributes) => $this->eolDate ? round((Carbon::now()->diffInDays(Carbon::parse($this->eolDate), false, 1))) : null,
         );
 
     }
@@ -576,7 +576,7 @@ class Asset extends Depreciable
     {
 
         return Attribute::make(
-            get: fn(mixed $value, array $attributes) => $this->eolDate ? Carbon::parse($this->eolDate)->diffForHumans() : null,
+            get: fn (mixed $value, array $attributes) => $this->eolDate ? Carbon::parse($this->eolDate)->diffForHumans() : null,
         );
 
     }
@@ -587,7 +587,7 @@ class Asset extends Depreciable
     protected function expectedCheckinFormattedDate(): Attribute
     {
         return Attribute::make(
-            get: fn(mixed $value, array $attributes) => array_key_exists('expected_checkin', $attributes) ? Helper::getFormattedDateObject($attributes['expected_checkin'], 'datetime', false) : null,
+            get: fn (mixed $value, array $attributes) => array_key_exists('expected_checkin', $attributes) ? Helper::getFormattedDateObject($attributes['expected_checkin'], 'datetime', false) : null,
         );
     }
 
@@ -597,7 +597,7 @@ class Asset extends Depreciable
     protected function expectedCheckinDiffForHumans(): Attribute
     {
         return Attribute::make(
-            get: fn(mixed $value, array $attributes) => array_key_exists('expected_checkin', $attributes) ? Carbon::parse($this->expected_checkin)->diffForHumans() : null,
+            get: fn (mixed $value, array $attributes) => array_key_exists('expected_checkin', $attributes) ? Carbon::parse($this->expected_checkin)->diffForHumans() : null,
         );
     }
 
@@ -638,7 +638,7 @@ class Asset extends Depreciable
     {
 
         // This asset is not currently assigned to anyone and is not deleted...
-        if ((!$this->assigned_to) && (!$this->deleted_at)) {
+        if ((! $this->assigned_to) && (! $this->deleted_at)) {
 
             // The asset status is not archived and is deployable
             if (
@@ -691,7 +691,7 @@ class Asset extends Depreciable
      */
     public function checkOut($target, $admin = null, $checkout_at = null, $expected_checkin = null, $note = null, $name = null, $location = null, bool $signInPlace = false)
     {
-        if (!$target) {
+        if (! $target) {
             return false;
         }
         if ($this->is($target)) {
@@ -760,7 +760,7 @@ class Asset extends Depreciable
             $user_name = 'Unassigned';
         }
 
-        return $this->asset_tag . ' - ' . $this->name . ' (' . $user_name . ') ' . ($this->model) ? $this->model->name : '';
+        return $this->asset_tag.' - '.$this->name.' ('.$user_name.') '.($this->model) ? $this->model->name : '';
     }
 
     /**
@@ -974,13 +974,13 @@ class Asset extends Depreciable
      */
     public function assetLoc($iterations = 1, $first_asset = null)
     {
-        if (!empty($this->assignedType())) {
+        if (! empty($this->assignedType())) {
             if ($this->assignedType() == self::ASSET) {
-                if (!$first_asset) {
+                if (! $first_asset) {
                     $first_asset = $this;
                 }
                 if ($iterations > 10) {
-                    throw new \Exception('Asset assignment Loop for Asset ID: ' . e($first_asset->id));
+                    throw new \Exception('Asset assignment Loop for Asset ID: '.e($first_asset->id));
                 }
                 $assigned_to = self::find($this->assigned_to); // have to do this this way because otherwise it errors
                 if ($assigned_to) {
@@ -1072,12 +1072,12 @@ class Asset extends Depreciable
      */
     public function getImageUrl($path = null)
     {
-        if ($this->image && !empty($this->image)) {
-            return Storage::disk('public')->url(FileStorage::Assets->publicPath() . e($this->image));
-        } elseif ($this->model && !empty($this->model->image)) {
-            return Storage::disk('public')->url(FileStorage::Models->publicPath() . e($this->model->image));
-        } elseif ($this->model?->category && !empty($this->model->category->image)) {
-            return Storage::disk('public')->url(FileStorage::Categories->publicPath() . e($this->model->category->image));
+        if ($this->image && ! empty($this->image)) {
+            return Storage::disk('public')->url(FileStorage::Assets->publicPath().e($this->image));
+        } elseif ($this->model && ! empty($this->model->image)) {
+            return Storage::disk('public')->url(FileStorage::Models->publicPath().e($this->model->image));
+        } elseif ($this->model?->category && ! empty($this->model->category->image)) {
+            return Storage::disk('public')->url(FileStorage::Categories->publicPath().e($this->model->category->image));
         }
 
         return false;
@@ -1337,10 +1337,10 @@ class Asset extends Depreciable
 
         if ($settings->auto_increment_assets == '1') {
             if ($settings->zerofill_count > 0) {
-                return $settings->auto_increment_prefix . self::zerofill($settings->next_auto_tag_base + $additional_increment, $settings->zerofill_count);
+                return $settings->auto_increment_prefix.self::zerofill($settings->next_auto_tag_base + $additional_increment, $settings->zerofill_count);
             }
 
-            return $settings->auto_increment_prefix . ($settings->next_auto_tag_base + $additional_increment);
+            return $settings->auto_increment_prefix.($settings->next_auto_tag_base + $additional_increment);
         } else {
             return false;
         }
@@ -1466,7 +1466,7 @@ class Asset extends Depreciable
      */
     public function eolProgressPercent(): float
     {
-        if (!$this->purchase_date || !$this->asset_eol_date) {
+        if (! $this->purchase_date || ! $this->asset_eol_date) {
             return 0.0;
         }
 
@@ -1482,7 +1482,7 @@ class Asset extends Depreciable
      */
     public function warrantyProgressPercent(): float
     {
-        if (!$this->purchase_date || !$this->warranty_expires) {
+        if (! $this->purchase_date || ! $this->warranty_expires) {
             return 0.0;
         }
 
@@ -1500,7 +1500,7 @@ class Asset extends Depreciable
         // encapsulates that fallback ladder.
         return (float) $this->accessories()
             ->get()
-            ->sum(fn($accessory) => (float) ($accessory->lastOrderDefaults()['unit_cost'] ?? 0));
+            ->sum(fn ($accessory) => (float) ($accessory->lastOrderDefaults()['unit_cost'] ?? 0));
     }
 
     /**
@@ -1521,8 +1521,8 @@ class Asset extends Depreciable
     protected function nextAuditDate(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
-            set: fn($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+            get: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+            set: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
         );
     }
 
@@ -1532,8 +1532,8 @@ class Asset extends Depreciable
     protected function lastAuditDate(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => $value ? Carbon::parse($value)->format('Y-m-d H:i:s') : null,
-            set: fn($value) => $value ? Carbon::parse($value)->format('Y-m-d H:i:s') : null,
+            get: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d H:i:s') : null,
+            set: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d H:i:s') : null,
         );
     }
 
@@ -1543,8 +1543,8 @@ class Asset extends Depreciable
     protected function lastCheckout(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => $value ? Carbon::parse($value)->format('Y-m-d H:i:s') : null,
-            set: fn($value) => $value ? Carbon::parse($value)->format('Y-m-d H:i:s') : null,
+            get: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d H:i:s') : null,
+            set: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d H:i:s') : null,
         );
     }
 
@@ -1554,8 +1554,8 @@ class Asset extends Depreciable
     protected function lastCheckin(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => $value ? Carbon::parse($value)->format('Y-m-d H:i:s') : null,
-            set: fn($value) => $value ? Carbon::parse($value)->format('Y-m-d H:i:s') : null,
+            get: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d H:i:s') : null,
+            set: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d H:i:s') : null,
         );
     }
 
@@ -1565,8 +1565,8 @@ class Asset extends Depreciable
     protected function assetEolDate(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
-            set: fn($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+            get: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
+            set: fn ($value) => $value ? Carbon::parse($value)->format('Y-m-d') : null,
         );
     }
 
@@ -1582,8 +1582,8 @@ class Asset extends Depreciable
     protected function requestable(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => (int) filter_var($value, FILTER_VALIDATE_BOOLEAN),
-            set: fn($value) => (int) filter_var($value, FILTER_VALIDATE_BOOLEAN),
+            get: fn ($value) => (int) filter_var($value, FILTER_VALIDATE_BOOLEAN),
+            set: fn ($value) => (int) filter_var($value, FILTER_VALIDATE_BOOLEAN),
         );
     }
 
@@ -1617,12 +1617,12 @@ class Asset extends Depreciable
         foreach ($terms as $term) {
 
             $query = $query
-                ->orWhere('assets_users.first_name', 'LIKE', '%' . $term . '%')
-                ->orWhere('assets_users.last_name', 'LIKE', '%' . $term . '%')
-                ->orWhere('assets_users.display_name', 'LIKE', '%' . $term . '%')
-                ->orWhere('assets_users.jobtitle', 'LIKE', '%' . $term . '%')
-                ->orWhere('assets_users.username', 'LIKE', '%' . $term . '%')
-                ->orWhere('assets_users.employee_num', 'LIKE', '%' . $term . '%')
+                ->orWhere('assets_users.first_name', 'LIKE', '%'.$term.'%')
+                ->orWhere('assets_users.last_name', 'LIKE', '%'.$term.'%')
+                ->orWhere('assets_users.display_name', 'LIKE', '%'.$term.'%')
+                ->orWhere('assets_users.jobtitle', 'LIKE', '%'.$term.'%')
+                ->orWhere('assets_users.username', 'LIKE', '%'.$term.'%')
+                ->orWhere('assets_users.employee_num', 'LIKE', '%'.$term.'%')
                 ->orWhereMultipleColumns(
                     [
                         'assets_users.first_name',
@@ -1645,7 +1645,7 @@ class Asset extends Depreciable
 
         foreach ($terms as $term) {
 
-            $query = $query->orWhere('assets_locations.name', 'LIKE', '%' . $term . '%');
+            $query = $query->orWhere('assets_locations.name', 'LIKE', '%'.$term.'%');
         }
 
         /**
@@ -1660,7 +1660,7 @@ class Asset extends Depreciable
         );
 
         foreach ($terms as $term) {
-            $query = $query->orWhere('assigned_assets.name', 'LIKE', '%' . $term . '%');
+            $query = $query->orWhere('assigned_assets.name', 'LIKE', '%'.$term.'%');
 
         }
 
@@ -1731,7 +1731,7 @@ class Asset extends Depreciable
      */
     public function hasOrphanedAssignment(): bool
     {
-        return ($this->assigned_to && !$this->assigned_type)
-            || ($this->assigned_to && $this->assigned_type && !$this->assignedTo);
+        return ($this->assigned_to && ! $this->assigned_type)
+            || ($this->assigned_to && $this->assigned_type && ! $this->assignedTo);
     }
 }

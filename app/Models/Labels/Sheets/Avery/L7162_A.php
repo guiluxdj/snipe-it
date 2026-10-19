@@ -122,7 +122,7 @@ class L7162_A extends L7162
 
     protected function getContentEditorConfig(): array
     {
-        return array(
+        return [
             'barcode_margin' => $this->getBarcodeMargin(),
             'barcode_2d_size' => $this->getLabelPrintableArea()->h - (self::TITLE_SIZE + self::TITLE_MARGIN),
             'tag_font' => 'freemono',
@@ -138,7 +138,7 @@ class L7162_A extends L7162
             'field_value_font_size' => 3.6,
             'field_value_margin' => $this->getFieldMargin(),
             'text_render_mode' => $this->getTextRenderMode(),
-        );
+        ];
     }
 
     protected function getSupportsEditorConfig(): array
@@ -152,6 +152,7 @@ class L7162_A extends L7162
             'title' => $this->getSupportTitle(),
         ];
     }
+
     public function write($pdf, $record)
     {
         $pa = $this->getLabelPrintableArea();

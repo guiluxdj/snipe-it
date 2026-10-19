@@ -1102,7 +1102,7 @@ class AuditFileStorage extends Command
         }
         fclose($handle);
 
-        note('Wrote ' . number_format(count($rows)) . " row(s) to $csvPath.");
+        note('Wrote '.number_format(count($rows))." row(s) to $csvPath.");
     }
 
     /**

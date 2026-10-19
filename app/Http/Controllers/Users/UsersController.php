@@ -172,7 +172,7 @@ class UsersController extends Controller
                 try {
                     $user->notify(new WelcomeNotification($user));
                 } catch (\Exception $e) {
-                    Log::warning('Could not send welcome notification for user: ' . $e->getMessage());
+                    Log::warning('Could not send welcome notification for user: '.$e->getMessage());
                 }
 
             }
@@ -714,7 +714,7 @@ class UsersController extends Controller
             fclose($handle);
         }, 200, [
             'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="users-' . date('Y-m-d-his') . '.csv"',
+            'Content-Disposition' => 'attachment; filename="users-'.date('Y-m-d-his').'.csv"',
         ]);
 
         return $response;
@@ -841,13 +841,13 @@ class UsersController extends Controller
             ->with('assignedTo')
             ->first();
 
-        if (!$firstAcceptance) {
+        if (! $firstAcceptance) {
             return redirect()->back()->with('warning', trans('admin/users/message.error.no_pending_acceptances'));
         }
 
         $mailable = new UnacceptedAssetReminderMail($firstAcceptance, $pendingItems->count());
 
-        if (!empty($user->locale)) {
+        if (! empty($user->locale)) {
             $mailable->locale($user->locale);
         }
 
@@ -895,11 +895,11 @@ class UsersController extends Controller
     {
         $this->authorize('update', $user);
 
-        if (!$user->twoFactorResettable()) {
+        if (! $user->twoFactorResettable()) {
             return redirect()->back()->with('error', trans('general.unauthorized'));
         }
 
-        if (!auth()->user()->can('canEditAuthFields', $user) || !auth()->user()->can('editableOnDemo')) {
+        if (! auth()->user()->can('canEditAuthFields', $user) || ! auth()->user()->can('editableOnDemo')) {
             return redirect()->back()->with('error', trans('general.unauthorized'));
         }
 
@@ -928,13 +928,15 @@ class UsersController extends Controller
     }
 
     // My update
-    /////////////////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////////////
 
     /**
      * Print inventoryAll
      *
      * @author Guillaume Debarsy
+     *
      * @since [v1.8]
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function printInventoryAll()

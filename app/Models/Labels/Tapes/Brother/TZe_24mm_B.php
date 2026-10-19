@@ -73,6 +73,7 @@ class TZe_24mm_B extends TZe_24mm
     {
         return self::FIELD_MARGIN;
     }
+
     public function getUnit()
     {
         return 'mm';
@@ -139,6 +140,7 @@ class TZe_24mm_B extends TZe_24mm
             'text_render_mode' => 'vertical_stack',
         ];
     }
+
     public function write($pdf, $record)
     {
         $pa = $this->getPrintableArea();

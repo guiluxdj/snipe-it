@@ -91,7 +91,7 @@ class CheckoutRequest extends Controller
 
         if (Company::isFullMultipleCompanySupportEnabled() && ! auth()->user()->isSuperUser()) {
             $requests = $requests->filter(function (CheckoutRequestModel $r): bool {
-                if (!$r->requestable || !Company::isCurrentUserHasAccess($r->requestable)) {
+                if (! $r->requestable || ! Company::isCurrentUserHasAccess($r->requestable)) {
                     return false;
                 }
 

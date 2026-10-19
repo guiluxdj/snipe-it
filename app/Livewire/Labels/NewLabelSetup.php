@@ -2,17 +2,22 @@
 
 namespace App\Livewire\Labels;
 
-use Livewire\Component;
 use App\Models\Labels\RectangleSheet;
-use App\Models\Labels\DefaultLabel;
+use Livewire\Component;
 class NewLabelSetup extends Component
 {
     public string $type = 'sheet';
+
     public string $pageSize = 'letter';
+
     public ?float $labelWidth = null;
+
     public ?float $labelHeight = null;
+
     public ?float $labelGap = null;
+
     public ?int $columns = null;
+
     public ?int $rows = null;
 
     public function getColumnsProperty(): int
@@ -25,6 +30,7 @@ class NewLabelSetup extends Component
 
         return RectangleSheet::calculateGridCount($page['width'], $this->columns, 1.2);
     }
+
     public function getRowsProperty(): int
     {
         if ($this->type !== 'sheet' || ! $this->labelHeight) {
@@ -40,6 +46,7 @@ class NewLabelSetup extends Component
     {
         return $this->columns * $this->rows;
     }
+
     public function render()
     {
         return view('livewire.labels.new-label-setup', [

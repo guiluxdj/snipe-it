@@ -40,7 +40,7 @@ trait BuildsCustomLabelLayout
 
     protected function resolveLayoutFields($record): array
     {
-        if (!$record->has('fields') || !$this->getSupportFields()) {
+        if (! $record->has('fields') || ! $this->getSupportFields()) {
             return [];
         }
 
@@ -97,8 +97,7 @@ trait BuildsCustomLabelLayout
         float $labelSize,
         float $fieldSize,
         float $rowAdvance,
-    ): array
-    {
+    ): array {
         $valueX = $textBox['x1'] + $labelWidth + $valueGap;
 
         return [

@@ -110,10 +110,11 @@ abstract class RectangleSheet extends Sheet
             return 1;
         }
 
-        $count = (int)floor(($usableSize + $spacing) / $denominator);
+        $count = (int) floor(($usableSize + $spacing) / $denominator);
 
         return max(1, $count);
     }
+
     public static function supportedPageSize(string $key): ?array
     {
         return static::supportedPageSizes()[$key] ?? null;

@@ -35,7 +35,6 @@ class TZe_12mm_A extends TZe_12mm
         return self::TEXT_SIZE_MOD;
     }
 
-
     public function getSupportAssetTag()
     {
         return true;

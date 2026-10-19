@@ -15,8 +15,11 @@ class _5267_A extends _5267
     private const FIELD_SIZE = 0.150;
 
     private const FIELD_MARGIN = 0.012;
+
     protected string $titleFont = 'freesans';
+
     protected string $fieldLabelFont = 'freesans';
+
     protected string $fieldValueFont = 'freemono';
 
     public function getBarcodeSize()

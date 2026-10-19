@@ -47,9 +47,9 @@ class CustomLabelRequest extends FormRequest
     private function sheetRules(): array
     {
         return [
-                'page' => ['required', 'array'],
-                'grid' => ['required', 'array'],
-                'label' => ['required', 'array'],
-            ] + LabelGeometryRules::sheet();
+            'page' => ['required', 'array'],
+            'grid' => ['required', 'array'],
+            'label' => ['required', 'array'],
+        ] + LabelGeometryRules::sheet();
     }
 }

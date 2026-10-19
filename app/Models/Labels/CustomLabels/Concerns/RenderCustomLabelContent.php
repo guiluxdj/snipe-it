@@ -6,11 +6,11 @@ trait RenderCustomLabelContent
 {
     protected function boxesOverlap(?array $a, ?array $b): bool
     {
-        if (!$a || !$b) {
+        if (! $a || ! $b) {
             return false;
         }
 
-        return !(
+        return ! (
             $b['x'] >= $a['x'] + $a['w'] ||
             $a['x'] >= $b['x'] + $b['w'] ||
             $b['y'] >= $a['y'] + $a['h'] ||
@@ -58,8 +58,8 @@ trait RenderCustomLabelContent
     {
         if (
             empty($layout['barcode1d']) ||
-            !$record->has('barcode1d') ||
-            !$this->getSupport1DBarcode()
+            ! $record->has('barcode1d') ||
+            ! $this->getSupport1DBarcode()
         ) {
             return;
         }
@@ -79,8 +79,8 @@ trait RenderCustomLabelContent
     {
         if (
             empty($layout['logo']) ||
-            !$record->has('logo') ||
-            !$this->getSupportLogo()
+            ! $record->has('logo') ||
+            ! $this->getSupportLogo()
         ) {
             return;
         }
@@ -105,8 +105,8 @@ trait RenderCustomLabelContent
     {
         if (
             empty($layout['barcode2d']) ||
-            !$record->has('barcode2d') ||
-            !$this->getSupport2DBarcode()
+            ! $record->has('barcode2d') ||
+            ! $this->getSupport2DBarcode()
         ) {
             return;
         }
@@ -126,8 +126,8 @@ trait RenderCustomLabelContent
     {
         if (
             empty($layout['tag']) ||
-            !$record->has('tag') ||
-            !$this->getSupportAssetTag()
+            ! $record->has('tag') ||
+            ! $this->getSupportAssetTag()
         ) {
             return;
         }
@@ -151,7 +151,7 @@ trait RenderCustomLabelContent
 
     protected function renderStackedTextBlock($pdf, $record, array $layout): void
     {
-        if (!empty($layout['title'])) {
+        if (! empty($layout['title'])) {
             static::writeText(
                 $pdf,
                 $record->get('title'),
@@ -188,7 +188,7 @@ trait RenderCustomLabelContent
             $value = $field['value'] ?? '';
 
             if (is_string($label) && trim($label) !== '') {
-                $label = rtrim($label, ':') . ':';
+                $label = rtrim($label, ':').':';
             }
 
             if ($label !== '') {
@@ -231,7 +231,7 @@ trait RenderCustomLabelContent
 
     protected function renderVerticalStackedTextBlock($pdf, $record, array $layout): void
     {
-        if (!empty($layout['title'])) {
+        if (! empty($layout['title'])) {
             static::writeText(
                 $pdf,
                 $record->get('title'),
@@ -247,7 +247,7 @@ trait RenderCustomLabelContent
                 0
             );
         }
-        
+
         if (empty($layout['fields'])) {
             return;
         }
@@ -296,6 +296,7 @@ trait RenderCustomLabelContent
             $y += $layout['fields']['field_size'] + $this->getFieldMargin();
         }
     }
+
     protected function resolveTextBox(array $body, array $boxes): array
     {
         $leftEdge = $body['x1'];
@@ -306,7 +307,7 @@ trait RenderCustomLabelContent
             ? $this->getBarcode2DMargin()
             : 0;
         foreach ($boxes as $box) {
-            if (!$box) {
+            if (! $box) {
                 continue;
             }
 
@@ -320,7 +321,6 @@ trait RenderCustomLabelContent
                 $this->getLogoMargin(),
                 $barcode2DMargin
             );
-
 
             if ($isLeftAnchored) {
                 $leftEdge = max($leftEdge, $box['x'] + $box['w'] + $sideMargin);
@@ -354,7 +354,7 @@ trait RenderCustomLabelContent
 
     protected function resolveLogoBox($record, array $body): ?array
     {
-        if (!$record->has('logo') || !$this->getSupportLogo()) {
+        if (! $record->has('logo') || ! $this->getSupportLogo()) {
             return null;
         }
 
@@ -371,7 +371,7 @@ trait RenderCustomLabelContent
 
     protected function resolve2DBarcodeBox($record, array $body, ?array $logoBox = null): ?array
     {
-        if (!$record->has('barcode2d') || !$this->getSupport2DBarcode()) {
+        if (! $record->has('barcode2d') || ! $this->getSupport2DBarcode()) {
             return null;
         }
 
@@ -397,7 +397,7 @@ trait RenderCustomLabelContent
                 $this->getBarcode2DVAlign()
             );
 
-            if (!$this->boxesOverlap($altBox, $logoBox)) {
+            if (! $this->boxesOverlap($altBox, $logoBox)) {
                 $box = $altBox;
             }
         }
@@ -407,7 +407,7 @@ trait RenderCustomLabelContent
 
     protected function resolveTagBox($record, array $body, ?array $barcode2dBox = null, ?array $logoBox = null): ?array
     {
-        if (!$record->has('tag') || !$this->getSupportAssetTag()) {
+        if (! $record->has('tag') || ! $this->getSupportAssetTag()) {
             return null;
         }
 
@@ -455,6 +455,7 @@ trait RenderCustomLabelContent
         if (method_exists($this, 'getTagPositionMode') && $this->getTagPositionMode() === 'under_barcode') {
             $maxHeight = max(0, ($container['h'] - $this->getTagSize() * .35) - .9);
         }
+
         return min(
             $this->get2DBarcodeSize(),
             $container['w'],
@@ -482,12 +483,13 @@ trait RenderCustomLabelContent
             return;
         }
 
-        if (!$this->getSupportLogo() || !$this->getSupport2DBarcode()) {
+        if (! $this->getSupportLogo() || ! $this->getSupport2DBarcode()) {
             return;
         }
 
         if ($changedKey === 'barcode2D_h_align') {
             $this->logoHAlign = $this->oppositeHAlign($this->barcode2DHAlign);
+
             return;
         }
 

@@ -228,7 +228,7 @@ class StatuslabelsController extends Controller
      */
     public function getAssetCountByStatuslabel(): array
     {
-        
+
         abort_unless(Gate::allows('view', Statuslabel::class) || Gate::allows('view', Asset::class), 403);
 
         if (Setting::getSettings()->show_archived_in_list == 0) {

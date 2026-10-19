@@ -45,7 +45,7 @@ class SendExpirationAlerts extends Command
     {
         $settings = Setting::getSettings();
         $alert_interval = $settings->alert_interval;
-        
+
         if ($alert_interval === null || (int) $alert_interval <= 0) {
             $this->info('No alert interval configured in settings. No alerts will be sent.');
 

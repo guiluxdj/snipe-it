@@ -10,39 +10,47 @@ use App\Models\Labels\CustomLabels\Concerns\HasCustomLabelSupports;
 use App\Models\Labels\CustomLabels\Concerns\RenderCustomLabelContent;
 use App\Models\Labels\CustomLabels\Concerns\SeedsCustomLabelFromTemplate;
 use App\Models\Labels\Label;
-use App\Helpers\Helper;
 use TCPDF;
 
 abstract class CustomTapeLabel extends Label
 {
-    use RenderCustomLabelContent;
+    use BuildsCustomLabelLayout;
+    use HasCustomLabelContentProperties;
     use HasCustomLabelEditorConfig {
         getContentEditorConfig as getBaseContentEditorConfig;
     }
     use HasCustomLabelEditorSections;
     use HasCustomLabelSupports;
-    use HasCustomLabelContentProperties;
+    use RenderCustomLabelContent;
     use SeedsCustomLabelFromTemplate;
-    use BuildsCustomLabelLayout;
+
     protected array $editorConfig = [];
 
     protected string $unit = 'mm';
 
     protected float $width = 50.0;
+
     protected float $height = 12.0;
+
     protected float $labelGap = 0.0;
+
     protected float $marginTop = 3.2;
+
     protected float $marginRight = 3.2;
+
     protected float $marginBottom = 3.2;
+
     protected float $marginLeft = 3.2;
 
     protected int $rotation = 0;
+
     protected string $orientation = 'L';
 
     public function getUnit(): string
     {
         return $this->unit;
     }
+
     public function getWidth()
     {
         return $this->width;
@@ -57,6 +65,7 @@ abstract class CustomTapeLabel extends Label
     {
         return $this->labelGap;
     }
+
     public function getMarginTop()
     {
         return $this->marginTop;
@@ -137,7 +146,6 @@ abstract class CustomTapeLabel extends Label
         return $this->rotation;
     }
 
-
     public function preparePDF(TCPDF $pdf): void
     {
         $pdf->SetMargins(0, 0, 0);
@@ -172,6 +180,7 @@ abstract class CustomTapeLabel extends Label
             ],
         ]);
     }
+
     public function getEditorConfigSections(): array
     {
         return [
@@ -199,7 +208,7 @@ abstract class CustomTapeLabel extends Label
         $this->seedEditorContentFromTemplate($template, $convert);
 
         $this->rotation = method_exists($template, 'getRotation')
-            ? (int)$template->getRotation()
+            ? (int) $template->getRotation()
             : $this->rotation;
 
         return $this;
@@ -220,12 +229,12 @@ abstract class CustomTapeLabel extends Label
         $this->hydrateContent($config['content'] ?? []);
 
         $dimensions = $config['dimensions'] ?? [];
-        $this->width = isset($dimensions['width']) ? (float)$dimensions['width'] : $this->width;
-        $this->height = isset($dimensions['height']) ? (float)$dimensions['height'] : $this->height;
-        $this->labelGap = isset($dimensions['label_gap']) ? (float)$dimensions['label_gap'] : $this->labelGap;
+        $this->width = isset($dimensions['width']) ? (float) $dimensions['width'] : $this->width;
+        $this->height = isset($dimensions['height']) ? (float) $dimensions['height'] : $this->height;
+        $this->labelGap = isset($dimensions['label_gap']) ? (float) $dimensions['label_gap'] : $this->labelGap;
         $meta = $config['meta'] ?? [];
 
-        $this->rotation = isset($meta['rotation']) ? (int)$meta['rotation'] : $this->rotation;
+        $this->rotation = isset($meta['rotation']) ? (int) $meta['rotation'] : $this->rotation;
     }
 
     public function write($pdf, $record)
@@ -251,7 +260,7 @@ abstract class CustomTapeLabel extends Label
         */
         $useTextColumnBarcode = $this->getBarcode1DPlacement() === 'text_column';
 
-        if (!$useTextColumnBarcode && $record->has('barcode1d') && $this->getSupport1DBarcode()) {
+        if (! $useTextColumnBarcode && $record->has('barcode1d') && $this->getSupport1DBarcode()) {
             $barcodeHeight = min(
                 max(0, $this->getBarcodeSize()),
                 $layout['body']['h']
@@ -297,13 +306,11 @@ abstract class CustomTapeLabel extends Label
 
             $barcode2dBox['x'] = $layout['body']['x1']
                 + (($layout['body']['w'] - $barcode2dBox['w']) / 2);
-            
-            $layout['barcode2d'] = $barcode2dBox;
 
+            $layout['barcode2d'] = $barcode2dBox;
 
             $layout['body']['y1'] = $barcode2dBox['y'] + $barcode2dBox['h'] + $this->getBarcode2DMargin();
             $layout['body']['h'] = max(0, $layout['body']['y2'] - $layout['body']['y1']);
-
 
             $layout['text'] = $layout['body'];
             $layout['logo'] = null;
@@ -421,7 +428,7 @@ abstract class CustomTapeLabel extends Label
 
     protected function renderInlineTag($pdf, $record, array $layout): void
     {
-        if (empty($layout['tag']) || !$record->has('tag') || !$this->getSupportAssetTag()) {
+        if (empty($layout['tag']) || ! $record->has('tag') || ! $this->getSupportAssetTag()) {
             return;
         }
 
@@ -446,6 +453,7 @@ abstract class CustomTapeLabel extends Label
     {
         if (in_array($this->getTextRenderMode(), ['block', 'vertical_stack'], true)) {
             $this->renderBlockTag($pdf, $record, $layout);
+
             return;
         }
 
@@ -456,11 +464,13 @@ abstract class CustomTapeLabel extends Label
     {
         if ($this->getTextRenderMode() === 'vertical_stack') {
             $this->renderVerticalStackedTextBlock($pdf, $record, $layout);
+
             return;
         }
 
         if ($this->getTextRenderMode() === 'block') {
             $this->renderStackedTextBlock($pdf, $record, $layout);
+
             return;
         }
 
@@ -475,7 +485,7 @@ abstract class CustomTapeLabel extends Label
 
         $field = collect($layout['fields']['fields'])->first();
 
-        if (!$field) {
+        if (! $field) {
             return;
         }
 
@@ -501,7 +511,7 @@ abstract class CustomTapeLabel extends Label
         $labels = collect($fields)
             ->pluck('label')
             ->filter()
-            ->map(fn($label) => rtrim((string)$label, ':') . ':');
+            ->map(fn ($label) => rtrim((string) $label, ':').':');
 
         if ($labels->isEmpty()) {
             return 0;
@@ -518,11 +528,11 @@ abstract class CustomTapeLabel extends Label
         );
 
         $width = $labels
-            ->map(fn($label) => $pdf->GetStringWidth($label))
+            ->map(fn ($label) => $pdf->GetStringWidth($label))
             ->max();
 
         $pdf->SetFont($prevFamily, $prevStyle, $prevSizePt);
 
-        return (float)$width;
+        return (float) $width;
     }
 }

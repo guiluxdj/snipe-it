@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
  * Model for Accessories.
  *
  * @version v1.0
+ *
  * @mixin IdeHelperAccessoryCheckout
  */
 class AccessoryCheckout extends Model

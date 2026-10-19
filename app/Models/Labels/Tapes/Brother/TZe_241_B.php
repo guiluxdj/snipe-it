@@ -7,7 +7,9 @@ use App\Helpers\Helper;
 class TZe_241_B extends TZe_18mm
 {
     private const LABEL_SIZE = 5.0;
+
     private const LABEL_MARGIN = 0.6;
+
     private const FIELD_SIZE = 5.0;
 
     private const FIELD_MARGIN = 0.8;
@@ -86,6 +88,7 @@ class TZe_241_B extends TZe_18mm
             'text_render_mode' => 'block',
         ];
     }
+
     public function write($pdf, $record)
     {
         $pa = $this->getPrintableArea();

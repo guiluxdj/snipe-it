@@ -21,6 +21,7 @@ class TZe_24mm_D extends TZe_24mm
     private const FIELD_MARGIN = 0.35;
 
     private const BARCODE1D_SIZE = 3.00;  // Size for the C128 barcode at bottom
+
     private string $barcode1DVAlign = 'B';
 
     public function getBarcodeMargin(): float
@@ -67,6 +68,7 @@ class TZe_24mm_D extends TZe_24mm
     {
         return $this->barcode1DVAlign;
     }
+
     public function getUnit()
     {
         return 'mm';

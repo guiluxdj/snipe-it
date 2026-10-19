@@ -186,6 +186,7 @@ class _14130046 extends RectangleSheet
             'field_value_font' => 'freesans',
         ];
     }
+
     public function write($pdf, $record)
     {
         // The QR code is a square occupying (nearly) the full label height,

@@ -242,8 +242,8 @@ class LdapSettings extends Component
         // Clamp against total step count in case a session pointer
         // was seeded when the wizard had a different step layout.
         $this->highestStepReached = min($this->highestStepReached, 5);
-        
-        if (!$this->ldap_enabled && !$this->isReadOnly) {
+
+        if (! $this->ldap_enabled && ! $this->isReadOnly) {
             $this->highestStepReached = min($this->highestStepReached, $this->highestReachableByPersistedData());
         }
 

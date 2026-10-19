@@ -19,8 +19,11 @@ class _5520_A extends _5520
     private const FIELD_SIZE = 0.150;
 
     private const FIELD_MARGIN = 0.012;
+
     protected string $titleFont = 'freesans';
+
     protected string $fieldLabelFont = 'freesans';
+
     protected string $fieldValueFont = 'freemono';
 
     public function getBarcodeMargin()
@@ -164,6 +167,7 @@ class _5520_A extends _5520
             'title_offset_x' => 0.590551,
         ];
     }
+
     public function write($pdf, $record)
     {
         $pa = $this->getLabelPrintableArea();
