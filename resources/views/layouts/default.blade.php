@@ -991,7 +991,7 @@
                         <a target="_blank" class="label label-default" rel="noopener"
                            href="{{  $snipeSettings->privacy_policy_link }}"
                            target="_new">{{ trans('admin/settings/general.privacy_policy') }}</a>
-                    @endif --}}
+                    @endif
                     </div>
                     <br>
                     @if ($snipeSettings->footer_text!='')
