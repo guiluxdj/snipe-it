@@ -126,6 +126,50 @@ class Helper
         );
     }
 
+    /**
+     * Return every item on a single page when the API call passes
+     * `?all=true` on the request. Used by the select2-checkboxes
+     * "Select all" button so it can pull the full filtered result set
+     * in one call instead of walking paginated pages.
+     *
+     * Caps the response at $cap items as a guardrail against runaway
+     * reads. The explicit $cap argument lets a controller pin a lower
+     * ceiling it knows is appropriate for its shape. Omitted, the
+     * default is `config('app.max_unpaginated_records')` (operator
+     * knob via MAX_UNPAGINATED, same lever the Groups bulk-user
+     * picker respects).
+     *
+     * A client-provided `?cap=` on the request is honored only as a
+     * CEILING SUGGESTION: it can lower the effective cap but never
+     * raise it. A malicious `?cap=99999999` is silently limited to
+     * the server-side value above. This is what lets per-widget
+     * data-max-select-all attributes work without opening a runaway
+     * surface.
+     *
+     * Falls through to paginateCollection() for everything else so
+     * existing callers keep working.
+     */
+    public static function paginateCollectionOrAll(Collection $items, ?int $cap = null): LengthAwarePaginator
+    {
+        if (! request()->boolean('all')) {
+            return self::paginateCollection($items);
+        }
+
+        $cap ??= (int) config('app.max_unpaginated_records', 5000);
+        $clientCap = (int) request()->integer('cap', PHP_INT_MAX);
+        if ($clientCap > 0) {
+            $cap = min($cap, $clientCap);
+        }
+        $capped = $items->take($cap)->values();
+
+        return new LengthAwarePaginator(
+            $capped,
+            $capped->count(),
+            max($capped->count(), 1),
+            1,
+        );
+    }
+
     public static function parseEscapedMarkedownInline($str = null)
     {
         $Parsedown = new \Parsedown;
@@ -824,7 +868,8 @@ class Helper
         $deprecations = [
             'ms_teams_deprecated' => [
                 'check' => ! Str::contains(Setting::getSettings()->webhook_endpoint, 'workflows') && (Setting::getSettings()->webhook_selected === 'microsoft'),
-                'message' => 'The Microsoft Teams webhook URL being used will be deprecated Dec 31st, 2025. <a class="btn btn-primary" href="'.route('settings.slack.index').'">Change webhook endpoint</a>'],
+                'message' => 'The Microsoft Teams webhook URL being used will be deprecated Dec 31st, 2025. <a class="btn btn-primary" href="'.route('settings.integrations.index').'">Change webhook endpoint</a>',
+            ],
         ];
 
         // if item of concern is being used and its being used with the deprecated values return the notification array.
@@ -873,18 +918,37 @@ class Helper
             ->havingRaw('(qty - consumables_users_count) < (min_amt + ?)', [$alert_threshold])
             ->get();
 
+        // Archived accessories are retired from active inventory and
+        // should not drive low-stock alerts even when they fall below
+        // their min_amt threshold.
         $accessories = Accessory::select('id', 'name', 'qty', 'min_amt')
             ->withCount('checkouts as checkouts_count')
             ->whereNotNull('min_amt')
+            ->notArchived()
             ->groupBy('accessories.id', 'accessories.name', 'accessories.qty', 'accessories.min_amt')
             ->havingRaw('(qty - checkouts_count) < (min_amt + ?)', [$alert_threshold])
             ->get();
 
+        // Components are checked out with a per-assignment quantity
+        // stored on the components_assets pivot (assigned_qty), NOT
+        // one row per unit. withCount() would count assignment rows
+        // and produce a wrong "remaining" ("qty - 1" instead of "qty
+        // - N" for a single pivot row that shipped N units). Match
+        // Component::numCheckedOut() by summing pivot.assigned_qty
+        // through the unconstrainedAssets relation, which also drops
+        // CompanyableScope so cross-company checkouts count against
+        // stock the same way the model method does. coalesce() maps
+        // "no assignments" (SUM returns NULL) back to 0 so the
+        // havingRaw comparison stays numeric.
+        // Archived components are retired from active inventory and
+        // should not drive low-stock alerts even when they fall below
+        // their min_amt threshold.
         $components = Component::select('id', 'name', 'qty', 'min_amt')
-            ->withCount('assets as sum_unconstrained_assets')
+            ->withSum('unconstrainedAssets as sum_unconstrained_assets', 'components_assets.assigned_qty')
             ->whereNotNull('min_amt')
+            ->notArchived()
             ->groupBy('components.id', 'components.name', 'components.qty', 'components.min_amt')
-            ->havingRaw('(qty - sum_unconstrained_assets) < (min_amt + ?)', [$alert_threshold])
+            ->havingRaw('(qty - COALESCE(sum_unconstrained_assets, 0)) < (min_amt + ?)', [$alert_threshold])
             ->get();
 
         $asset_models = AssetModel::select('id', 'name', 'min_amt')
@@ -942,7 +1006,7 @@ class Helper
         }
 
         foreach ($components as $component) {
-            $avail = $component->qty - $component->sum_unconstrained_assets;
+            $avail = $component->qty - ($component->sum_unconstrained_assets ?? 0);
             $percent = $component->qty > 0
                 ? number_format((($avail / $component->qty) * 100), 0)
                 : 100;
@@ -997,7 +1061,7 @@ class Helper
      *
      * @since [v3.0]
      *
-     * @param  File  $file
+     * @param  string  $file
      * @return string | bool
      */
     public static function checkUploadIsImage($file)
@@ -1016,7 +1080,7 @@ class Helper
     /**
      * Check if the file is a video, so we can show a preview
      *
-     * @param  File  $file
+     * @param  string  $file
      * @return string | bool
      *
      * @author [B. Wetherington] [<bwetherington@grokability.com>]
@@ -1039,7 +1103,7 @@ class Helper
     /**
      * Check if the file is audio, so we can show a preview
      *
-     * @param  File  $file
+     * @param  string  $file
      * @return string | bool
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
@@ -1150,7 +1214,13 @@ class Helper
 
                     return false;
                 } else {
-                    if (strpos($rule, 'required') !== false) {
+                    // Pipe-delimited rules like "nullable|max:10|required_with:depreciation_id"
+                    // contain the substring "required" even when the only
+                    // required-family rule is conditional. Split on `|` and
+                    // match the bare `required` token so conditional
+                    // variants (required_with, required_if, required_unless, etc.)
+                    // don't flip the UI's unconditional-required indicator.
+                    if (in_array('required', explode('|', $rule), true)) {
                         return true;
                     }
                     if (strpos($rule, 'fmcs_company') !== false && self::fmcsCompanyIsCurrentlyRequired()) {
@@ -1285,11 +1355,32 @@ class Helper
             return strtoupper(trans('admin/custom_fields/general.encrypted'));
         }
 
-        if (isset($item)) {
-            return self::gracefulDecrypt($field, $item->{$field->db_column_name()});
+        $value = isset($item)
+            ? self::gracefulDecrypt($field, $item->{$field->db_column_name()})
+            : $field->defaultValue($model->id);
+
+        // DATE / DATETIME custom fields can hold non-YYYY-MM-DD strings
+        // in the DB (e.g. `3/28/2025` from a historic CSV import that
+        // shoved raw cell values into the column). The datepicker
+        // widgets expect `Y-m-d` / `Y-m-d H:i:s` and blank or mangle
+        // anything else. AssetsTransformer already normalizes on the
+        // view / API read path via getFormattedDateObject; do the
+        // same here so the edit form renders a value the picker can
+        // hydrate. Save cycle rewrites the column to YYYY-MM-DD via
+        // the picker's own output, so the DB heals per-edit. Any
+        // value Carbon cannot parse falls through unchanged so the
+        // user sees the raw string and can correct it.
+        if (in_array($field->format, ['DATE', 'DATETIME'], true) && ! empty($value)) {
+            try {
+                $value = $field->format === 'DATETIME'
+                    ? Carbon::parse($value)->format('Y-m-d H:i:s')
+                    : Carbon::parse($value)->format('Y-m-d');
+            } catch (\Exception $e) {
+                // Unparseable value stays as-is.
+            }
         }
 
-        return $field->defaultValue($model->id);
+        return $value;
     }
 
     public static function formatStandardApiResponse($status, $payload = null, $messages = null)
@@ -1621,7 +1712,6 @@ class Helper
     {
         if (config('app.lock_passwords') === true) {
             return true;
-            Log::debug('app locked!');
         }
 
         return false;
@@ -1678,8 +1768,6 @@ class Helper
                 return (1 / 72) * static::getUnitConversionFactor('in');
             default:
                 throw new \InvalidArgumentException('Unit: '.e($unit).' is not supported');
-
-                return false;
         }
     }
 
@@ -1777,12 +1865,31 @@ class Helper
 
         $url = str_replace(["\r", "\n"], '', $url);
 
-        $parts = parse_url($url);
+        // Normalize backslashes to forward slashes before parsing, so that a malicious input like
+        // https:\\evil.com\@example.com\@evil.com\@example.com
+        // doesn't get parsed as a same-origin URL.
+        $normalized = str_replace('\\', '/', $url);
+
+        $parts = parse_url($normalized);
         if ($parts === false) {
             return null;
         }
 
         if (isset($parts['scheme']) && ! in_array(strtolower($parts['scheme']), ['http', 'https'], true)) {
+            return null;
+        }
+
+        // Same-origin redirects never legitimately carry credentials.
+        // Reject any input where parse_url extracted a userinfo component,
+        // closing further parser-differential variants that hide the real
+        // authority behind an `@`.
+        if (isset($parts['user']) || isset($parts['pass'])) {
+            return null;
+        }
+
+        // Reject scheme-only URLs with no authority (e.g. "https:evil.com",
+        // "https:/evil.com", "http:@evil.com").
+        if (isset($parts['scheme']) && ! isset($parts['host'])) {
             return null;
         }
 
@@ -1794,6 +1901,30 @@ class Helper
         }
 
         return $url;
+    }
+
+    /**
+     * Emission-side replacement for Laravel's redirect()->intended().
+     *
+     * Laravel's redirect()->intended() pulls session('url.intended') and
+     * hands it straight to redirect()->to() with no host validation. The
+     * write-side sanitize we perform in SamlController::acs and similar
+     * places is defense-in-depth, but any writer that skips it (or any
+     * parser-differential bypass of Helper::sameOriginUrl at write time)
+     * leaves an open-redirect surface. This helper reads url.intended,
+     * runs it through sameOriginUrl at emission, and falls back to the
+     * caller-supplied default whenever the stored value is missing or
+     * fails the guard. Every controller that previously called
+     * redirect()->intended(...) directly should call this instead.
+     */
+    public static function safeIntended(?string $default = null): RedirectResponse
+    {
+        $default ??= '/';
+
+        $intended = session()->pull('url.intended');
+        $target = self::sameOriginUrl($intended) ?? $default;
+
+        return redirect()->to($target);
     }
 
     public static function getRedirectOption($request, $id, $table, $item_id = null): RedirectResponse
@@ -1825,6 +1956,7 @@ class Helper
                 'Components' => route('components.index'),
                 'Consumables' => route('consumables.index'),
                 'Maintenances' => route('maintenances.index'),
+                default => route('home'),
             };
 
             // #15214: preserve query-string filters when the user came
@@ -1850,6 +1982,7 @@ class Helper
                 'Accessories' => redirect()->route('accessories.show', $id ?? $item_id),
                 'Components' => redirect()->route('components.show', $id ?? $item_id),
                 'Consumables' => redirect()->route('consumables.show', $id ?? $item_id),
+                default => redirect()->route('home'),
             };
         }
 
@@ -1869,6 +2002,7 @@ class Helper
                 'asset' => $assetId
                     ? redirect()->route('hardware.show', $assetId)
                     : redirect()->route('hardware.index'),
+                default => redirect()->route('home'),
             };
         }
 
@@ -1877,6 +2011,7 @@ class Helper
             return match ($other_redirect) {
                 'audit' => redirect()->route('assets.audit.due'),
                 'model' => redirect()->route('models.show', $request->model_id),
+                default => redirect()->route('home'),
             };
 
         }

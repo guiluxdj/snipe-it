@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Reports;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\CustomComponentReportRequest;
 use App\Models\Actionlog;
+use App\Models\Builders\ComponentQueryBuilder;
 use App\Models\Component;
 use App\Models\ReportTemplate;
 use Carbon\Carbon;
@@ -42,7 +43,7 @@ class CustomComponentReportController extends Controller
     {
         $this->authorize('reports.view');
 
-        ini_set('max_execution_time', env('REPORT_TIME_LIMIT', 12000)); // 12000 seconds = 200 minutes
+        ini_set('max_execution_time', config('app.report_time_limit')); // 12000 seconds = 200 minutes
 
         $this->disableDebugbar();
 
@@ -153,7 +154,11 @@ class CustomComponentReportController extends Controller
             ],
             'include_assignments' => [
                 'headers' => [
-                    trans('admin/hardware/form.name'),
+                    // The include_assignments block lists the ASSET a
+                    // component is assigned to, not the component itself,
+                    // so use the asset-flavored variant of item_name_var
+                    // for consistency with the other asset-column exports.
+                    trans('general.item_name_var', ['item' => trans('general.asset')]),
                     trans('admin/hardware/form.tag'),
                     trans('admin/reports/general.custom_export.asset_company'),
                     trans('admin/reports/general.custom_export.asset_serial'),
@@ -242,6 +247,10 @@ class CustomComponentReportController extends Controller
                 'headers' => [trans('general.deleted')],
                 'values' => fn ($component, $i) => [$component->deleted_at ?? ''],
             ],
+            'archived' => [
+                'headers' => [trans('general.archived')],
+                'values' => fn ($component, $i) => [$component->archived ? trans('general.yes') : trans('general.no')],
+            ],
             'notes' => [
                 'headers' => [trans('general.notes')],
                 'values' => fn ($component, $i) => [$component->notes],
@@ -262,7 +271,7 @@ class CustomComponentReportController extends Controller
         return $headers;
     }
 
-    private function buildQuery(Request $request): Builder
+    private function buildQuery(Request $request): ComponentQueryBuilder
     {
         $query = Component::select('components.*')
             ->with([
@@ -372,6 +381,10 @@ class CustomComponentReportController extends Controller
                 ->pluck('item_id');
 
             $query->whereIn('components.id', $componentIdsWithinCheckoutRange);
+        }
+
+        if ($request->filled('exclude_archived')) {
+            $query->notArchived();
         }
 
         if ($request->input('deleted_components') === 'include_deleted') {

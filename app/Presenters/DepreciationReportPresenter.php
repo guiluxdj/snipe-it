@@ -2,6 +2,7 @@
 
 namespace App\Presenters;
 
+use App\Enums\FileStorage;
 use DateTime;
 use Illuminate\Support\Facades\Storage;
 
@@ -39,7 +40,9 @@ class DepreciationReportPresenter extends Presenter
                 'searchable' => true,
                 'sortable' => true,
                 'switchable' => false,
-                'title' => trans('admin/hardware/form.name'),
+                // Match the import wizard's Name label so
+                // downloads use importer's auto-mapper.
+                'title' => trans('general.item_name_var', ['item' => trans('general.asset')]),
                 'visible' => false,
             ], [
                 'field' => 'asset_tag',
@@ -256,7 +259,7 @@ class DepreciationReportPresenter extends Presenter
             $imagePath = $this->model->image;
         }
         if (! empty($imagePath)) {
-            return Storage::disk('public')->url(app('assets_upload_path').e($imagePath));
+            return Storage::disk('public')->url(FileStorage::Assets->publicPath().e($imagePath));
         }
 
         return $imagePath;

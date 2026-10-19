@@ -2,8 +2,8 @@
 
 namespace App\Http\Transformers;
 
+use App\Enums\FileStorage;
 use App\Helpers\Helper;
-use App\Models\Accessory;
 use App\Models\AccessoryCheckout;
 use App\Models\Asset;
 use App\Models\Component;
@@ -51,12 +51,14 @@ class AssetsTransformer
                 'name' => e($asset->status->name),
                 'status_type' => e($asset->status->getStatuslabelType()),
                 'status_meta' => e($asset->present()->statusMeta),
+                'tag_color' => ($asset->status->color) ? e($asset->status->color) : null,
             ] : null, // <-- legacy - will be removed
             'status' => ($asset->status) ? [
                 'id' => (int) $asset->status->id,
                 'name' => e($asset->status->name),
                 'status_type' => e($asset->status->getStatuslabelType()),
                 'status_meta' => e($asset->present()->statusMeta),
+                'tag_color' => ($asset->status->color) ? e($asset->status->color) : null,
             ] : null,
             'category' => (($asset->model) && ($asset->model->category)) ? [
                 'id' => (int) $asset->model->category->id,
@@ -99,8 +101,8 @@ class AssetsTransformer
             ] : null,
             'image' => ($asset->getImageUrl()) ? $asset->getImageUrl() : null,
             'qr_code_url' => route('qr_code/common', ['object_type' => 'hardware', 'id' => $asset->id]),
-            'qr' => ($setting->qr_code == '1') ? Storage::disk('public')->url('barcodes/qr-'.str_slug($asset->asset_tag).'-'.str_slug($asset->id).'.png') : null,
-            'alt_barcode' => ($setting->alt_barcode_enabled == '1') ? Storage::disk('public')->url('barcodes/'.str_slug($setting->alt_barcode).'-'.str_slug($asset->asset_tag).'.png') : null,
+            'qr' => ($setting->qr_code == '1') ? Storage::disk('public')->url(FileStorage::Barcodes->publicPath().'qr-'.str_slug($asset->asset_tag).'-'.str_slug($asset->id).'.png') : null,
+            'alt_barcode' => ($setting->alt_barcode_enabled == '1') ? Storage::disk('public')->url(FileStorage::Barcodes->publicPath().str_slug($setting->alt_barcode).'-'.str_slug($asset->asset_tag).'.png') : null,
             'assigned_to' => $this->transformAssignedTo($asset),
             'warranty_months' => ($asset->warranty_months > 0) ? e($asset->warranty_months.' '.trans('admin/hardware/form.months')) : null,
             'warranty_expires' => ($asset->warranty_months > 0) ? Helper::getFormattedDateObject($asset->warranty_expires, 'date') : null,
@@ -125,6 +127,16 @@ class AssetsTransformer
             'requests_counter' => (int) $asset->requests_counter,
             'user_can_checkout' => (bool) $asset->availableForCheckout(),
             'book_value' => Helper::formatCurrencyOutput($asset->getDepreciatedValue()),
+
+            // Sync-adapter side-table data. Flat keys (rather than a
+            // nested object) so bs-table can bind columns to them
+            // directly without a subfield formatter. Null when the
+            // asset has never been synced.
+            'primary_mac' => ($asset->externalSource?->primary_mac) ? e($asset->externalSource->primary_mac) : null,
+            'primary_ip' => ($asset->externalSource?->primary_ip) ? e($asset->externalSource->primary_ip) : null,
+            'external_os' => ($asset->externalSource?->os) ? e($asset->externalSource->os) : null,
+            'external_os_version' => ($asset->externalSource?->os_version) ? e($asset->externalSource->os_version) : null,
+            'last_seen' => ($asset->externalSource?->last_seen) ? Helper::getFormattedDateObject($asset->externalSource->last_seen, 'datetime') : null,
         ];
 
         if (($asset->model) && ($asset->model->fieldset) && ($asset->model->fieldset->fields->count() > 0)) {
@@ -172,20 +184,20 @@ class AssetsTransformer
         }
 
         $permissions_array['available_actions'] = [
-            'checkout' => ($asset->deleted_at == '' && Gate::allows('checkout', Asset::class)) ? true : false,
-            'checkin' => ($asset->deleted_at == '' && Gate::allows('checkin', Asset::class)) ? true : false,
-            'clone' => Gate::allows('create', Asset::class) ? true : false,
+            'checkout' => ($asset->deleted_at == '' && Gate::allows('checkout', $asset)) ? true : false,
+            'checkin' => ($asset->deleted_at == '' && Gate::allows('checkin', $asset)) ? true : false,
+            'clone' => Gate::allows('clone', $asset) ? true : false,
             'restore' => ($asset->deleted_at != '' && Gate::allows('create', Asset::class)) ? true : false,
-            'update' => ($asset->deleted_at == '' && Gate::allows('update', Asset::class)) ? true : false,
-            'audit' => Gate::allows('audit', Asset::class) ? true : false,
-            'delete' => ($asset->deleted_at == '' && $asset->assigned_to == '' && Gate::allows('delete', Asset::class) && ($asset->deleted_at == '')) ? true : false,
+            'update' => ($asset->deleted_at == '' && Gate::allows('update', $asset)) ? true : false,
+            'audit' => Gate::allows('audit', $asset) ? true : false,
+            'delete' => ($asset->deleted_at == '' && $asset->assigned_to == '' && Gate::allows('delete', $asset) && ($asset->deleted_at == '')) ? true : false,
             'bulk_selectable' => [
-                'edit' => ($asset->deleted_at == '' && Gate::allows('update', Asset::class)),
-                'maintenance' => ($asset->deleted_at == '' && Gate::allows('update', Asset::class)),
-                'checkout' => ($asset->deleted_at == '' && ! $asset->assigned_to && Gate::allows('checkout', Asset::class)),
-                'checkin' => ($asset->deleted_at == '' && $asset->assigned_to && Gate::allows('checkin', Asset::class)),
-                'audit' => ($asset->deleted_at == '' && Gate::allows('audit', Asset::class)),
-                'delete' => ($asset->deleted_at == '' && ! $asset->assigned_to && Gate::allows('delete', Asset::class)),
+                'edit' => ($asset->deleted_at == '' && Gate::allows('update', $asset)),
+                'maintenance' => ($asset->deleted_at == '' && Gate::allows('update', $asset)),
+                'checkout' => ($asset->deleted_at == '' && ! $asset->assigned_to && Gate::allows('checkout', $asset)),
+                'checkin' => ($asset->deleted_at == '' && $asset->assigned_to && Gate::allows('checkin', $asset)),
+                'audit' => ($asset->deleted_at == '' && Gate::allows('audit', $asset)),
+                'delete' => ($asset->deleted_at == '' && ! $asset->assigned_to && Gate::allows('delete', $asset)),
                 'labels' => $asset->deleted_at == '',
                 'restore' => ($asset->deleted_at != '' && Gate::allows('create', Asset::class)),
             ],
@@ -199,9 +211,7 @@ class AssetsTransformer
                 foreach ($asset->components as $component) {
                     // Info-disclosure guard: if the caller is denied view
                     // on this specific component, omit it from the response
-                    // entirely - not even id / pivot_id are exposed, so a
-                    // caller with an explicit components.view deny can't
-                    // enumerate what's on the asset.
+                    // entirely
                     if (Gate::denies('view', $component)) {
                         continue;
                     }
@@ -308,10 +318,10 @@ class AssetsTransformer
             'expected_checkin' => Helper::getFormattedDateObject($asset->expected_checkin, 'datetime'),
             'location' => ($asset->location) ? e($asset->location->name) : null,
             'status' => ($asset->status) ? $asset->present()->statusMeta : null,
-            // Category is nested through model; emit the standard
+            // Category is nested through model. Emit the standard
             // {id, name, tag_color} object so the requestable-tab
             // categoriesLinkObjFormatter can render the tag_color
-            // icon + link. Company is direct on Asset; emit the
+            // icon + link. Company is direct on Asset. Emit the
             // matching {id, name} shape.
             'category' => (($asset->model) && ($asset->model->category)) ? [
                 'id' => (int) $asset->model->category->id,
@@ -359,7 +369,7 @@ class AssetsTransformer
 
     public function transformAssetCompact(Asset $asset)
     {
-        $array = [
+        return [
             'id' => (int) $asset->id,
             'image' => ($asset->getImageUrl()) ? $asset->getImageUrl() : null,
             'type' => 'asset',
@@ -368,20 +378,41 @@ class AssetsTransformer
             'model_number' => (($asset->model) && ($asset->model->model_number)) ? e($asset->model->model_number) : null,
             'asset_tag' => e($asset->asset_tag),
             'serial' => e($asset->serial),
+            // Drives polymorphicItemFormatter / genericColumnObjLinkFormatter:
+            // rendered as plain text (no link) when the caller cannot reach
+            // this asset's show page, so a scoped viewer's click through
+            // Assigned / Orders / History cross-links does not 403.
+            'viewable' => Gate::allows('view', $asset),
         ];
-
-        return $array;
     }
 
     public function transformCheckedoutAccessories($accessory_checkouts, $total)
     {
 
         $array = [];
+        $suppressed = 0;
         foreach ($accessory_checkouts as $checkout) {
+            // Info-disclosure guard: GET /api/v1/hardware/{asset}/assigned/accessories
+            // is gated only on assets.view, so a caller with assets.view but
+            // an explicit deny on accessories.view used to read the accessory's
+            // name / note / image straight off this response. When denied, skip
+            // the row entirely so nothing about the accessory (not even id or
+            // existence) is exposed. Same shape as transformCheckedoutComponents
+            // below.
+            //
+            // The controller-supplied $total still reflects the true row count
+            // and would leak "there are N accessories you can't see", so
+            // decrement it by the number of rows suppressed here.
+            if (! $checkout->accessory || Gate::denies('view', $checkout->accessory)) {
+                $suppressed++;
+
+                continue;
+            }
+
             $array[] = self::transformCheckedoutAccessory($checkout);
         }
 
-        return (new DatatablesTransformer)->transformDatatables($array, $total);
+        return (new DatatablesTransformer)->transformDatatables($array, max(0, $total - $suppressed));
     }
 
     public function transformCheckedoutAccessory(AccessoryCheckout $accessory_checkout)
@@ -394,7 +425,7 @@ class AssetsTransformer
                     'name' => e($accessory_checkout->accessory->display_name),
                 ],
                 'assigned_to' => $accessory_checkout->assigned_to,
-                'image' => ($accessory_checkout->accessory->image) ? Storage::disk('public')->url('accessories/'.e($accessory_checkout->accessory->image)) : null,
+                'image' => ($accessory_checkout->accessory->image) ? Storage::disk('public')->url(FileStorage::Accessories->publicPath().e($accessory_checkout->accessory->image)) : null,
                 'note' => $accessory_checkout->note ? e($accessory_checkout->note) : null,
                 'created_by' => $accessory_checkout->adminuser ? [
                     'id' => (int) $accessory_checkout->adminuser->id,
@@ -406,7 +437,7 @@ class AssetsTransformer
 
             $permissions_array['available_actions'] = [
                 'checkout' => false,
-                'checkin' => Gate::allows('checkin', Accessory::class),
+                'checkin' => Gate::allows('checkin', $accessory_checkout->accessory),
             ];
 
             $array += $permissions_array;
@@ -451,9 +482,9 @@ class AssetsTransformer
 
         $permissions_array['available_actions'] = [
             'checkout' => false,
-            'checkin' => Gate::allows('checkin', License::class),
+            'checkin' => Gate::allows('checkin', $licenseseat->license),
             'bulk_selectable' => [
-                'checkin' => Gate::allows('checkin', License::class),
+                'checkin' => Gate::allows('checkin', $licenseseat->license),
             ],
         ];
 
@@ -503,8 +534,8 @@ class AssetsTransformer
                     'name' => e($component_checkout->adminuser->display_name),
                 ] : null,
                 'available_actions' => [
-                    'checkin' => (($component->deleted_at == '') && Gate::allows('checkin', Component::class)),
-                    'view' => (($component->deleted_at == '') && Gate::allows('view', Component::class)),
+                    'checkin' => (($component->deleted_at == '') && Gate::allows('checkin', $component)),
+                    'view' => (($component->deleted_at == '') && Gate::allows('view', $component)),
                 ],
             ];
         }

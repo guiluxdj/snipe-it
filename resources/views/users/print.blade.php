@@ -105,7 +105,7 @@
     </h3>
     <p></p>{{ trans('admin/users/general.all_assigned_list_generation')}} {{ Helper::getFormattedDateObject(now(), 'datetime', false) }}
 
-    @can('view', \App\Models\Asset::class)
+    @if ($canViewAssets)
     @if ($show_user->assets->count() > 0)
         @php
             $counter = 1;
@@ -175,9 +175,9 @@
             </tbody>
         </table>
     @endif
-    @endcan
+    @endif
 
-    @can('view', \App\Models\License::class)
+    @if ($canViewLicenses)
         @if ($show_user->directlicenses->count() > 0)
         <div id="licenses-toolbar">
             <h4>{{ trans_choice('general.countable.licenses', $show_user->directlicenses->count(), ['count' => $show_user->directlicenses->count()]) }}</h4>
@@ -238,10 +238,10 @@
             @endforeach
         </table>
     @endif
-    @endcan
+    @endif
 
 
-    @can('view', \App\Models\Accessory::class)
+    @if ($canViewAccessories)
     @if ($show_user->accessories->count() > 0)
         <div id="accessories-toolbar">
             <h4>{{ trans_choice('general.countable.accessories', $show_user->accessories->count(), ['count' => $show_user->accessories->count()]) }}</h4>
@@ -305,9 +305,9 @@
             @endforeach
         </table>
     @endif
-    @endcan
+    @endif
 
-    @can('view', \App\Models\Consumable::class)
+    @if ($canViewConsumables)
     @if ($show_user->consumables->count() > 0)
         <div id="consumables-toolbar">
             <h4>{{ trans_choice('general.countable.consumables', $show_user->consumables->count(), ['count' => $show_user->consumables->count()]) }}</h4>
@@ -371,7 +371,7 @@
             @endforeach
         </table>
     @endif
-    @endcan
+    @endif
     @if(($indirectItemsCount ?? 0) > 0 && $settings->show_assigned_assets)
 
         <div id="indirect-assignments-toolbar">
@@ -417,7 +417,7 @@
                         $indirectAssignmentsCounter++
                     @endphp
                 @endforeach
-                    @can('view', \App\Models\License::class)
+                    @if ($canViewLicenses)
                 @foreach ($asset->licenses as $indirectLicense)
                     @if($indirectLicense)
                         <tr>
@@ -432,8 +432,8 @@
                     $indirectAssignmentsCounter ++
                     @endphp
                 @endforeach
-                @endcan
-                @can('view', \App\Models\Component::class)
+                @endif
+                @if ($canViewComponents)
                 @foreach ($asset->components as $component)
                     @if($component)
                         <tr>
@@ -448,8 +448,8 @@
                         $indirectAssignmentsCounter ++
                     @endphp
                 @endforeach
-                @endcan
-                @can('view', \App\Models\Accessory::class)
+                @endif
+                @if ($canViewAccessories)
                 @foreach ($asset->assignedAccessories as $indirectAccessory)
                     @if($indirectAccessory)
                         <tr>
@@ -464,7 +464,7 @@
                         $indirectAssignmentsCounter ++
                     @endphp
                 @endforeach
-                @endcan
+                @endif
             @endforeach
         </table>
     @endif

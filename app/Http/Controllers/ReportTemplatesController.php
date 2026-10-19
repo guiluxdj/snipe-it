@@ -34,6 +34,10 @@ class ReportTemplatesController extends Controller
     {
         $this->authorize('reports.view');
 
+        if ($reportTemplate->created_by !== auth()->id() && ! $reportTemplate->is_shared) {
+            abort(404, trans('general.generic_model_not_found', ['model' => trans('general.report_template')]));
+        }
+
         $customfields = CustomField::get();
 
         try {
@@ -52,26 +56,7 @@ class ReportTemplatesController extends Controller
 
     public function edit(ReportTemplate $reportTemplate)
     {
-        $this->authorize('reports.view');
-
-        if ($reportTemplate->created_by != auth()->id()) {
-            return redirect()
-                ->route('report-templates.show', $reportTemplate)
-                ->withError(trans('general.report_not_editable'));
-        }
-
-        try {
-            $view = $reportTemplate->getViewPath();
-        } catch (UnhandledMatchError $e) {
-            return redirect()
-                ->route('reports.index')
-                ->with('error', 'Saved template type is not valid.');
-        }
-
-        return view($view, [
-            'customfields' => CustomField::get(),
-            'template' => $reportTemplate,
-        ]);
+        return redirect()->route('report-templates.show', $reportTemplate);
     }
 
     public function update(Request $request, ReportTemplate $reportTemplate): RedirectResponse

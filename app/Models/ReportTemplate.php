@@ -11,6 +11,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use UnhandledMatchError;
 use Watson\Validating\ValidatingTrait;
 
+/**
+ * @mixin IdeHelperReportTemplate
+ */
 class ReportTemplate extends Model
 {
     use HasFactory;
@@ -54,13 +57,15 @@ class ReportTemplate extends Model
 
     protected static function booted()
     {
-        // Scope to current user or if template is shared
+        // Scope to templates the current user owns OR that are marked
+        // shared.
         static::addGlobalScope(
             'current_user', function (Builder $builder) {
-
                 if (auth()->check()) {
-                    $builder->where('created_by', auth()->id())
-                        ->orWhere('is_shared', 1);
+                    $builder->where(function (Builder $inner) {
+                        $inner->where('created_by', auth()->id())
+                            ->orWhere('is_shared', 1);
+                    });
                 }
             }
         );

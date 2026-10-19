@@ -36,12 +36,12 @@
 
                 <x-slot:tabpanes>
                     <x-tabs.pane name="assets">
-                        <x-table.assets :route="route('api.assets.index', ['model_id' => $model->id, 'status' => $model->deleted_at!='' ? 'Deleted' : ''])" />
+                        <x-table.assets name="modelAssets" :route="route('api.assets.index', ['model_id' => $model->id, 'status' => $model->deleted_at!='' ? 'Deleted' : ''])" />
                     </x-tabs.pane>
 
                     <!-- start orders tab pane -->
                     <x-tabs.pane name="orders">
-                        <x-table.orders :route="route('api.order-items.index', ['asset_model_id' => $model->id])"/>
+                        <x-table.orders name="modelOrders" :route="route('api.order-items.index', ['asset_model_id' => $model->id])"/>
                     </x-tabs.pane>
                     <!-- end orders tab pane -->
 
@@ -55,7 +55,7 @@
                              per-asset checkout / adjust-quantity flows.
                              `item` is redundant since every row is
                              this same model. --}}
-                        <x-table.history
+                        <x-table.history name="modelHistory"
                             :model="$model"
                             :route="route('api.models.history', $model)"
                             :hide_fields="['order_number', 'target', 'item', 'serial', 'file', 'file_download', 'signature_file', 'quantity']"
@@ -90,7 +90,7 @@
 
 @section('moar_scripts')
     @can('files', $model)
-        @include ('modals.upload-file', ['item_type' => 'models', 'item_id' => $model->id])
+        <x-modals.upload-file item-type="models" :item-id="$model->id" />
     @endcan
 
     @include ('partials.bootstrap-table', ['exportFile' => 'models-' . $model->name . '-export', 'search' => false])

@@ -100,18 +100,55 @@ class ConsumablesTransformer
         $permissions_array['assigned_to_self'] = $userHasOpenRequest;
 
         $permissions_array['available_actions'] = [
-            'checkout' => Gate::allows('checkout', Consumable::class),
-            'checkin' => Gate::allows('checkin', Consumable::class),
-            'update' => Gate::allows('update', Consumable::class),
-            'adjust_quantity' => Gate::allows('update', Consumable::class),
-            'delete' => Gate::allows('delete', Consumable::class),
-            'clone' => (Gate::allows('create', Consumable::class) && ($consumable->deleted_at == '')),
+            'checkout' => Gate::allows('checkout', $consumable),
+            'checkin' => Gate::allows('checkin', $consumable),
+            'update' => Gate::allows('update', $consumable),
+            'adjust_quantity' => Gate::allows('update', $consumable),
+            'delete' => Gate::allows('delete', $consumable),
+            'clone' => (Gate::allows('clone', $consumable) && ($consumable->deleted_at == '')),
             'request' => (bool) $consumable->requestable && ! $userHasOpenRequest,
             'cancel' => (bool) $consumable->requestable && $userHasOpenRequest,
         ];
         $array += $permissions_array;
 
         return $array;
+    }
+
+    public function transformRequestedConsumables(Collection $consumables, $total)
+    {
+        $array = [];
+        foreach ($consumables as $consumable) {
+            $array[] = self::transformRequestedConsumable($consumable);
+        }
+
+        return (new DatatablesTransformer)->transformDatatables($array, $total);
+    }
+
+    public function transformRequestedConsumable(Consumable $consumable)
+    {
+        $userHasOpenRequest = auth()->check() && $consumable->relationLoaded('requests') && $consumable->requests->contains(
+            fn (\App\Models\CheckoutRequest $request) => $request->user_id === auth()->id() && $request->canceled_at === null
+        );
+
+        return [
+            'id' => (int) $consumable->id,
+            'name' => e($consumable->name),
+            'image' => ($consumable->getImageUrl()) ? ($consumable->getImageUrl()) : null,
+            'model_number' => ($consumable->model_number != '') ? e($consumable->model_number) : null,
+            'location' => ($consumable->location) ? [
+                'id' => (int) $consumable->location->id,
+                'name' => e($consumable->location->name),
+                'tag_color' => $consumable->location->tag_color ? e($consumable->location->tag_color) : null,
+            ] : null,
+            'qty' => (int) $consumable->qty,
+            'remaining' => $consumable->numRemaining(),
+            'requestable' => (bool) $consumable->requestable,
+            'assigned_to_self' => $userHasOpenRequest,
+            'available_actions' => [
+                'request' => (bool) $consumable->requestable && ! $userHasOpenRequest,
+                'cancel' => (bool) $consumable->requestable && $userHasOpenRequest,
+            ],
+        ];
     }
 
     public function transformCheckedoutConsumables(Collection $consumables_users, $total)

@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Helpers\Helper;
 use App\Models\Setting;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Messages\SlackMessage;
@@ -12,14 +13,22 @@ use Symfony\Component\Mime\Email;
 
 class RequestAssetNotification extends Notification implements ShouldQueue
 {
+    use Queueable;
 
     public $target;
+
     public $item;
+
     public $item_type;
+
     public $item_quantity;
+
     public $note = '';
+
     public $last_checkout = '';
+
     public $expected_checkin = '';
+
     public $requested_date;
 
     public $start_date;
@@ -68,7 +77,6 @@ class RequestAssetNotification extends Notification implements ShouldQueue
     /**
      * Get the notification's delivery channels.
      *
-     * @param  mixed  $notifiable
      * @return array
      */
     public function via()

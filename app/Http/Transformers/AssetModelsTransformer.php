@@ -2,6 +2,7 @@
 
 namespace App\Http\Transformers;
 
+use App\Enums\FileStorage;
 use App\Helpers\Helper;
 use App\Models\Asset;
 use App\Models\AssetModel;
@@ -47,7 +48,7 @@ class AssetModelsTransformer
                 'name' => e($assetmodel->manufacturer->name),
                 'tag_color' => ($assetmodel->manufacturer->tag_color) ? e($assetmodel->manufacturer->tag_color) : null,
             ] : null,
-            'image' => ($assetmodel->image != '') ? Storage::disk('public')->url('models/'.e($assetmodel->image)) : null,
+            'image' => ($assetmodel->image != '') ? Storage::disk('public')->url(FileStorage::Models->publicPath().e($assetmodel->image)) : null,
             'qr_code_url' => route('qr_code/common', ['object_type' => 'models', 'id' => $assetmodel->id]),
             'model_number' => ($assetmodel->model_number ? e($assetmodel->model_number) : null),
             'min_amt' => ($assetmodel->min_amt) ? (int) $assetmodel->min_amt : null,
@@ -59,7 +60,9 @@ class AssetModelsTransformer
             'assets_count' => (int) $assetmodel->assets_count,
             'assets_assigned_count' => (int) $assetmodel->assets_assigned_count,
             'assets_archived_count' => (int) $assetmodel->assets_archived_count,
-            'remaining' => (int) ($assetmodel->assets_count - (int) $assetmodel->assets_assigned_count) - (int) $assetmodel->assets_archived_count,
+            'remaining' => $assetmodel->remaining !== null
+                ? (int) $assetmodel->remaining
+                : (int) ($assetmodel->assets_count - (int) $assetmodel->assets_assigned_count) - (int) $assetmodel->assets_archived_count,
             'percent_remaining' => round($assetmodel->percentRemaining()),
             'category' => ($assetmodel->category) ? [
                 'id' => (int) $assetmodel->category->id,
@@ -104,10 +107,10 @@ class AssetModelsTransformer
             // render the name as an <a> link or as plain text. Keeps
             // the permission check server-side so the JS doesn't need
             // a compile-time @can inside its Blade-hosted formatter.
-            'view' => Gate::allows('view', AssetModel::class),
-            'update' => (Gate::allows('update', AssetModel::class) && ($assetmodel->deleted_at == '')),
+            'view' => Gate::allows('view', $assetmodel),
+            'update' => (Gate::allows('update', $assetmodel) && ($assetmodel->deleted_at == '')),
             'delete' => $assetmodel->isDeletable(),
-            'clone' => (Gate::allows('create', AssetModel::class) && ($assetmodel->deleted_at == '')),
+            'clone' => (Gate::allows('clone', $assetmodel) && ($assetmodel->deleted_at == '')),
             'restore' => (Gate::allows('create', AssetModel::class) && ($assetmodel->deleted_at != '')),
             // Request / cancel: if the requestable flag is off the row
             // never surfaces on /account/requestable anyway (scoped
@@ -116,8 +119,9 @@ class AssetModelsTransformer
             'request' => (bool) $assetmodel->requestable && ! $userHasOpenRequest,
             'cancel' => (bool) $assetmodel->requestable && $userHasOpenRequest,
             'bulk_selectable' => [
-                'edit' => (Gate::allows('update', AssetModel::class) && ($assetmodel->deleted_at == '')),
-                'delete' => (Gate::allows('delete', AssetModel::class) && $assetmodel->isDeletable()),
+                'edit' => (Gate::allows('update', $assetmodel) && ($assetmodel->deleted_at == '')),
+                'delete' => (Gate::allows('delete', $assetmodel) && $assetmodel->isDeletable()),
+                'merge' => (Gate::allows('delete', AssetModel::class) && ($assetmodel->deleted_at == '')),
             ],
         ];
 
@@ -155,7 +159,7 @@ class AssetModelsTransformer
         ];
 
         $permissions_array['available_actions'] = [
-            'delete' => (Gate::allows('update', AssetModel::class) && ($assetmodel->deleted_at == '')),
+            'delete' => (Gate::allows('update', $assetmodel) && ($assetmodel->deleted_at == '')),
         ];
 
         $array += $permissions_array;

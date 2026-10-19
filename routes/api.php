@@ -72,6 +72,13 @@ Route::group(['prefix' => 'v1', 'middleware' => ['api', 'api-throttle:api']], fu
      */
     Route::group(['prefix' => 'account'], function () {
 
+        Route::get('assets',
+            [
+                Api\ProfileController::class,
+                'assets',
+            ]
+        )->name('api.account.assets');
+
         Route::get('requests',
             [
                 Api\ProfileController::class,
@@ -517,6 +524,17 @@ Route::group(['prefix' => 'v1', 'middleware' => ['api', 'api-throttle:api']], fu
     /**
      * Groups API routes
      */
+    Route::group(['prefix' => 'groups'], function () {
+
+        Route::get('selectlist',
+            [
+                Api\GroupsController::class,
+                'selectlist',
+            ]
+        )->name('api.groups.selectlist');
+
+    });
+
     Route::resource('groups',
         Api\GroupsController::class,
         ['names' => [
@@ -991,7 +1009,7 @@ Route::group(['prefix' => 'v1', 'middleware' => ['api', 'api-throttle:api']], fu
             ]
         )->name('api.models.selectlist');
 
-        Route::get('assets',
+        Route::get('{id}/assets',
             [
                 Api\AssetModelsController::class,
                 'assets',
@@ -1269,6 +1287,13 @@ Route::group(['prefix' => 'v1', 'middleware' => ['api', 'api-throttle:api']], fu
             ]
         )->name('api.users.accessorieslist');
 
+        Route::get('{user}/consumables',
+            [
+                Api\UsersController::class,
+                'consumables',
+            ]
+        )->name('api.users.consumableslist');
+
         Route::get('{user}/licenses',
             [
                 Api\UsersController::class,
@@ -1455,6 +1480,41 @@ Route::group(['prefix' => 'v1', 'middleware' => ['api', 'api-throttle:api']], fu
             ]
         )->name('api.reports.activity.chart');
     }); // end reports api routes
+
+    /**
+     * Dashboard widget API routes.
+     */
+    Route::group(['prefix' => 'dashboard'], function () {
+
+        Route::get('activity',
+            [
+                Api\DashboardController::class,
+                'activity',
+            ]
+        )->name('api.dashboard.activity');
+
+        Route::get('categories',
+            [
+                Api\DashboardController::class,
+                'categories',
+            ]
+        )->name('api.dashboard.categories');
+
+        Route::get('companies',
+            [
+                Api\DashboardController::class,
+                'companies',
+            ]
+        )->name('api.dashboard.companies');
+
+        Route::get('locations',
+            [
+                Api\DashboardController::class,
+                'locations',
+            ]
+        )->name('api.dashboard.locations');
+
+    }); // end dashboard widget api routes
 
     /**
      * Version API routes

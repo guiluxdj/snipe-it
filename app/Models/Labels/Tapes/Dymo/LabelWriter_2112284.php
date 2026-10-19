@@ -21,6 +21,7 @@ class LabelWriter_2112284 extends LabelWriter
     private const FIELD_SIZE = 2.40;
 
     private const FIELD_MARGIN = 0.10;
+
     private const RIGHT_SAFE_OFFSET = 4.0;
 
     public function getUnit()
@@ -68,8 +69,43 @@ class LabelWriter_2112284 extends LabelWriter
         return true;
     }
 
-    public function preparePDF($pdf)
+    protected function getContentEditorConfig(): array
     {
+        return [
+
+            'barcode_size' => self::TAG_SIZE,
+            'barcode_margin' => self::BARCODE_MARGIN,
+
+            'barcode1D_v_align' => 'B',
+            'barcode1D_placement' => 'text_column',
+
+
+            'barcode_2d_size' => $this->getPrintableArea()->h - self::TAG_SIZE,
+            'barcode2D_h_align' => 'L',
+            'barcode2D_v_align' => 'T',
+
+
+            'tag_font_size' => self::TAG_SIZE,
+            'tag_alignment' => 'C',
+            'tag_position_mode' => 'under_barcode',
+            'tag_font' => 'freesans',
+
+
+            'title_font_size' => self::TITLE_SIZE,
+            'title_margin' => self::TITLE_MARGIN,
+            'title_font' => 'freesans',
+
+
+            'field_label_font_size' => self::LABEL_SIZE,
+            'field_label_margin' => self::LABEL_MARGIN,
+            'field_label_font' => 'freesans',
+
+            'field_value_font_size' => self::FIELD_SIZE,
+            'field_value_margin' => self::FIELD_MARGIN,
+            'field_value_font' => 'freemono',
+
+            'text_render_mode' => 'block',
+        ];
     }
 
     public function write($pdf, $record)
@@ -145,9 +181,9 @@ class LabelWriter_2112284 extends LabelWriter
 
         foreach ($fields as $field) {
             $rawLabel = $field['label'] ?? null;
-            $value = (string)($field['value'] ?? '');
+            $value = (string) ($field['value'] ?? '');
 
-            if (!is_string($rawLabel) || trim($rawLabel) === '') {
+            if (! is_string($rawLabel) || trim($rawLabel) === '') {
                 static::writeText(
                     $pdf, $value,
                     $currentX, $currentY,
@@ -160,7 +196,7 @@ class LabelWriter_2112284 extends LabelWriter
                 continue;
             }
 
-            $labelText = rtrim($rawLabel, ':') . ':';
+            $labelText = rtrim($rawLabel, ':').':';
 
             static::writeText(
                 $pdf, $labelText,

@@ -40,7 +40,7 @@
                     <x-tabs.pane name="assigned">
 
                         <x-table
-                            :presenter="\App\Presenters\ConsumablePresenter::checkedOut()"
+                            name="consumableCheckedOut" :presenter="\App\Presenters\ConsumablePresenter::checkedOut()"
                             :api_url="route('api.consumables.show.users', $consumable->id)"
                         />
 
@@ -52,13 +52,13 @@
 
                     <!-- start orders tab pane -->
                     <x-tabs.pane name="orders">
-                        <x-table.orders :route="route('api.order-items.index', ['item_type' => \App\Models\Consumable::class, 'item_id' => $consumable->id])"/>
+                        <x-table.orders name="consumableOrders" :route="route('api.order-items.index', ['item_type' => \App\Models\Consumable::class, 'item_id' => $consumable->id])"/>
                     </x-tabs.pane>
                     <!-- end orders tab pane -->
 
                     <!-- start history tab pane -->
                     <x-tabs.pane name="history">
-                        <x-table.history :model="$consumable" :route="route('api.consumables.history', $consumable)" :hide_fields="['serial']"/>
+                        <x-table.history name="consumableHistory" :model="$consumable" :route="route('api.consumables.history', $consumable)" :hide_fields="['serial']"/>
                     </x-tabs.pane>
                     <!-- end history tab pane -->
 
@@ -103,7 +103,7 @@
 
 @section('moar_scripts')
     @can('files', $consumable)
-        @include ('modals.upload-file', ['item_type' => 'consumables', 'item_id' => $consumable->id])
+        <x-modals.upload-file item-type="consumables" :item-id="$consumable->id" />
     @endcan
 
     @can('update', $consumable)

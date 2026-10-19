@@ -42,15 +42,7 @@
             @endif
 
                 <a href="{{ $infoPanelObj->getImageUrl($img_path) }}" data-toggle="lightbox" data-type="image">
-                    {{-- width:100% + max-width:300px = "scale down with the
-                         container up to a 300px cap". Without the explicit
-                         width:100%, the !important max-width overrides
-                         img-responsive's max-width:100% and the image
-                         renders at its intrinsic (or 300px cap) width
-                         regardless of container. At md and smaller, the
-                         info-panel column is narrower than 300px and the
-                         image overflows into the whitespace to its right. --}}
-                    <img src="{{ $infoPanelObj->getImageUrl($img_path) }}" class="img-responsive img-thumbnail" alt="{{ $infoPanelObj->name }}" style="width: 100%; max-width: 300px !important; max-height: 300px !important; height: auto; margin-bottom: 10px;">
+                    <img src="{{ $infoPanelObj->getImageUrl($img_path) }}" class="img-responsive img-thumbnail" alt="{{ $infoPanelObj->name }}" style="max-width: min(100%, 300px); max-height: 300px; margin-bottom: 10px;">
             </a>
         </div>
         <br>
@@ -78,7 +70,7 @@
 
         @if ($infoPanelObj->notes)
             <x-info-element icon_type="notes" title="{{ trans('general.notes') }}">
-                <x-copy-to-clipboard class="pull-right" copy_what="notes">{!! nl2br(Helper::parseEscapedMarkedownInline($infoPanelObj->notes)) !!}</x-copy-to-clipboard>
+                <x-copy-to-clipboard class="pull-right" copy_what="notes">{!! (new \Parsedown)->setSafeMode(true)->setBreaksEnabled(true)->line($infoPanelObj->notes) !!}</x-copy-to-clipboard>
             </x-info-element>
         @endif
 
@@ -190,15 +182,17 @@
         @endif
 
         @php
-            // Prefer the most recent OrderItem's price + currency so the
-            // Unit Cost row reflects the last acquisition, not the
-            // initial-create parent value. Falls back to parent
-            // purchase_cost + location.currency for legacy rows that
-            // never got an OrderItem written.
+            // Assets own purchase_cost as a canonical column on the parent
+            // row and Accessories / Consumables / Components moved that
+            // concept off the parent onto per-transaction OrderItem lines,
+            // so read the parent's own value first and let the
+            // Order-derived fallback fill in for the post-Orders inventory
+            // types where the parent no longer carries a purchase_cost
+            // column. See GH #19572.
             $lastOrderInfoPanel = method_exists($infoPanelObj, 'lastOrderDefaults')
                 ? $infoPanelObj->lastOrderDefaults()
                 : null;
-            $unitCost = $lastOrderInfoPanel['unit_cost'] ?? $infoPanelObj->purchase_cost ?? null;
+            $unitCost = $infoPanelObj->purchase_cost ?? $lastOrderInfoPanel['unit_cost'] ?? null;
             $unitCostCurrency = $lastOrderInfoPanel['currency']
                 ?? ($infoPanelObj->location->currency ?? null)
                 ?: $snipeSettings->default_currency;
@@ -225,10 +219,10 @@
                 <x-info-element>
                     <x-icon type="cost" class="fa-fw" title="{{ trans('general.total_cost') }}"/>
                     {{ trans('general.total_cost') }}
-                    <span class="pull-right">
-                        {{ $currency !== '' ? $currency : $snipeSettings->default_currency }}
+                    {{ $currency !== '' ? $currency : $snipeSettings->default_currency }}
+                    <x-copy-to-clipboard copy_what="total_cost" class="pull-right">
                         {{ Helper::formatCurrencyOutput($totalsByCurrency[$currency]) }}
-                    </span>
+                    </x-copy-to-clipboard>
                 </x-info-element>
             @elseif (count($totalsByCurrency) > 1)
                 <x-info-element>
@@ -390,7 +384,7 @@
         @if ($infoPanelObj->depreciation && $infoPanelObj->purchase_date)
             <x-info-element icon_type="depreciation" title="{{ trans('general.depreciation') }}">
                 {!!  $infoPanelObj->depreciation->present()->nameUrl !!}
-                ({{ $infoPanelObj->depreciation->months.' '.trans('general.months')}})
+                ({{ trans_choice('general.months_plural', $infoPanelObj->depreciation->months) }})
             </x-info-element>
 
             <x-info-element icon_type="depreciation-calendar" class="{{ $infoPanelObj->depreciationProgressPercent() > 90 ? 'text-danger' : '' }}" title="{{ trans('admin/hardware/form.fully_depreciated') }}">
@@ -518,7 +512,7 @@
 
         @if (($infoPanelObj->present()->displayAddress) && (config('services.google.maps_api_key')))
 
-                <x-info-element>
+                <x-info-element class="hidden-print">
                     <div class="text-center">
                         <img src="https://maps.googleapis.com/maps/api/staticmap?markers={{ urlencode($infoPanelObj->address.','.$infoPanelObj->city.' '.$infoPanelObj->state.' '.$infoPanelObj->country.' '.$infoPanelObj->zip) }}&size=500x300&maptype=roadmap&key={{ config('services.google.maps_api_key') }}" class="img-thumbnail img-responsive" style="width: 100%" alt="Map">
                     </div>
@@ -561,12 +555,19 @@
 
 
         @php
-            // Prefer the most recent OrderItem's parent Order.purchase_date
-            // so the info-panel reflects the LAST acquisition, not the
-            // initial-create parent value. Falls back to parent
-            // purchase_date for legacy rows without an OrderItem.
-            $displayPurchaseDate = ($lastOrderInfoPanel['purchase_date'] ?? null)
-                ?: $infoPanelObj->purchase_date;
+            // Same canonical-parent-first rule as unit cost above. Assets
+            // keep purchase_date on the parent as the source of truth and
+            // the AssetObserver doesn't sync it back to Order because
+            // multiple assets can share one Order row (dedupe by
+            // order_number + supplier + company), so on that Order row
+            // purchase_date is a write-once snapshot from the first
+            // sibling asset's create. Reading the parent's canonical
+            // column keeps the info-panel in step with the edit form.
+            // Post-Orders inventory types (Accessory / Consumable /
+            // Component) have no parent purchase_date column, so their
+            // Order-derived fallback still wins. See GH #19572.
+            $displayPurchaseDate = $infoPanelObj->purchase_date
+                ?: ($lastOrderInfoPanel['purchase_date'] ?? null);
         @endphp
         @if ($displayPurchaseDate)
             <x-info-element>

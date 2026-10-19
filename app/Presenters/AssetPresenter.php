@@ -2,6 +2,7 @@
 
 namespace App\Presenters;
 
+use App\Enums\FileStorage;
 use App\Models\CustomField;
 use Carbon\CarbonImmutable;
 use DateTime;
@@ -55,7 +56,10 @@ class AssetPresenter extends Presenter
                 'scope' => 'col',
                 'searchable' => true,
                 'sortable' => true,
-                'title' => trans('general.name'),
+                // Match the import wizard's Name target label so the
+                // asset datatable export round-trips through the
+                // importer's auto-mapper on every locale.
+                'title' => trans('general.item_name_var', ['item' => trans('general.asset')]),
                 'visible' => true,
                 'formatter' => 'hardwareLinkFormatter',
             ], [
@@ -189,6 +193,15 @@ class AssetPresenter extends Presenter
             //                'title' => trans('general.first_checkout'),
             //                'formatter' => 'dateDisplayFormatter',
             //            ],
+            [
+                'field' => 'last_checkout',
+                'scope' => 'col',
+                'searchable' => true,
+                'sortable' => true,
+                'visible' => false,
+                'title' => trans('general.last_checkout'),
+                'formatter' => 'dateDisplayFormatter',
+            ],
             [
                 'field' => 'age',
                 'scope' => 'col',
@@ -415,6 +428,60 @@ class AssetPresenter extends Presenter
             ];
         }
 
+        // Sync-adapter side-table columns. Hidden by default, exposable
+        // via the column picker for admins syncing from an MDM / RMM.
+        // Sort routed through Asset::scopeOrderExternalSource (leftJoin
+        // on asset_external_sources) and search routed through the
+        // externalSource relation in $searchableRelations. last_seen
+        // sortable but not searchable (datetime substring match is
+        // nonsensical for the top search bar).
+        $layout[] = [
+            'field' => 'primary_mac',
+            'scope' => 'col',
+            'searchable' => true,
+            'sortable' => true,
+            'switchable' => true,
+            'title' => trans('admin/settings/sync_adapters.field_mac'),
+            'visible' => false,
+        ];
+        $layout[] = [
+            'field' => 'primary_ip',
+            'scope' => 'col',
+            'searchable' => true,
+            'sortable' => true,
+            'switchable' => true,
+            'title' => trans('admin/settings/sync_adapters.field_ip'),
+            'visible' => false,
+        ];
+        $layout[] = [
+            'field' => 'external_os',
+            'scope' => 'col',
+            'searchable' => true,
+            'sortable' => true,
+            'switchable' => true,
+            'title' => trans('admin/settings/sync_adapters.field_os'),
+            'visible' => false,
+        ];
+        $layout[] = [
+            'field' => 'external_os_version',
+            'scope' => 'col',
+            'searchable' => true,
+            'sortable' => true,
+            'switchable' => true,
+            'title' => trans('admin/settings/sync_adapters.field_os_version'),
+            'visible' => false,
+        ];
+        $layout[] = [
+            'field' => 'last_seen',
+            'scope' => 'col',
+            'searchable' => false,
+            'sortable' => true,
+            'switchable' => true,
+            'title' => trans('admin/settings/sync_adapters.field_last_seen'),
+            'visible' => false,
+            'formatter' => 'dateDisplayFormatter',
+        ];
+
         $layout[] = [
             'field' => 'checkincheckout',
             'scope' => 'col',
@@ -576,7 +643,7 @@ class AssetPresenter extends Presenter
             $imageAlt = $this->model->name;
         }
         if (! empty($imagePath)) {
-            $url = Storage::disk('public')->url(app('assets_upload_path').e($imagePath));
+            $url = Storage::disk('public')->url(FileStorage::Assets->publicPath().e($imagePath));
             $imagePath = '<img src="'.$url.'" height="50" width="50" alt="'.e($imageAlt).'">';
         }
 
@@ -597,7 +664,7 @@ class AssetPresenter extends Presenter
             $imagePath = $this->model->image;
         }
         if (! empty($imagePath)) {
-            return Storage::disk('public')->url(app('assets_upload_path').e($imagePath));
+            return Storage::disk('public')->url(FileStorage::Assets->publicPath().e($imagePath));
         }
 
         return $imagePath;
@@ -838,7 +905,12 @@ class AssetPresenter extends Presenter
                 'scope' => 'col',
                 'searchable' => true,
                 'sortable' => true,
-                'title' => trans('admin/hardware/form.name'),
+                // Use the same trans key the import wizard uses for the
+                // Name target label so the assets datatable download
+                // round-trips through the importer's auto-mapper on
+                // every locale. See ReportsController::postCustom for
+                // the sibling change and the rationale.
+                'title' => trans('general.item_name_var', ['item' => trans('general.asset')]),
             ], [
                 'field' => 'serial',
                 'scope' => 'col',

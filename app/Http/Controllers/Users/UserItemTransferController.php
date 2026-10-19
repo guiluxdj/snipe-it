@@ -16,6 +16,7 @@ use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class UserItemTransferController extends Controller
 {
@@ -30,15 +31,23 @@ class UserItemTransferController extends Controller
             ->whereNull('deleted_at')
             ->get();
 
-        $accessoryCheckouts = AccessoryCheckout::with(['accessory.category', 'accessory.company'])
-            ->where('assigned_to', $user->id)
-            ->where('assigned_type', User::class)
-            ->get();
+        // Gate each section independently. An asset-focused operator without
+        // accessories.view or licenses.view can still legitimately use the
+        // page to transfer hardware, but should not see accessory or license
+        // metadata belonging to the source user.
+        $accessoryCheckouts = Gate::allows('view', Accessory::class)
+            ? AccessoryCheckout::with(['accessory.category', 'accessory.company'])
+                ->where('assigned_to', $user->id)
+                ->where('assigned_type', User::class)
+                ->get()
+            : collect();
 
-        $licenseSeats = LicenseSeat::with(['license.category', 'license.company'])
-            ->where('assigned_to', $user->id)
-            ->whereNull('asset_id')
-            ->get();
+        $licenseSeats = Gate::allows('view', License::class)
+            ? LicenseSeat::with(['license.category', 'license.company'])
+                ->where('assigned_to', $user->id)
+                ->whereNull('asset_id')
+                ->get()
+            : collect();
 
         if ($assets->isEmpty() && $accessoryCheckouts->isEmpty() && $licenseSeats->isEmpty()) {
             return redirect()->route('users.show', $user)
@@ -114,7 +123,7 @@ class UserItemTransferController extends Controller
             }
 
             $this->checkInAsset($asset, $source, $note);
-            $asset->checkOut($target, auth()->user(), date('Y-m-d H:i:s'), null, $note);
+            $asset->checkOut($target, auth()->user(), date('Y-m-d H:i:s'), null, $note, $asset->name);
             $count++;
         }
 
@@ -209,12 +218,6 @@ class UserItemTransferController extends Controller
             $seat->update(['assigned_to' => null]);
         });
 
-        CheckoutAcceptance::pending()
-            ->where('checkoutable_type', Asset::class)
-            ->where('checkoutable_id', $asset->id)
-            ->get()
-            ->each(fn ($a) => $a->delete());
-
         $asset->save();
 
         event(new CheckoutableCheckedIn($asset, $source, auth()->user(), $note, $checkinAt, $originalValues));
@@ -224,13 +227,9 @@ class UserItemTransferController extends Controller
     {
         $source = $checkout->assignedTo;
 
-        CheckoutAcceptance::pending()
-            ->where('checkoutable_type', Accessory::class)
-            ->where('checkoutable_id', $accessory->id)
-            ->where('assigned_to_id', $checkout->assigned_to)
-            ->get()
-            ->each(fn ($a) => $a->delete());
-
+        // You might think you need to clean up acceptances here but that
+        // is going to be handled in the CheckoutableListener that
+        // is run when the event below is fired.
         $checkout->delete();
 
         event(new CheckoutableCheckedIn($accessory, $source, auth()->user(), $note, date('Y-m-d H:i:s')));
@@ -253,8 +252,8 @@ class UserItemTransferController extends Controller
     private function transferLicenseSeat(LicenseSeat $seat, User $source, User $target, ?string $note): void
     {
         CheckoutAcceptance::pending()
-            ->where('checkoutable_type', License::class)
-            ->where('checkoutable_id', $seat->license_id)
+            ->where('checkoutable_type', LicenseSeat::class)
+            ->where('checkoutable_id', $seat->id)
             ->where('assigned_to_id', $source->id)
             ->get()
             ->each(fn ($a) => $a->delete());

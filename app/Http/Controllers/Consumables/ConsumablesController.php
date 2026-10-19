@@ -136,8 +136,6 @@ class ConsumablesController extends Controller
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
      *
-     * @param  int  $consumableId
-     *
      * @see ConsumablesController::postEdit() method that stores the form data.
      * @since [v1.0]
      */
@@ -160,7 +158,6 @@ class ConsumablesController extends Controller
      * @author [A. Gianotto] [<snipe@snipe.net>]
      *
      * @param  ImageUploadRequest  $request
-     * @param  int  $consumableId
      * @return RedirectResponse
      *
      * @throws AuthorizationException
@@ -241,7 +238,6 @@ class ConsumablesController extends Controller
      * @see ConsumablesController::getDataView() method that generates the JSON response
      * @since [v1.0]
      *
-     * @param  int  $consumableId
      * @return View
      *
      * @throws AuthorizationException
@@ -256,7 +252,7 @@ class ConsumablesController extends Controller
 
     public function clone(Consumable $consumable): View
     {
-        $this->authorize('create', $consumable);
+        $this->authorize('clone', $consumable);
         $consumable_to_close = $consumable;
         $consumable = clone $consumable_to_close;
         $consumable->id = null;

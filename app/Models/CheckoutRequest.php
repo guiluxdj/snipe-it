@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\CheckoutRequestState;
 use App\Exceptions\InvalidCheckoutRequestTransition;
+use App\Models\Builders\CheckoutRequestQueryBuilder;
 use App\Models\Traits\HasCalendarEvents;
 use App\Models\Traits\Searchable;
 use Illuminate\Database\Eloquent\Builder;
@@ -14,7 +15,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 
 /**
- * @property CheckoutRequestState $state
+ * @property \App\Enums\CheckoutRequestState $state
+ *
+ * @mixin IdeHelperCheckoutRequest
  */
 class CheckoutRequest extends Model
 {
@@ -105,11 +108,43 @@ class CheckoutRequest extends Model
      * these methods when a source model isn't wired through the
      * Presenter/Presentable chain (which CheckoutRequest isn't - it
      * extends the plain Eloquent Model, not SnipeModel).
+     *
+     * Reservations link to the checkout confirmation screen with a
+     * `request_id` query hint, so an admin clicking a today-widget
+     * row lands on the pre-filled fulfill flow for that specific
+     * request. Every checkout controller under Assets / Accessories
+     * / Components / Consumables / Licenses honors the hint. Types
+     * without a dedicated checkout screen (AssetModel) fall back to
+     * the presenter's calendarUrl, which points at the item's show
+     * page.
      */
     public function calendarUrl(): ?string
     {
         $item = $this->itemRequested();
-        if ($item && method_exists($item, 'present')) {
+        if (! $item) {
+            return null;
+        }
+
+        $checkoutRoute = match (true) {
+            $item instanceof Asset => ['hardware.checkout.create', ['asset' => $item->id]],
+            $item instanceof Accessory => ['accessories.checkout.show', ['accessory' => $item->id]],
+            $item instanceof Component => ['components.checkout.show', ['componentID' => $item->id]],
+            $item instanceof Consumable => ['consumables.checkout.show', ['consumablesID' => $item->id]],
+            $item instanceof License => ['licenses.checkout', ['license' => $item->id]],
+            // AssetModel reservations point at the multi-fulfill
+            // screen where an admin picks specific assets of that
+            // model to fulfill the request against.
+            $item instanceof AssetModel => ['models.fulfill-requests.create', ['model' => $item->id]],
+            default => null,
+        };
+
+        if ($checkoutRoute !== null) {
+            [$name, $params] = $checkoutRoute;
+
+            return route($name, array_merge($params, ['request_id' => $this->id]));
+        }
+
+        if (method_exists($item, 'present')) {
             $presenter = $item->present();
             if (method_exists($presenter, 'calendarUrl')) {
                 return $presenter->calendarUrl();
@@ -238,11 +273,32 @@ class CheckoutRequest extends Model
 
     public function name()
     {
-        if ($this->itemType() == 'asset') {
-            return $this->itemRequested()->display_name;
+        $item = $this->itemRequested();
+
+        if (! $item) {
+            return '';
         }
 
-        return $this->itemRequested()->name;
+        return $item->display_name;
+    }
+
+    /**
+     * Accessor mirror of name() so property-style access (`->name`) doesn't
+     * fall through Eloquent's __get to `getRelationValue('name')`, which
+     * treats the plain name() method as a candidate relation and throws
+     * `LogicException: name must return a relationship instance` when it
+     * gets a string back. `hasGetMutator('name')` fires first and returns
+     * this accessor's value before relation resolution ever runs.
+     *
+     * The specific symptom is `CalendarEventsTransformer::titleFor()` which
+     * coalesces `$source->display_name ?? $source->name ?? ...` for any
+     * source without a Presentable presenter (CheckoutRequest doesn't have
+     * one); pre-accessor, that crashed the calendar API for any install
+     * with a reservation-shape CheckoutRequest on the calendar.
+     */
+    public function getNameAttribute(): ?string
+    {
+        return $this->name();
     }
 
     public function fulfilledBy(): BelongsTo
@@ -261,24 +317,9 @@ class CheckoutRequest extends Model
      * Requestable::isRequestedBy() gate. Terminal-state rows (
      * fulfilled, canceled) are excluded.
      */
-    public function scopeOpen(Builder $query): Builder
+    public function newEloquentBuilder($query): CheckoutRequestQueryBuilder
     {
-        return $query->where('state', CheckoutRequestState::Pending->value);
-    }
-
-    public function scopePending(Builder $query): Builder
-    {
-        return $query->where('state', CheckoutRequestState::Pending->value);
-    }
-
-    public function scopeFulfilled(Builder $query): Builder
-    {
-        return $query->where('state', CheckoutRequestState::Fulfilled->value);
-    }
-
-    public function scopeCanceled(Builder $query): Builder
-    {
-        return $query->where('state', CheckoutRequestState::Canceled->value);
+        return new CheckoutRequestQueryBuilder($query);
     }
 
     public function isReservation(): bool

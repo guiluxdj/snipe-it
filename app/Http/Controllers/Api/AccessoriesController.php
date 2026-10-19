@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\CheckoutableCheckedIn;
 use App\Events\CheckoutableCheckedOut;
 use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
@@ -17,7 +18,6 @@ use App\Http\Transformers\SelectlistTransformer;
 use App\Models\Accessory;
 use App\Models\AccessoryCheckout;
 use App\Models\Company;
-use App\Models\Setting;
 use App\Models\User;
 use Carbon\Carbon;
 use DomainException;
@@ -80,6 +80,19 @@ class AccessoriesController extends Controller
         $accessories = Accessory::select('accessories.*')
             ->with('category', 'company', 'manufacturer', 'checkouts', 'location', 'defaultSupplier', 'adminuser', 'orderItems.order.supplier')
             ->withCount('checkouts as checkouts_count');
+
+        // Archived / soft-deleted scope.
+        switch ($request->input('status')) {
+            case 'Archived':
+                $accessories->archived();
+                break;
+            case 'Deleted':
+                $accessories->onlyTrashed();
+                break;
+            default:
+                $accessories->accessoriesForShow();
+                break;
+        }
 
         // This invokes the Searchable model trait scopeTextSearch and will handle input by search or by advanced search filter
         if ($request->filled('filter') || $request->filled('search')) {
@@ -265,7 +278,7 @@ class AccessoriesController extends Controller
      * @since [v4.0]
      *
      * @param  int  $id
-     * @return | array
+     * @return array<string, mixed>
      */
     public function checkedout(Request $request, $id)
     {
@@ -404,7 +417,6 @@ class AccessoriesController extends Controller
      * If Slack is enabled and/or asset acceptance is enabled, it will also
      * trigger a Slack message and send an email.
      *
-     * @param  int  $accessoryId
      * @return JsonResponse
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
@@ -414,7 +426,7 @@ class AccessoriesController extends Controller
         $this->authorize('checkout', $accessory);
         $target = $this->determineCheckoutTarget();
 
-        if ((Setting::getSettings()->full_multiple_companies_support == '1') && (! $target->companies()->where('companies.id', $accessory->company_id)->exists())) {
+        if (! $accessory->canCheckoutTo($target)) {
             return response()->json(Helper::formatStandardApiResponse('error', null, trans('general.error_user_company')));
         }
 
@@ -485,7 +497,6 @@ class AccessoriesController extends Controller
      * Check in the item so that it can be checked out again to someone else
      *
      * @param  int  $accessoryUserId
-     * @param  string  $backto
      * @return JsonResponse
      *
      * @uses Accessory::checkin_email() to determine if an email can and should be sent
@@ -503,13 +514,8 @@ class AccessoriesController extends Controller
         $accessory = Accessory::find($accessory_checkout->accessory_id);
         $this->authorize('checkin', $accessory);
 
-        $accessory->logCheckin(User::find($accessory_checkout->assigned_to), $request->input('note'));
-
-        // Was the accessory updated?
         if ($accessory_checkout->delete()) {
-            if (! is_null($accessory_checkout->assigned_to)) {
-                $user = User::find($accessory_checkout->assigned_to);
-            }
+            event(new CheckoutableCheckedIn($accessory, $accessory_checkout->assignedTo, auth()->user(), $request->input('note')));
 
             $payload = [
                 'accessory_id' => $accessory->id,
@@ -588,6 +594,6 @@ class AccessoriesController extends Controller
 
         $rows = $query->orderBy($sort, $order)->skip($offset)->take($limit)->get();
 
-        return (new AccessoriesTransformer)->transformAccessories($rows, $total);
+        return (new AccessoriesTransformer)->transformRequestedAccessories($rows, $total);
     }
 }

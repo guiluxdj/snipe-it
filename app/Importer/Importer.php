@@ -112,6 +112,7 @@ abstract class Importer
         'qty' => 'quantity',
         'reassignable' => 'reassignable',
         'requestable' => 'requestable',
+        'archived' => 'archived',
         'seats' => 'seats',
         'serial' => 'serial number',
         'status' => 'status',
@@ -393,7 +394,14 @@ abstract class Importer
                 // Lowercase header values to ensure we're comparing values properly.
                 $row = array_change_key_case($row, CASE_LOWER);
 
-                $this->handle($row);
+                try {
+                    $this->handle($row);
+                } catch (\App\Exceptions\ImportRowRejected $e) {
+                    $this->recordErrored();
+                    $this->log('Row rejected: '.$e->getMessage());
+                    $rowLabel = $row['asset tag'] ?? $row['item name'] ?? $row['name'] ?? 'Row #'.($importedItemsCount + 1);
+                    $this->addErrorToBag((object) ['name' => $rowLabel], $e->field, $e->getMessage());
+                }
 
                 $importedItemsCount++;
                 $processedInSlice++;
@@ -815,7 +823,6 @@ abstract class Importer
     /**
      * Defines mappings of csv fields
      *
-     * @param  bool  $updating  the updating
      * @return self
      */
     public function setFieldMappings($fields)

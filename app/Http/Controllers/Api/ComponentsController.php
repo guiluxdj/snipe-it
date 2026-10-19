@@ -21,6 +21,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
@@ -72,6 +73,19 @@ class ComponentsController extends Controller
         $components = Component::select('components.*')
             ->with('company', 'location', 'category', 'defaultSupplier', 'adminuser', 'manufacturer', 'orderItems.order.supplier')
             ->withSum('unconstrainedAssets as sum_unconstrained_assets', 'components_assets.assigned_qty');
+
+        // Archived / soft-deleted scope.
+        switch ($request->input('status')) {
+            case 'Archived':
+                $components->archived();
+                break;
+            case 'Deleted':
+                $components->onlyTrashed();
+                break;
+            default:
+                $components->componentsForShow();
+                break;
+        }
 
         $filter = [];
 
@@ -169,6 +183,11 @@ class ComponentsController extends Controller
                 break;
             case 'remaining':
                 $components = $components->OrderRemaining($order);
+                break;
+            case 'order_number':
+                // components.order_number is `legacy_order_number` now
+                // so a raw orderBy on it is a SQL error.
+                $components = $components->OrderByOrderNumber($order);
                 break;
             case 'purchase_cost':
                 // See AccessoriesController for the rationale — these
@@ -332,12 +351,20 @@ class ComponentsController extends Controller
      * @author [A. Bergamasco] [@vjandrea]
      *
      * @since [v4.0]
-     *
-     * @param  int  $id
      */
     public function getAssets(Component $component, Request $request): array
     {
-        $this->authorize('view', Asset::class);
+        // Backs the default "Assigned" tab on the component show
+        // page. Anyone who can view this specific component reaches
+        // that page, so gating on view Asset alone (which
+        // components-only viewers don't have) 403s the tab that
+        // opens by default and breaks the show page for scoped
+        // viewers. Accept either view on this component OR view on
+        // Asset. Asset viewers who hit this endpoint directly still
+        // work as they did before this widen. The BelongsToMany
+        // below still applies Asset's CompanyableScope so
+        // FMCS-scoped viewers see only assets in their own company.
+        abort_unless(Gate::allows('view', $component) || Gate::allows('view', Asset::class), 403);
 
         $offset = request('offset', 0);
         $limit = $request->input('limit', 50);
@@ -568,6 +595,6 @@ class ComponentsController extends Controller
 
         $rows = $query->orderBy($sort, $order)->skip($offset)->take($limit)->get();
 
-        return (new ComponentsTransformer)->transformComponents($rows, $total);
+        return (new ComponentsTransformer)->transformRequestedComponents($rows, $total);
     }
 }

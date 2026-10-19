@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\CalendarEvent;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Migrations\Migration;
 
 /**
@@ -16,6 +15,13 @@ use Illuminate\Database\Migrations\Migration;
  * that already has maintenances / audits / etc., the backfill
  * populates the index so those existing records show up on the
  * calendar without waiting for a manual save on each one.
+ *
+ * Capped at the most-recent 2000 rows per source (ordered by primary
+ * key desc). Large installs with a decade of audit / maintenance /
+ * checkout history would otherwise grind through every historical
+ * row during upgrade to populate a calendar view most users only use
+ * for recent and upcoming events. Admins who want the full backlog
+ * run snipeit:reconcile-calendar-events after the upgrade completes.
  *
  * Duplicates snipeit:reconcile-calendar-events's sync logic on
  * purpose - the command is meant to be re-runnable on demand later,
@@ -42,15 +48,18 @@ return new class extends Migration
 
     protected function backfillSource(string $sourceClass): void
     {
+        $instance = new $sourceClass;
+        $keyName = $instance->getKeyName();
+
+        // Live rows only. Backfilling trashed sources created calendar
+        // events for soft-deleted records that users could neither
+        // open nor remove (see issue #19760).
         $sourceClass::query()
-            ->when(
-                in_array(SoftDeletes::class, class_uses_recursive($sourceClass), true),
-                fn ($q) => $q->withTrashed(),
-            )
-            ->chunkById(500, function ($rows) {
-                foreach ($rows as $row) {
-                    $row->forceSyncCalendarEvents();
-                }
+            ->orderByDesc($keyName)
+            ->limit(2000)
+            ->get()
+            ->each(function ($row) {
+                $row->forceSyncCalendarEvents();
             });
     }
 

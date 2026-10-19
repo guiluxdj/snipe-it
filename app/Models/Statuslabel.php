@@ -3,17 +3,22 @@
 namespace App\Models;
 
 use App\Http\Traits\UniqueUndeletedTrait;
+use App\Models\Builders\StatuslabelQueryBuilder;
 use App\Models\Traits\Searchable;
 use App\Presenters\Presentable;
 use App\Presenters\StatusLabelPresenter;
+use App\Rules\CssColor;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Watson\Validating\ValidatingTrait;
 
+/**
+ * @mixin IdeHelperStatuslabel
+ */
 class Statuslabel extends SnipeModel
 {
     use HasFactory;
@@ -47,6 +52,16 @@ class Statuslabel extends SnipeModel
     ];
 
     use Searchable;
+
+    /**
+     * Sanitize of the color column on read.
+     */
+    protected function color(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => CssColor::sanitize($value, ''),
+        );
+    }
 
     /**
      * Per-request memo of the ID lists used by Asset's status-driven scopes
@@ -156,54 +171,6 @@ class Statuslabel extends SnipeModel
     }
 
     /**
-     * Query builder scope to for pending status types
-     *
-     * @return Builder Modified query builder
-     */
-    public function scopePending()
-    {
-        return $this->where('pending', '=', 1)
-            ->where('archived', '=', 0)
-            ->where('deployable', '=', 0);
-    }
-
-    /**
-     * Query builder scope for archived status types
-     *
-     * @return Builder Modified query builder
-     */
-    public function scopeArchived()
-    {
-        return $this->where('pending', '=', 0)
-            ->where('archived', '=', 1)
-            ->where('deployable', '=', 0);
-    }
-
-    /**
-     * Query builder scope for deployable status types
-     *
-     * @return Builder Modified query builder
-     */
-    public function scopeDeployable()
-    {
-        return $this->where('pending', '=', 0)
-            ->where('archived', '=', 0)
-            ->where('deployable', '=', 1);
-    }
-
-    /**
-     * Query builder scope for undeployable status types
-     *
-     * @return Builder Modified query builder
-     */
-    public function scopeUndeployable()
-    {
-        return $this->where('pending', '=', 0)
-            ->where('archived', '=', 0)
-            ->where('deployable', '=', 0);
-    }
-
-    /**
      * Helper function to determine type attributes
      *
      * @author A. Gianotto <snipe@snipe.net>
@@ -235,8 +202,8 @@ class Statuslabel extends SnipeModel
         return $statustype;
     }
 
-    public function scopeOrderByCreatedBy($query, $order)
+    public function newEloquentBuilder($query): StatuslabelQueryBuilder
     {
-        return $query->leftJoin('users as admin_sort', 'status_labels.created_by', '=', 'admin_sort.id')->select('status_labels.*')->orderBy('admin_sort.first_name', $order)->orderBy('admin_sort.last_name', $order);
+        return new StatuslabelQueryBuilder($query);
     }
 }

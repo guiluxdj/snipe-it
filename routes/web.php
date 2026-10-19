@@ -37,12 +37,13 @@ use App\Http\Controllers\SetupController;
 use App\Http\Controllers\StatuslabelsController;
 use App\Http\Controllers\StorageProxyController;
 use App\Http\Controllers\SuppliersController;
+use App\Http\Controllers\SyncAdapterController;
 use App\Http\Controllers\UploadedFilesController;
 use App\Http\Controllers\ViewAssetsController;
 use App\Livewire\Importer;
-use App\Mail\CheckoutComponentMail;
 use App\Models\MaintenanceType;
 use App\Models\ReportTemplate;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Tabuna\Breadcrumbs\Trail;
 
@@ -129,6 +130,13 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::post('categories/bulk/delete', [BulkCategoriesController::class, 'destroy'])->name('categories.bulk.delete');
 
+    Route::post('categories/bulk/edit', [BulkCategoriesController::class, 'edit'])
+        ->name('categories.bulk.edit')
+        ->breadcrumbs(fn (Trail $trail) => $trail->parent('categories.index', route('categories.index'))
+            ->push(trans('general.bulk_edit'), route('categories.index')));
+
+    Route::post('categories/bulk/save', [BulkCategoriesController::class, 'update'])->name('categories.bulk.save');
+
     /*
     * Labels
     */
@@ -137,11 +145,6 @@ Route::group(['middleware' => 'auth'], function () {
         [LabelsController::class, 'show']
     )->where('labelName', '.*')->name('labels.show');
 
-    Route::get('/test-email', function () {
-        $mailable = new CheckoutComponentMail;
-
-        return $mailable->render(); // dumps HTML
-    });
     /*
     * Manufacturers
     */
@@ -321,13 +324,73 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'authorize:superuser
     Route::post('notifications', [SettingsController::class, 'postAlerts'])
         ->name('settings.alerts.save');
 
-    Route::get('slack', [SettingsController::class, 'getSlack'])
-        ->name('settings.slack.index')
+    Route::get('integrations', [SettingsController::class, 'getIntegrations'])
+        ->name('settings.integrations.index')
         ->breadcrumbs(fn (Trail $trail) => $trail->parent('settings.index')
-            ->push(trans('admin/settings/general.webhook_title'), route('settings.slack.index')));
+            ->push(trans('admin/settings/general.webhook_title'), route('settings.integrations.index')));
 
-    Route::post('slack', [SettingsController::class, 'postSlack'])
-        ->name('settings.slack.save');
+    Route::get('adapters', [SyncAdapterController::class, 'getAdapters'])
+        ->name('settings.adapters.index')
+        ->breadcrumbs(fn (Trail $trail) => $trail->parent('settings.index')
+            ->push(trans('admin/settings/sync_adapters.title'), route('settings.adapters.index')));
+
+    Route::post('adapters', [SyncAdapterController::class, 'postCreateAdapterInstance'])
+        ->name('settings.adapters.create');
+
+    Route::post('adapters/{instance}', [SyncAdapterController::class, 'postAdapterConfig'])
+        ->name('settings.adapters.save')
+        ->missing(fn () => abort(404));
+
+    Route::post('adapters/{instance}/sync', [SyncAdapterController::class, 'postAdapterSync'])
+        ->name('settings.adapters.sync')
+        ->missing(fn () => abort(404));
+
+    Route::post('adapters/{instance}/push', [SyncAdapterController::class, 'postAdapterPush'])
+        ->name('settings.adapters.push')
+        ->missing(fn () => abort(404));
+
+    Route::post('adapters/{instance}/refresh-groups', [SyncAdapterController::class, 'postAdapterRefreshGroups'])
+        ->name('settings.adapters.refresh_groups')
+        ->missing(fn () => abort(404));
+
+    Route::post('adapters/{instance}/refresh-sites', [SyncAdapterController::class, 'postAdapterRefreshSites'])
+        ->name('settings.adapters.refresh_sites')
+        ->missing(fn () => abort(404));
+
+    Route::post('adapters/{instance}/refresh-custom-fields', [SyncAdapterController::class, 'postAdapterRefreshCustomFields'])
+        ->name('settings.adapters.refresh_custom_fields')
+        ->missing(fn () => abort(404));
+
+    Route::post('adapters/{instance}/clone', [SyncAdapterController::class, 'postCloneAdapterInstance'])
+        ->name('settings.adapters.clone')
+        ->missing(fn () => abort(404));
+
+    Route::delete('adapters/{instance}', [SyncAdapterController::class, 'deleteAdapterInstance'])
+        ->name('settings.adapters.destroy')
+        ->missing(fn () => abort(404));
+
+    // One-time download of the per-run log flashed from Sync Now /
+    // Push Now. Token comes from session('sync_run_log_token') and
+    // the cache entry is deleted after a successful download.
+    Route::get('adapters/sync-log/{token}', [SyncAdapterController::class, 'downloadSyncRunLog'])
+        ->name('settings.adapters.sync_log.download')
+        ->where('token', '[A-Za-z0-9]+');
+
+    // AJAX diagnostic endpoints under the composed-notes section of
+    // each adapter's config form. All three return JSON with an
+    // 'output' field containing the captured sync-adapters log text,
+    // plus per-endpoint payload specifics.
+    Route::post('adapters/{instance}/preview-push-payload', [SyncAdapterController::class, 'postPreviewPushPayload'])
+        ->name('settings.adapters.preview_push_payload')
+        ->missing(fn () => abort(404));
+
+    Route::post('adapters/{instance}/test-1-push', [SyncAdapterController::class, 'postTest1Push'])
+        ->name('settings.adapters.test_1_push')
+        ->missing(fn () => abort(404));
+
+    Route::post('adapters/{instance}/test-1-pull', [SyncAdapterController::class, 'postTest1Pull'])
+        ->name('settings.adapters.test_1_pull')
+        ->missing(fn () => abort(404));
 
     Route::get('asset_tags', [SettingsController::class, 'getAssetTags'])
         ->name('settings.asset_tags.index')
@@ -341,9 +404,22 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth', 'authorize:superuser
         ->name('settings.labels.index')
         ->breadcrumbs(fn (Trail $trail) => $trail->parent('settings.index')
             ->push(trans('admin/settings/general.labels_title'), route('settings.labels.index')));
+    Route::get('labels/customizer-preview/{labelName}', [LabelsController::class, 'customLabelPreview']
+    )->where('labelName', '.*')->name('labels.customizer-preview');
 
     Route::post('labels', [SettingsController::class, 'postLabels'])
         ->name('settings.labels.save');
+
+    Route::get('/settings/labels/create', [LabelsController::class, 'create'])
+        ->name('settings.labels.create');
+    Route::get('/settings/labels/{label}/edit', [LabelsController::class, 'edit'])
+        ->name('settings.labels.edit');
+    Route::post('/settings/labels', [LabelsController::class, 'store'])
+        ->name('settings.labels.store');
+    Route::put('/settings/labels/{label}', [LabelsController::class, 'update'])
+        ->name('settings.labels.update');
+    Route::delete('settings/labels/{label}', [LabelsController::class, 'destroy'])
+        ->name('settings.labels.destroy');
 
     Route::get('ldap', [SettingsController::class, 'getLdapSettings'])
         ->name('settings.ldap.index')
@@ -633,7 +709,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('requests', [\App\Http\Controllers\Assets\AssetsController::class, 'getRequestedIndex'])
         ->name('requests.index')
         ->breadcrumbs(fn (Trail $trail) => $trail->parent('home')
-            ->push(trans('general.requested'), route('requests.index'))
+            ->push(trans('general.pending_requests'), route('requests.index'))
         );
 
     Route::post('requests/bulk-cancel', [\App\Http\Controllers\Assets\AssetsController::class, 'bulkCancelRequests'])
@@ -740,10 +816,13 @@ Route::group(['prefix' => 'reports', 'middleware' => ['auth']], function () {
             Route::get('/{reportTemplate}', [ReportTemplatesController::class, 'show'])
                 ->name('report-templates.show')
                 ->breadcrumbs(function (Trail $trail, ReportTemplate $reportTemplate) {
+                    // 'asset' folds into the default since it maps to the
+                    // same breadcrumb parent. Component / consumable have
+                    // their own custom-report parents.
                     $parent = match ($reportTemplate->type) {
-                        'asset' => 'reports/custom',
                         'component' => 'reports.custom.component',
                         'consumable' => 'reports.custom.consumable',
+                        default => 'reports/custom',
                     };
 
                     return $trail->parent($parent)
@@ -753,10 +832,13 @@ Route::group(['prefix' => 'reports', 'middleware' => ['auth']], function () {
             Route::get('/{reportTemplate}/edit', [ReportTemplatesController::class, 'edit'])
                 ->name('report-templates.edit')
                 ->breadcrumbs(function (Trail $trail, ReportTemplate $reportTemplate) {
+                    // 'asset' folds into the default since it maps to the
+                    // same breadcrumb parent. Component / consumable have
+                    // their own custom-report parents.
                     $parent = match ($reportTemplate->type) {
-                        'asset' => 'reports/custom',
                         'component' => 'reports.custom.component',
                         'consumable' => 'reports.custom.consumable',
+                        default => 'reports/custom',
                     };
 
                     return $trail->parent($parent)
@@ -774,18 +856,40 @@ Route::group(['prefix' => 'reports', 'middleware' => ['auth']], function () {
     Route::get(
         'activity', [ReportsController::class, 'getActivityReport'])
         ->name('reports.activity')
-        ->breadcrumbs(fn (Trail $trail) => $trail->parent('home')
-            ->push(trans('general.reports'), route('reports.index'))
-            ->push(trans('general.activity_report'), route('reports.activity')));
+        // Scoped viewers reach this page through the dashboard Recent
+        // Activity widget's View-all button but do not hold reports.view,
+        // so a "Reports" middle crumb linking to reports.index would 403
+        // on click. Emit it only when the caller can reach reports.index.
+        // Trail has no ->when() helper, so use a plain if inside a
+        // multi-line closure.
+        ->breadcrumbs(function (Trail $trail) {
+            $trail->parent('home');
+            if (Gate::allows('reports.view')) {
+                $trail->push(trans('general.reports'), route('reports.index'));
+            }
+            $trail->push(trans('general.activity_report'), route('reports.activity'));
+
+            return $trail;
+        });
 
     Route::post('activity', [ReportsController::class, 'postActivityReport'])
         ->name('reports.activity.post');
 
     Route::get('unaccepted_assets/{deleted?}', [ReportsController::class, 'getAssetAcceptanceReport'])
         ->name('reports/unaccepted_assets')
-        ->breadcrumbs(fn (Trail $trail) => $trail->parent('home')
-            ->push(trans('general.reports'), route('reports.index'))
-            ->push(trans('general.unaccepted_asset_report'), route('reports/unaccepted_assets')));
+        // Same reasoning as reports.activity above: scoped viewers
+        // arrive via the Needs Attention widget's link and would 403
+        // if we exposed a "Reports" middle crumb linking to
+        // reports.index.
+        ->breadcrumbs(function (Trail $trail) {
+            $trail->parent('home');
+            if (Gate::allows('reports.view')) {
+                $trail->push(trans('general.reports'), route('reports.index'));
+            }
+            $trail->push(trans('general.unaccepted_asset_report'), route('reports/unaccepted_assets'));
+
+            return $trail;
+        });
 
     Route::post('unaccepted_assets/sent_reminder', [ReportsController::class, 'sentAssetAcceptanceReminder'])
         ->name('reports/unaccepted_assets_sent_reminder');
@@ -917,6 +1021,7 @@ Route::group(['middleware' => 'web'], function () {
     Route::get('{object_type}/{id}/qr_code',
         [QrCodeController::class, 'show']
     )->name('qr_code/common')
+        ->middleware('auth')
         ->where(['object_type' => 'accessories|assets|hardware|licenses|locations|models|companies|components|consumables|users']);
 
     /**

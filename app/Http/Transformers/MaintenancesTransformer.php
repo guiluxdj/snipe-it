@@ -2,8 +2,8 @@
 
 namespace App\Http\Transformers;
 
+use App\Enums\FileStorage;
 use App\Helpers\Helper;
-use App\Models\Asset;
 use App\Models\Maintenance;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Gate;
@@ -34,7 +34,7 @@ class MaintenancesTransformer
                 'created_at' => Helper::getFormattedDateObject($assetmaintenance->asset->created_at, 'datetime'),
                 'updated_at' => Helper::getFormattedDateObject($assetmaintenance->asset->updated_at, 'datetime'),
             ] : null,
-            'image' => ($assetmaintenance->image != '') ? Storage::disk('public')->url('maintenances/'.e($assetmaintenance->image)) : null,
+            'image' => ($assetmaintenance->image != '') ? Storage::disk('public')->url(FileStorage::Maintenances->publicPath().e($assetmaintenance->image)) : null,
             'model' => (($assetmaintenance->asset) && ($assetmaintenance->asset->model)) ? [
                 'id' => (int) $assetmaintenance->asset->model->id,
                 'name' => ($assetmaintenance->asset->model->name) ? e($assetmaintenance->asset->model->name) : null,
@@ -125,9 +125,9 @@ class MaintenancesTransformer
         ];
 
         $permissions_array['available_actions'] = [
-            'update' => (Gate::allows('update', Asset::class) && ((($assetmaintenance->asset) && $assetmaintenance->asset->deleted_at == ''))) ? true : false,
-            'delete' => Gate::allows('delete', Asset::class),
-            'complete' => Gate::allows('update', Asset::class) && ! $assetmaintenance->completed_at,
+            'update' => (Gate::allows('update', $assetmaintenance->asset) && ((($assetmaintenance->asset) && $assetmaintenance->asset->deleted_at == ''))) ? true : false,
+            'delete' => Gate::allows('delete', $assetmaintenance->asset),
+            'complete' => Gate::allows('update', $assetmaintenance->asset) && ! $assetmaintenance->completed_at,
         ];
 
         $array += $permissions_array;
@@ -165,7 +165,7 @@ class MaintenancesTransformer
             'asset_name' => $asset?->name ? e($asset->name) : null,
             'asset_tag' => $asset?->asset_tag ? e($asset->asset_tag) : null,
             'serial' => $asset?->serial ? e($asset->serial) : null,
-            'image' => ($assetmaintenance->image != '') ? Storage::disk('public')->url('maintenances/'.e($assetmaintenance->image)) : null,
+            'image' => ($assetmaintenance->image != '') ? Storage::disk('public')->url(FileStorage::Maintenances->publicPath().e($assetmaintenance->image)) : null,
             'model' => $modelName ? e($modelName) : null,
             'model_number' => $modelNumber ? e($modelNumber) : null,
             'status_label' => $statusName ? e($statusName) : null,

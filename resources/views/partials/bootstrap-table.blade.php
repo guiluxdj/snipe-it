@@ -15,6 +15,17 @@
             color: #fff !important;
             text-decoration: none !important;
         }
+
+        /* When the bulk-actions dropdown has a specific action picked,
+           rows that don't support that action get this class so the
+           operator can tell at a glance that the checkbox is inert
+           for that specific action. Style is checkbox-only (dimmed +
+           not-allowed cursor); the rest of the row stays fully
+           legible so the operator can still read the row's data. */
+        tr.bulk-action-incompatible input[type="checkbox"] {
+            cursor: not-allowed;
+            opacity: 0.4;
+        }
     </style>
 @endpush
 
@@ -285,7 +296,7 @@
                 var colMap = {};
                 this.columns.forEach(c => colMap[c.field] = c.title);
                 var op = this.getAdvancedSearchOperator();
-                var html = '<span class="label label-warning" style="font-size: 11px; margin-right:6px;display:inline-block;margin-bottom:6px;">' +
+                var html = '<span class="label label-warning" style="font-size: 12px; margin-right:6px;display:inline-block;margin-bottom:6px; padding: 4px;">' +
                     advancedSearchOperatorLabel + ': ' + (op === 'or' ? advancedSearchOrText : advancedSearchAndText) + '</span>';
 
                 Object.keys(filters).forEach(f => {
@@ -299,10 +310,10 @@
                     // jQuery.html() would then parse and execute).
                     var safeLabel = escapeAdvancedSearchValue(colMap[f] || f);
                     var safeField = escapeAdvancedSearchAttr(f);
-                    html += '<span class="label label-primary" style="font-size: 11px; margin-right:6px;display:inline-block;margin-bottom:6px;"><b>' +
+                    html += '<span class="label label-primary" style="font-size: 12px; margin-right:6px;display:inline-block;margin-bottom:6px; padding: 4px;"><b>' +
                         safeLabel + ':</b> ' + escapeAdvancedSearchValue(filters[f]) +
                         ' <a href="javascript:void(0)" class="snipe-advanced-search-tag-remove" data-field="' + safeField +
-                        '" style="color:#fff;margin-left:6px;text-decoration:none;">&times;</a></span>';
+                        '" style="font-size: 12px; margin-right:6px;display:inline-block;color:#fff;text-decoration:none;">&times;</a></span>';
                 });
 
                 // "Clear all" pill: same shortcut as opening the modal and hitting
@@ -312,7 +323,7 @@
                 html += '<a href="javascript:void(0)" class="label label-danger snipe-advanced-search-tags-clear-all"' +
                     ' title="' + safeClearAllLabel + '"' +
                     ' aria-label="' + safeClearAllLabel + '"' +
-                    ' style="font-size: 11px; margin-right:6px; display:inline-block; margin-bottom:6px; color:#fff; text-decoration:none; cursor:pointer;">' +
+                    ' style="font-size: 12px; margin-right:6px; display:inline-block; margin-bottom:6px; color:#fff; text-decoration:none; cursor:pointer; padding: 4px;">' +
                     '<i class="fas fa-trash" aria-hidden="true" style="margin-right:4px;"></i>' + safeClearAllLabel +
                     '</a>';
 
@@ -386,7 +397,16 @@
                 var html = [`<form class="form-horizontal toolbar-model-form" action="${this.options.actionForm}">`];
                 var operator = this.getAdvancedSearchOperator();
 
-                html.push('<div class="form-group row"><div class="col-sm-12"><p class="help-block"><i class="fa fa-solid fa-lightbulb text-info" aria-hidden="true"></i> {!! trans('general.search_tip') !!}</p></div></div>');
+                {{-- search_tip is dropped through @js so the translation is
+                     JS-safe (escapes quotes, embedded newlines, unicode).
+                     The German locales de-DE / de-if used to carry a
+                     literal newline in this key which turned the whole
+                     inline script into a SyntaxError and left the table
+                     un-initialized. See issue #19736. Any other locale
+                     that grows a newline or apostrophe here (French,
+                     Italian, etc.) is now safe by construction. --}}
+                var searchTipHtml = @js(trans('general.search_tip'));
+                html.push('<div class="form-group row"><div class="col-sm-12"><p class="help-block"><i class="fa fa-solid fa-lightbulb text-info" aria-hidden="true"></i> ' + searchTipHtml + '</p></div></div>');
 
                 html.push(`
                     <div class="form-group row">
@@ -818,6 +838,7 @@
                 buttonsOrder: [
                     'columns',
                     'btnAdd',
+                    'btnShowArchived',
                     'btnShowDeleted',
                     'btnToggleCompleted',
                     'btnDue',
@@ -1530,6 +1551,30 @@
                 @endif
             }
         },
+
+        btnShowArchived: {
+            text: '{{ (request()->input('status') == "Archived") ? trans('general.show_current') : trans('general.show_archived') }}',
+            icon: '{{ \App\Helpers\IconHelper::icon('archived') }}',
+            event () {
+                window.location.href = '{{ (request()->input('status') == "Archived") ? route('accessories.index') : route('accessories.index', ['status' => 'Archived']) }}';
+            },
+            attributes: {
+                class: '{{ (request()->input('status') == "Archived") ? 'btn-selected' : '' }}',
+                title: '{{ (request()->input('status') == "Archived") ? trans('general.show_current') : trans('general.show_archived') }}',
+            }
+        },
+
+        btnShowDeleted: {
+            text: '{{ (request()->input('status') == "Deleted") ? trans('general.show_current') : trans('general.show_deleted') }}',
+            icon: 'fa-solid fa-trash',
+            event () {
+                window.location.href = '{{ (request()->input('status') == "Deleted") ? route('accessories.index') : route('accessories.index', ['status' => 'Deleted']) }}';
+            },
+            attributes: {
+                class: '{{ (request()->input('status') == "Deleted") ? 'btn-selected' : '' }}',
+                title: '{{ (request()->input('status') == "Deleted") ? trans('general.show_current') : trans('general.show_deleted') }}',
+            }
+        },
     });
     @endcan
 
@@ -1856,6 +1901,32 @@
         },
     });
     @endcan
+        window.labelButtons = () => ({
+        btnAdd: {
+            icon: 'fa fa-plus',
+            text: 'Create New Label',
+            title: 'Create New Label',
+            event() {
+                $('#new-label-modal').modal('show');
+            },
+            attributes: {
+                class: 'btn-info',
+                title: 'Create New Label'
+            }
+        },
+        btnImport: {
+            icon: 'fa-solid fa-file-import',
+            text: 'Import Label',
+            title: 'Import Label',
+            event() {
+                $('#import-label-modal').modal('show');
+            },
+            attributes: {
+                class: 'btn-info',
+                title: 'Import Label'
+            }
+        }
+    });
 
     @can('create', \App\Models\Statuslabel::class)
     // Status label table buttons
@@ -1991,10 +2062,13 @@
     });
 
     // Dynamic bulk actions: when a table's bulk-actions dropdown was rendered with
-    // data-dynamic-actions, its options are populated here from the intersection of
-    // each selected row's available_actions.bulk_selectable. An action shows only
-    // when every currently-selected row supports it. Tables that rendered a static
-    // option list have no data-dynamic-actions attribute and are unaffected.
+    // data-dynamic-actions, its options are populated here from the UNION of every
+    // selected row's available_actions.bulk_selectable. An action shows if AT LEAST
+    // ONE currently-selected row supports it. Rows that don't support the picked
+    // action are auto-unchecked when the operator selects the action from the
+    // dropdown, so the effective selection lines up with what "Go" will actually
+    // submit. Tables that rendered a static option list have no data-dynamic-actions
+    // attribute and are unaffected.
     function refreshDynamicBulkActions(table) {
         var $table = $(table);
         var formId = $table.data('bulk-form-id');
@@ -2015,19 +2089,11 @@
         var currentValue = $select.val();
         var placeholder = $select.attr('data-placeholder') || '';
 
-        var eligible = null;
+        var eligible = {};
         for (var i = 0; i < selections.length; i++) {
             var supported = (selections[i].available_actions && selections[i].available_actions.bulk_selectable) || {};
-            var rowActions = {};
             for (var k in supported) {
-                if (supported[k] === true) rowActions[k] = true;
-            }
-            if (eligible === null) {
-                eligible = rowActions;
-            } else {
-                var next = {};
-                for (var kk in eligible) if (rowActions[kk]) next[kk] = true;
-                eligible = next;
+                if (supported[k] === true) eligible[k] = true;
             }
         }
 
@@ -2039,7 +2105,8 @@
         if (selections.length === 0) {
             $select.append($('<option/>', { value: '', text: placeholder }));
             $button.attr('disabled', 'disabled');
-        } else if (!eligible || Object.keys(eligible).length === 0) {
+        }
+        else if (Object.keys(eligible).length === 0) {
             $select.append($('<option/>', { value: '', text: '{{ trans('general.bulk_actions_none_available') }}' }));
             $button.attr('disabled', 'disabled');
         } else {
@@ -2062,7 +2129,262 @@
         }
 
         $select.select2({ minimumResultsForSearch: Infinity });
+
+        // Auto-uncheck rows that don't support the picked action. Bound
+        // here rather than via document delegation because select2's
+        // destroy-then-init cycle inside this function was intermittently
+        // swallowing delegated change events. Rebinding on every
+        // refresh keeps this deterministic. .off('.autoUncheck')
+        // isolates just this namespace so we don't clobber select2's
+        // own handlers.
+        $select.off('change.autoUncheck select2:select.autoUncheck').on('change.autoUncheck select2:select.autoUncheck', function () {
+            var action = $(this).val();
+            if (action) {
+                autoUncheckIncompatibleRowsFor($table, $(this));
+            }
+            else {
+                clearActionDependentRowStyling($table);
+            }
+        });
+
+        // Re-apply the action-dependent visual state now, in case the
+        // refresh was triggered while an action was still selected in
+        // the dropdown (e.g. operator checked a new row while "delete"
+        // was picked). Keeps styling consistent with the just-adjusted
+        // selection.
+        applyActionDependentRowStyling($table, $select.val() || null);
     }
+
+    function autoUncheckIncompatibleRowsFor($table, $select) {
+        var action = $select.val();
+        if (!action) return;
+
+        // Track IDs we auto-unchecked so switching back to an action
+        // where they ARE eligible re-checks them automatically. Without
+        // this, a select-all → delete (3 rows auto-unchecked as not
+        // deletable) → edit cycle leaves those 3 rows unchecked even
+        // though edit accepts them. Keyed per-table so sibling bulk
+        // tables don't cross-contaminate.
+        var autoUnchecked = $table.data('mutexAutoUnchecked') || {};
+        var data = $table.bootstrapTable('getData');
+
+        // Mark the batch as in-flight so our own check/uncheck events
+        // short-circuit the per-row handlers below.
+        $table.data('mutexAutoInFlight', true);
+
+        // Styling pass FIRST for the new action: enables any
+        // previously-disabled checkboxes that are now compatible
+        // (e.g. a row disabled under "delete" that supports "edit").
+        // bootstrapTable's internal check/uncheck toggles no-op on
+        // disabled DOM checkboxes, so Phase 1 below would silently
+        // fail to re-check those rows otherwise.
+        applyActionDependentRowStyling($table, action);
+
+        // Phase 1: re-check any previously auto-unchecked rows that
+        // now support this action.
+        for (var r = 0; r < data.length; r++) {
+            var rid = data[r].id;
+            if (!autoUnchecked[rid]) continue;
+            var supportsNow = (data[r].available_actions && data[r].available_actions.bulk_selectable) || {};
+            if (supportsNow[action] === true) {
+                $table.bootstrapTable('check', r);
+                delete autoUnchecked[rid];
+            }
+        }
+
+        // Phase 2: standard incompatible-row auto-uncheck. Use
+        // uncheck(index) instead of uncheckBy(field, values). bs-table's
+        // uncheckBy at bootstrap-table.js line 10791 filters on ':enabled',
+        // which means once applyActionDependentRowStyling disables the
+        // checkbox on an incompatible row (or a prior refresh cycle did),
+        // uncheckBy silently skips it. uncheck(index) uses _toggleCheck
+        // which sets checked=false via prop() directly, without the
+        // :enabled filter, so incompatible rows still uncheck even if
+        // their checkbox is already disabled.
+        var idsToUncheck = {};
+        var selections = $table.bootstrapTable('getSelections');
+        for (var i = 0; i < selections.length; i++) {
+            var supported = (selections[i].available_actions && selections[i].available_actions.bulk_selectable) || {};
+            if (supported[action] !== true) {
+                idsToUncheck[selections[i].id] = true;
+            }
+        }
+
+        for (var j = 0; j < data.length; j++) {
+            if (idsToUncheck[data[j].id]) {
+                $table.bootstrapTable('uncheck', j);
+                autoUnchecked[data[j].id] = true;
+            }
+        }
+
+        $table.data('mutexAutoUnchecked', autoUnchecked);
+        $table.data('mutexAutoInFlight', false);
+
+        // The per-row check/uncheck handlers short-circuit while
+        // mutexAutoInFlight is true (prevents per-row refresh thrash
+        // and the re-entry bug that would stop phase 1 after one row).
+        // Run the deferred bookkeeping once now that the batch is
+        // done so the hidden ids[] inputs, selected-count readout,
+        // and dropdown eligibility all match the new selection.
+        syncBulkInputsForTable($table);
+        updateSelectedCount($table[0]);
+        refreshDynamicBulkActions($table[0]);
+
+        applyActionDependentRowStyling($table, action);
+    }
+
+    // Rebuilds the hidden ids[] inputs after a batch check/uncheck
+    // pass. Mirrors the add + remove logic the per-row check/uncheck
+    // handlers would do, but as a single sweep rather than one event
+    // per row.
+    function syncBulkInputsForTable($table) {
+        var tableId = $table.data('id-table');
+        var buttonId = $table.data('bulk-button-id');
+        var $button = $(buttonId);
+        var $form = $($table.data('bulk-form-id'));
+        if (!tableId || !$button.length || !$form.length) return;
+
+        var selectedIds = {};
+        $table.bootstrapTable('getSelections').forEach(function (row) {
+            selectedIds[row.id] = true;
+        });
+
+        // Remove hidden inputs for rows no longer selected.
+        $form.find('input[name="ids[]"]').each(function () {
+            if (! selectedIds[this.value]) {
+                $(this).remove();
+            }
+        });
+
+        // Add hidden inputs for newly-selected rows that don't have one.
+        Object.keys(selectedIds).forEach(function (id) {
+            if (! document.getElementById(tableId + '_checkbox_' + id)) {
+                $button.after($('<input/>', {
+                    id: tableId + '_checkbox_' + id,
+                    type: 'hidden',
+                    name: 'ids[]',
+                    value: id,
+                }));
+            }
+        });
+
+        if (Object.keys(selectedIds).length > 0) {
+            $button.removeAttr('disabled');
+        } else {
+            $button.attr('disabled', 'disabled');
+        }
+    }
+
+    // Toggle a visual disabled state on rows that don't support the
+    // currently-picked action. Composes on top of checkboxEnabledFormatter
+    // (which handles the "no actions at all" case at render time). This
+    // layer reacts live to dropdown changes and check events so operators
+    // can tell at a glance which rows will land in the batch.
+    function applyActionDependentRowStyling($table, action) {
+        var data = $table.bootstrapTable('getData');
+
+        $table.find('tbody > tr').each(function () {
+            var $tr = $(this);
+            var index = $tr.data('index');
+            var rowData = (typeof index !== 'undefined') ? data[index] : null;
+            if (!rowData || !rowData.available_actions || !rowData.available_actions.bulk_selectable) return;
+
+            var supported = rowData.available_actions.bulk_selectable;
+            var isIncompatible = !!(action && supported[action] !== true);
+
+            $tr.toggleClass('bulk-action-incompatible', isIncompatible);
+
+            // Only toggle the disabled attribute we set — leave whatever
+            // checkboxEnabledFormatter already decided at render time
+            // alone by only ADDING disabled when we mark incompatible
+            // and REMOVING it only when the row would otherwise be
+            // renderable (checkboxEnabledFormatter marks .disabled on
+            // the CELL wrapper, so we test that before re-enabling).
+            var $checkbox = $tr.find('input[type="checkbox"][name="btSelectItem"]');
+            if (!$checkbox.length) return;
+            if (isIncompatible) {
+                $checkbox.prop('disabled', true);
+            }
+            else {
+                var $cell = $checkbox.closest('.bs-checkbox');
+                var cellSaysDisabled = $cell.length && $cell.hasClass('disabled');
+                if (!cellSaysDisabled) {
+                    $checkbox.prop('disabled', false);
+                }
+            }
+        });
+    }
+
+    // Clear the class + attribute back to base state when there's no
+    // action picked (dropdown cleared or reset).
+    function clearActionDependentRowStyling($table) {
+        applyActionDependentRowStyling($table, null);
+    }
+
+    // Re-run the auto-uncheck against whatever action is currently in the
+    // dropdown for this table's bulk-actions form. Called after any row-
+    // check event so a re-check (or check-all) of an incompatible row
+    // doesn't sneak past the guard that fired on dropdown pick.
+    function reapplyAutoUncheckForTable(table) {
+        var $table = $(table);
+        // Guard re-entry while a batch auto-uncheck/re-check pass is
+        // mid-flight. The check/uncheck events fired by our own
+        // bootstrapTable('check'/'uncheck') calls bubble back through
+        // the handlers below and would recursively re-call this,
+        // flipping the in-flight flag off before the outer loop
+        // finishes, which caused only one row to re-check instead of
+        // the whole set.
+        if ($table.data('mutexAutoInFlight')) return;
+
+        var formId = $table.data('bulk-form-id');
+        if (!formId) return;
+
+        var $select = $(formId).find('select[data-dynamic-actions]');
+        if ($select.length === 0) return;
+        if (!$select.val()) return;
+
+        autoUncheckIncompatibleRowsFor($table, $select);
+    }
+
+    // bs-table wipes DOM classes when it re-renders rows (pagination,
+    // sort, filter, search). Re-apply the action-dependent styling
+    // after every body render so the visual state survives those
+    // interactions.
+    $('.snipe-table').on('post-body.bs.table', function () {
+        var $table = $(this);
+        var formId = $table.data('bulk-form-id');
+        if (!formId) return;
+
+        var $select = $(formId).find('select[data-dynamic-actions]');
+        if ($select.length === 0) return;
+
+        applyActionDependentRowStyling($table, $select.val() || null);
+    });
+
+    // Safety-net delegated listener for the dropdown change event. The
+    // direct binding inside refreshDynamicBulkActions should be doing
+    // the work, but if select2's destroy/init cycle ever clobbers it,
+    // this catches the event through DOM delegation. Both routes call
+    // the same function so double-firing is idempotent.
+    $(document).on('change', 'select[data-dynamic-actions]', function () {
+        var $select = $(this);
+        var formEl = $select.closest('form')[0];
+        if (!formEl) return;
+
+        var $table = $('.snipe-table').filter(function () {
+            var formId = $(this).data('bulk-form-id');
+            return formId && $(formId)[0] === formEl;
+        });
+        if ($table.length === 0) return;
+
+        var action = $select.val();
+        if (action) {
+            autoUncheckIncompatibleRowsFor($table, $select);
+        }
+        else {
+            clearActionDependentRowStyling($table);
+        }
+    });
 
     // These methods dynamically add/remove hidden input values in the bulk actions form
     $('.snipe-table').on('check.bs.table .btSelectItem', function (row, $element) {
@@ -2076,8 +2398,32 @@
             name: 'ids[]',
             value: $element.id
         }));
+
+        // Skip the expensive bulk-actions refresh + re-entry when
+        // this check is being fired by our own batch auto-uncheck /
+        // re-check pass. The outer autoUncheckIncompatibleRowsFor
+        // finishes the whole batch and runs refreshDynamicBulkActions /
+        // applyActionDependentRowStyling once at the end. Without this
+        // short-circuit, every row we re-check triggered a full refresh
+        // cycle, which both caused the "only one row re-selects" bug
+        // (re-entry flipped the in-flight flag off mid-loop) and made
+        // the whole interaction visibly laggy.
+        if ($(this).data('mutexAutoInFlight')) {
+            return;
+        }
+
+        // User-initiated check acknowledges this row explicitly. Drop
+        // it from auto-uncheck tracking so an action switch doesn't
+        // treat it as "we unchecked this" when it was them.
+        var auto = $(this).data('mutexAutoUnchecked') || {};
+        if (auto[$element.id]) {
+            delete auto[$element.id];
+            $(this).data('mutexAutoUnchecked', auto);
+        }
+
         updateSelectedCount(this);
         refreshDynamicBulkActions(this);
+        reapplyAutoUncheckForTable(this);
     });
 
     $('.snipe-table').on('check-all.bs.table', function (event, rowsAfter) {
@@ -2097,11 +2443,20 @@
             }
         }
 
+        // Check-all is an explicit "take everything" from the user,
+        // so wipe the auto-uncheck tracking set. reapplyAutoUncheckForTable
+        // below will then re-run the gate against the picked action
+        // and populate the set fresh.
+        if (! $(this).data('mutexAutoInFlight')) {
+            $(this).data('mutexAutoUnchecked', {});
+        }
+
         if ($(this).bootstrapTable('getSelections').length > 0) {
             $(buttonName).removeAttr('disabled');
         }
         updateSelectedCount(this);
         refreshDynamicBulkActions(this);
+        reapplyAutoUncheckForTable(this);
     });
 
 
@@ -2109,11 +2464,39 @@
         var tableId =  $(this).data('id-table');
         $( "#" + tableId + "_checkbox_" + $element.id).remove();
         updateSelectedCount(this);
+
+        // Skip the auto-uncheck bookkeeping when our own batch pass
+        // is firing this event. The outer function tracks adds / drops
+        // directly and shouldn't interact with the per-event handler.
+        if ($(this).data('mutexAutoInFlight')) {
+            return;
+        }
+
+        // Drop this id from the auto-uncheck tracking set when the
+        // user is the one unchecking. Without this, a user who
+        // manually unchecks a row after a prior auto-uncheck cycle
+        // would see it resurrected the next time they picked an action
+        // that accepts it.
+        var auto = $(this).data('mutexAutoUnchecked') || {};
+        if (auto[$element.id]) {
+            delete auto[$element.id];
+            $(this).data('mutexAutoUnchecked', auto);
+        }
     });
 
 
     // Handle whether the edit button should be disabled
     $('.snipe-table').on('uncheck.bs.table', function () {
+        // Short-circuit while a batch auto-uncheck/re-check pass is
+        // mid-flight. Same reason as the sibling check/uncheck
+        // handlers above: our own programmatic uncheck calls bubble
+        // through here and would run refreshDynamicBulkActions per
+        // row, both re-entering autoUncheckIncompatibleRowsFor and
+        // thrashing the dropdown.
+        if ($(this).data('mutexAutoInFlight')) {
+            return;
+        }
+
         var buttonName =  $(this).data('bulk-button-id');
 
         if ($(this).bootstrapTable('getSelections').length == 0) {
@@ -2124,6 +2507,13 @@
     });
 
     $('.snipe-table').on('uncheck-all.bs.table', function (event, rowsAfter, rowsBefore) {
+
+        // Uncheck-all is an explicit "clear everything" from the user,
+        // so the auto-uncheck tracking resets too. Otherwise a prior
+        // auto-unchecked set could spring back on the next action switch.
+        if (! $(this).data('mutexAutoInFlight')) {
+            $(this).data('mutexAutoUnchecked', {});
+        }
 
         var buttonName =  $(this).data('bulk-button-id');
         $(buttonName).attr('disabled', 'disabled');
@@ -2220,6 +2610,15 @@
             }
 
             if (value) {
+                // Row carries available_actions.view when the user
+                // can see the show page for this record. Render as
+                // plain text (no link) when they can't, so clicking
+                // through does not 403. Transformers that don't emit
+                // the flag stay linked for back-compat since undefined
+                // is not === false.
+                if (row && row.available_actions && row.available_actions.view === false) {
+                    return '<span style="white-space:nowrap;">' + tag_icon + value + '</span>';
+                }
                 return '<span style="white-space:nowrap;">' + tag_icon + '<a href="{{ config('app.url') }}/' + destination + '/' + row.id + '">' + value + '</a></span>';
             }
         };
@@ -2267,12 +2666,13 @@
         if (destination == 'maintenanceTypes') {
             destination = 'maintenance-types';
         }
-        return function (value,row) {
+        return function (value) {
             if ((value) && (value.status_meta)) {
 
-                var text_color;
+                var color_style;
                 var icon_style;
                 var text_help;
+                var square_tag = '';
                 var status_meta = {
                   'deployed': '{{ strtolower(trans('general.deployed')) }}',
                   'deployable': '{{ strtolower(trans('admin/hardware/general.deployable')) }}',
@@ -2283,27 +2683,37 @@
 
                 switch (value.status_meta) {
                     case 'deployed':
-                        text_color = 'blue';
+                        color_style = 'text-blue';
                         icon_style = 'fa-circle';
                         text_help = '<label class="label label-default">{{ trans('general.deployed') }}</label>';
                     break;
                     case 'deployable':
-                        text_color = 'green';
+                        color_style = 'text-green';
                         icon_style = 'fa-circle';
                         text_help = '';
                     break;
                     case 'pending':
-                        text_color = 'orange';
+                        color_style = 'text-orange';
                         icon_style = 'fa-circle';
                         text_help = '';
                         break;
                     default:
-                        text_color = 'red';
+                        color_style = 'text-red';
                         icon_style = 'fa-times';
                         text_help = '';
                 }
 
-                return '<nobr><a href="{{ config('app.url') }}/' + destination + '/' + value.id + '" data-tooltip="true" title="'+ status_meta[value.status_meta] + '"> <i class="fa ' + icon_style + ' text-' + text_color + '"></i> ' + value.name + ' ' + text_help + ' </a> </nobr>';
+                if (value.tag_color) {
+                    square_tag = "<i class='fa-solid fa-fw fa-square' style='color: " + value.tag_color + "' aria-hidden='true'></i> ";
+                }
+
+                return '<nobr><a href="{{ config('app.url') }}/' + destination + '/' + value.id + '" data-tooltip="true" title="' + status_meta[value.status_meta] + '">'
+                    + '<i class="fa ' + icon_style + ' ' + color_style + '"></i> ' + square_tag
+                    + value.name
+                    + ' '
+                    + text_help
+                    + ' '
+                    + '</a> </nobr> ';
             } else if ((value) && (value.name)) {
 
                 // Add some overrides for any funny urls we have
@@ -2322,6 +2732,16 @@
                     var tag_icon = '<i class="fa-solid fa-square" style="color: ' + value.tag_color + ';" aria-hidden="true"></i>';
                 } else {
                     var tag_icon = '';
+                }
+
+                // Same viewable-flag treatment as
+                // polymorphicItemFormatter and genericRowLinkFormatter.
+                // A scoped viewer's Recent Activity row that names an
+                // admin / target / user they cannot reach must render
+                // as plain text so the click does not 403. Values
+                // without a viewable key stay linked for back-compat.
+                if (value.viewable === false) {
+                    return '<nobr>' + tag_icon + ' ' + value.name + '</nobr>';
                 }
 
                 return '<nobr>'+ tag_icon + ' <a href="{{ config('app.url') }}/' + polymorphicItemFormatterDest + dest + '/' + value.id + '">' + value.name + '</a></span>';
@@ -2405,27 +2825,34 @@
             // available_actions.adjust_quantity (accessories, consumables,
             // components). The click handler in snipeit.js reads the
             // data-* attrs and shows blade/modals/adjust-quantity.
+            // Archived components keep the button rendered but
+            // disabled so admins see the control is unavailable
+            // for retired inventory rather than wondering where it
+            // went.
             if ((row.available_actions) && (row.available_actions.adjust_quantity === true)) {
+                var adjustDeleted = !!row.deleted_at;
+                var adjustDisabled = adjustDeleted || row.archived === true;
+                var adjustReason = adjustDeleted
+                    ? '{{ trans('general.component_deleted_warning') }}'
+                    : '{{ trans('general.archived_item_label', ['item_type' => trans('general.component')]) }}';
                 actions += window.renderAdjustQuantityButton({
                     dest: dest,
                     id: row.id,
                     name: row.name || '',
                     available: row.remaining,
+                    disabled: adjustDisabled,
+                    disabledReason: adjustReason,
                 }) + '&nbsp;';
             }
 
-            if ((row.available_actions) && (row.available_actions.delete === true)) {
-
+            if ((row.available_actions) && (row.available_actions.update === true)) {
                 // use the asset tag if no name is provided
-
                 if (row.name) {
                     var name_for_box = row.name
                 } else if (row.asset_tag) {
                     var name_for_box = row.asset_tag
                 }
 
-
-                
                 actions += '<a href="{{ config('app.url') }}/' + dest + '/' + row.id + '" '
                     + ' class="actions btn btn-danger btn-sm delete-asset hidden-print" data-tooltip="true"  '
                     + ' data-toggle="modal" data-icon="fa-trash"'
@@ -2519,6 +2946,17 @@
             // Show as strikethrough if it's been deleted
             if (value.deleted_at && value.deleted_at != '') {
                 return '<nobr><span class="text-muted" data-tooltip="true" title="{{ trans('general.deleted') }} ' + value.type + '"><del><i class="' + item_icon + ' fa-fw"></i> ' + value.name + '</del></span></nobr>';
+            }
+
+            // Render as plain text (no link) when the caller cannot
+            // view the underlying record. Prevents 403 click-throughs
+            // from the dashboard's recent-activity row for scoped
+            // viewers who see actionlogs on types they can't drill
+            // into. ActionlogsTransformer emits viewable=false for
+            // those. Transformers that don't emit the flag stay
+            // linked for back-compat since undefined is not === false.
+            if (value.viewable === false) {
+                return '<nobr><span data-tooltip="true" title="' + value.type + '"><i class="' + item_icon + ' fa-fw"></i> ' + value.name + '</span></nobr>';
             }
 
             return '<nobr><a href="{{ config('app.url') }}/' + item_destination +'/' + value.id + '" data-tooltip="true" title="' + value.type + '"><i class="' + item_icon + ' fa-fw"></i> ' + value.name + '</a></nobr>';
@@ -2662,11 +3100,9 @@
             if (!typeSlug) {
                 return actions; // Unknown type, don't render a broken cancel button.
             }
-            // Same shape the old blade posted to. Includes the fifth
-            // "requestingUser" segment so an admin cancels the
-            // specific user's request rather than their own.
+            
             var cancelUrl = '{{ config('app.url') }}/account/request/' +
-                typeSlug + '/' + row.requestable.id + '/1/' + row.user.id;
+                typeSlug + '/' + row.requestable.id + '/' + row.user.id;
             // Pipe through the shared dataConfirmModal so this
             // behaves like every other destructive action in the
             // app (delete-asset class + data-href + data-content).
@@ -2804,7 +3240,7 @@
         else if (permissions.checkin && row.requestable) {
             actions += ' <a href="{{ config('app.url') }}/hardware/' + row.requestable.id +
                 '/checkin" class="btn btn-sm bg-purple" data-tooltip="true" title="{{ trans('general.checkin_tooltip') }}">' +
-                '{{ trans('general.checkin') }}</a>';
+                '<x-icon type="checkin" class="fa-fw" /><span class="sr-only">{{ trans('general.checkin') }}</span></a>';
         }
 
         // Replenish button opens the shared adjust-quantity modal
@@ -2893,11 +3329,13 @@
     // Checkouts need the license ID, checkins need the specific seat ID
 
     function licenseSeatInOutFormatter(value, row) {
+        
+        var backto = row.checkin_backto ? '/' + row.checkin_backto : '';
         if (row.disabled && (row.assigned_user || row.assigned_asset)) {
-            return '<a href="{{ config('app.url') }}/licenses/' + row.id + '/checkin" class="btn btn-sm bg-purple" data-tooltip="true" title="{{ trans('general.checkin_tooltip') }}">{{ trans('general.checkin') }}</a>';
+            return '<a href="{{ config('app.url') }}/licenses/' + row.id + '/checkin' + backto + '" class="btn btn-sm bg-purple" data-tooltip="true" title="{{ trans('general.checkin_tooltip') }}">{{ trans('general.checkin') }}</a>';
         }
         if (row.disabled) {
-            return '<a href="{{ config('app.url') }}/licenses/' + row.id + '/checkin" class="btn btn-sm bg-maroon btn-checkout disabled" data-tooltip="true" title="{{ trans('general.checkin_tooltip') }}">{{ trans('general.checkout') }}</a>';
+            return '<a href="{{ config('app.url') }}/licenses/' + row.id + '/checkin' + backto + '" class="btn btn-sm bg-maroon btn-checkout disabled" data-tooltip="true" title="{{ trans('general.checkin_tooltip') }}">{{ trans('general.checkout') }}</a>';
         }
         // The user is allowed to check the license seat out and it's available
         if ((row.available_actions.checkout === true) && (row.user_can_checkout === true) && ((!row.assigned_asset) && (!row.assigned_user))) {
@@ -2906,7 +3344,7 @@
 
         // The user is allowed to check the license seat in and it's available
         if ((row.available_actions.checkin === true) && ((row.assigned_asset) || (row.assigned_user))) {
-            return '<a href="{{ config('app.url') }}/licenses/' + row.id + '/checkin" class="btn btn-sm bg-purple btn-checkin" data-tooltip="true" title="{{ trans('general.checkin_tooltip') }}">{{ trans('general.checkin') }}</a>';
+            return '<a href="{{ config('app.url') }}/licenses/' + row.id + '/checkin' + backto + '" class="btn btn-sm bg-purple btn-checkin" data-tooltip="true" title="{{ trans('general.checkin_tooltip') }}">{{ trans('general.checkin') }}</a>';
         }
 
     }
@@ -2920,6 +3358,21 @@
             destination = 'maintenance-types';
         }
         return function (value, row) {
+
+            // Optional row.checkin_backto lets the caller redirect
+            // back to a context page (e.g. a user detail view) after
+            // a checkin action. Segment appended to the URL to match
+            // the /{destination}/{id}/checkin/{backto?} route.
+            var backto = row.checkin_backto ? '/' + row.checkin_backto : '';
+
+            // Soft-deleted rows render a disabled checkout stand-in
+            // instead of the active link so the Deleted-index view
+            // keeps the control visible but inert. row.deleted_at is
+            // populated by the transformer whenever the model uses
+            // SoftDeletes.
+            if (row.deleted_at && (row.available_actions.checkout == true)) {
+                return '<span data-tooltip="true" title="{{ trans('general.cannot_be_checked_out') }}"><a class="btn btn-sm bg-maroon btn-checkout disabled">{{ trans('general.checkout') }}</a></span>';
+            }
 
             // The user is allowed to check items out, AND the item is deployable
             if ((row.available_actions.checkout == true) && (row.user_can_checkout == true) && ((!row.asset_id) && (!row.assigned_to))) {
@@ -2940,9 +3393,9 @@
             // The user is allowed to check items in
             } else if (row.available_actions.checkin == true)  {
                 if (row.assigned_to) {
-                    return '<a href="{{ config('app.url') }}/' + destination + '/' + row.id + '/checkin" class="btn btn-sm bg-purple btn-checkin" data-tooltip="true" title="{{ trans('general.checkin_tooltip') }}">{{ trans('general.checkin') }}</a>';
+                    return '<a href="{{ config('app.url') }}/' + destination + '/' + row.id + '/checkin' + backto + '" class="btn btn-sm bg-purple btn-checkin" data-tooltip="true" title="{{ trans('general.checkin_tooltip') }}">{{ trans('general.checkin') }}</a>';
                 } else if (row.assigned_pivot_id) {
-                    return '<a href="{{ config('app.url') }}/' + destination + '/' + row.assigned_pivot_id + '/checkin" class="btn btn-sm bg-purple btn-checkin" data-tooltip="true" title="{{ trans('general.checkin_tooltip') }}">{{ trans('general.checkin') }}</a>';
+                    return '<a href="{{ config('app.url') }}/' + destination + '/' + row.assigned_pivot_id + '/checkin' + backto + '" class="btn btn-sm bg-purple btn-checkin" data-tooltip="true" title="{{ trans('general.checkin_tooltip') }}">{{ trans('general.checkin') }}</a>';
                 }
 
             }
@@ -3225,7 +3678,13 @@
     // for the modal header, and the available count for the modal help
     // text.
     window.renderAdjustQuantityButton = function (opts) {
-        return '<button type="button" class="actions btn btn-sm btn-primary hidden-print adjust-quantity" data-tooltip="true" title="{{ trans('general.adjust_quantity') }}"'
+        var disabled = opts.disabled === true;
+        var title = disabled && opts.disabledReason
+            ? opts.disabledReason
+            : '{{ trans('general.adjust_quantity') }}';
+        return '<button type="button" class="actions btn btn-sm btn-primary hidden-print adjust-quantity'
+            + (disabled ? ' disabled' : '') + '" data-tooltip="true" title="' + title + '"'
+            + (disabled ? ' disabled' : '')
             + ' data-adjust-url="{{ config('app.url') }}/' + opts.dest + '/' + opts.id + '/adjust-quantity"'
             + ' data-item-name="' + (opts.name || '') + '"'
             + ' data-available="' + (opts.available != null ? opts.available : '') + '">'
@@ -3512,6 +3971,30 @@
         }
     }
 
+    function companyWebhookActionsFormatter(value, row) {
+        return '<a href="{{ config('app.url') }}/companies/' + row.id + '/edit" ' +
+            'class="btn btn-sm btn-warning" ' +
+            'title="Edit">' +
+            '<i class="fas fa-pencil" aria-hidden="true"></i>' +
+            '<span class="sr-only">{{ trans('general.edit') }}</span>' +
+            '</a>';
+    }
+    function companyWebhookIntegrationFormatter(value) {
+        switch (value) {
+            case 'slack':
+                return '<i class="fa-brands fa-slack fa-lg" title="Slack"></i>';
+
+            case 'google':
+                return '<i class="fa-brands fa-google fa-lg" title="Google Chat"></i>';
+
+            case 'microsoft':
+                return '<i class="fa-brands fa-microsoft fa-lg" title="Microsoft Teams"></i>';
+
+            default:
+                return '<i class="fa-solid fa-webhook fa-lg" title="Webhook"></i>';
+        }
+    }
+
     // Renders a single company tag. `isInherited` is decided by the caller —
     // it's true only when (a) we're on the companies show page (viewing context
     // is set), (b) the row didn't get included via direct membership, and (c)
@@ -3677,16 +4160,21 @@
     }
 
 
-    function filePreviewFormatter(row, value) {
+    // bootstrap-table formatter signature is (value, row, index, field).
+    // The `image` column backing this formatter is a placeholder: no
+    // `image` key is emitted by UploadedFilesTransformer, so `value` is
+    // always undefined. The preview data (url, mediatype, inlineable)
+    // lives at the row root, so the formatter drives off `row` directly.
+    function filePreviewFormatter(value, row) {
 
-        if ((value) && (value.url) && (value.inlineable)) {
+        if ((row) && (row.url) && (row.inlineable)) {
 
-            if (value.mediatype == 'image') {
-                return '<a href="' + value.url + '?inline=true" data-toggle="lightbox" data-type="image"><img src="' + value.url + '" style="max-height: {{ $snipeSettings->thumbnail_max_h }}px; width: auto;" class="img-responsive" alt=""></a>';
-            } else if (value.mediatype == 'video') {
-                return '<a href="' + value.url + '?inline=true" data-toggle="lightbox" data-type="video"><video style="max-height: {{ $snipeSettings->thumbnail_max_h }}px; width: auto;" class="img-responsive"><source src="' + value.url + '?inline=true"></video></a>';
-            } else if (value.mediatype == 'audio') {
-                return '<audio controls><source src="' + value.url + '?inline=true" type="audio/mp3">Your browser does not support the audio element.</audio>';
+            if (row.mediatype == 'image') {
+                return '<a href="' + row.url + '?inline=true" data-toggle="lightbox" data-type="image"><img src="' + row.url + '" style="max-height: {{ $snipeSettings->thumbnail_max_h }}px; width: auto;" class="img-responsive" alt=""></a>';
+            } else if (row.mediatype == 'video') {
+                return '<a href="' + row.url + '?inline=true" data-toggle="lightbox" data-type="video"><video style="max-height: {{ $snipeSettings->thumbnail_max_h }}px; width: auto;" class="img-responsive"><source src="' + row.url + '?inline=true"></video></a>';
+            } else if (row.mediatype == 'audio') {
+                return '<audio controls><source src="' + row.url + '?inline=true" type="audio/mp3">Your browser does not support the audio element.</audio>';
             }
             return '{{ trans('general.preview_not_available') }}';
         }
@@ -3803,7 +4291,7 @@
     }
 
     function linkNumberToUserAssetsFormatter(value, row) {
-        return linkToUserSectionBasedOnCount(value, row.id, 'asset');
+        return linkToUserSectionBasedOnCount(value, row.id, 'assets');
     }
 
     function linkNumberToUserLicensesFormatter(value, row) {
@@ -3828,6 +4316,76 @@
 
     function linkNumberToUserAssignedMaintenancesFormatter(value, row) {
         return linkToUserSectionBasedOnCount(value, row.id, 'maintenances');
+    }
+
+    function labelActionsFormatter(value, row) {
+        if (!row.name) return '';
+
+        const createUrl = '{{ route('settings.labels.create') }}';
+        // Clone Button
+        let cloneHref;
+
+        if (row.source === 'custom') {
+            cloneHref = createUrl + '?custom_label_id=' + row.custom_label_id;
+        } else {
+            cloneHref = createUrl + '?label=' + encodeURIComponent(row.name);
+        }
+
+        let actions = '<a href="' + cloneHref + '" '
+            + 'class="actions btn btn-sm btn-primary hidden-print" '
+            + 'data-tooltip="true" '
+            + 'title="{{ trans('general.clone') }}">'
+            + '<i class="fa-regular fa-clone"></i>'
+            + '<span class="sr-only">{{ trans('general.clone') }}</span>'
+            + '</a>&nbsp;';
+        // Only allow delete, share or edit for custom labels
+        if (row.source === 'custom') {
+            // Update Button
+            var editUrl = editLabelUrlTemplate.replace('label_id', row.custom_label_id);
+
+            actions += '<a href="' + editUrl + '" '
+                + 'class="actions btn btn-sm btn-warning hidden-print" '
+                + 'data-tooltip="true" '
+                + 'title="{{ trans('general.update') }}">'
+                + '<x-icon type="edit" class="fa-fw" />'
+                + '<span class="sr-only">{{ trans('general.update') }}</span>'
+                + '</a>&nbsp;';
+            // Share button
+            var encodedJson = encodeURIComponent(JSON.stringify(row.config_snapshot || {}, null, 2));
+
+            actions += '<button type="button" '
+                + 'class="btn btn-primary btn-sm export-label-json hidden-print" '
+                + 'data-json="' + encodedJson + '" '
+                + 'data-name="' + encodeURIComponent(row.name || "label") + '" '
+                + 'title="Export Label" '
+                + 'data-tooltip="true">'
+                + '<i class="fa-solid fa-file-export"></i>'
+                + '<span class="sr-only">Export Label</span>'
+                + '</button>&nbsp;';
+
+            // Delete button
+            var safeName = $('<div>').text(row.name || 'this label').html().replace(/"/g, '&quot;');
+            var deleteUrl = deleteLabelUrlTemplate.replace('label_id', row.custom_label_id);
+
+            actions += '<a href="' + deleteUrl + '" '
+                + 'class="actions btn btn-danger btn-sm delete-custom-label hidden-print" '
+                + 'data-tooltip="true" '
+                + 'data-icon="fa-trash" '
+                + 'data-content="{{ trans('general.sure_to_delete') }}: ' + safeName + '?" '
+                + 'data-title="{{ trans('general.delete') }}">'
+                + '<x-icon type="delete" class="fa-fw" />'
+                + '<span class="sr-only">{{ trans('general.delete') }}</span>'
+                + '</a>&nbsp;';
+        }
+
+
+        return actions;
+    }
+
+    function labelNameFormatter(value) {
+        if (!value) return '';
+        value = String(value).replace(/\//g, '\\').replace(/^(Sheets|Tapes)\\/, '');
+        return $('<div/>').text(value).html();
     }
 
     function labelPerPageFormatter(value, row, index, field) {

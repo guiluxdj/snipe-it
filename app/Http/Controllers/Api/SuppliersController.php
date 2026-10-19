@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Actions\Suppliers\DestroySupplierAction;
+use App\Enums\FileStorage;
+use App\Exceptions\Handler;
 use App\Exceptions\ItemStillHasAccessories;
 use App\Exceptions\ItemStillHasAssets;
 use App\Exceptions\ItemStillHasComponents;
@@ -60,7 +62,7 @@ class SuppliersController extends Controller
         ];
 
         $suppliers = Supplier::select(
-            ['id', 'name', 'address', 'address2', 'city', 'state', 'country', 'fax', 'phone', 'email', 'contact', 'created_at', 'created_by', 'updated_at', 'deleted_at', 'image', 'notes', 'url', 'zip', 'tag_color'])
+            ['suppliers.id', 'suppliers.name', 'suppliers.address', 'suppliers.address2', 'suppliers.city', 'suppliers.state', 'suppliers.country', 'suppliers.fax', 'suppliers.phone', 'suppliers.email', 'suppliers.contact', 'suppliers.created_at', 'suppliers.created_by', 'suppliers.updated_at', 'suppliers.deleted_at', 'suppliers.image', 'suppliers.notes', 'suppliers.url', 'suppliers.zip', 'suppliers.tag_color'])
             ->withCount('assets as assets_count')
             ->withCount('licenses as licenses_count')
             ->withCount('accessories as accessories_count')
@@ -203,8 +205,6 @@ class SuppliersController extends Controller
      * @author [A. Gianotto] [<snipe@snipe.net>]
      *
      * @since [v4.0]
-     *
-     * @param  int  $id
      */
     public function destroy(Supplier $supplier): JsonResponse
     {
@@ -235,8 +235,8 @@ class SuppliersController extends Controller
             return response()->json(Helper::formatStandardApiResponse('error', null, trans('general.bulk_delete_associations.assoc_components', [
                 'components_count' => (int) $supplier->components_count, 'item' => trans('general.supplier'),
             ])));
-        } catch (\Exception $e) {
-            report($e);
+        } catch (\Throwable $e) {
+            Handler::reportOrRethrow($e);
 
             return response()->json(Helper::formatStandardApiResponse('error', null, trans('general.something_went_wrong')));
         }
@@ -275,7 +275,7 @@ class SuppliersController extends Controller
         // they may not have a ->name value but we want to display something anyway
         foreach ($suppliers as $supplier) {
             $supplier->use_text = $supplier->name;
-            $supplier->use_image = ($supplier->image) ? Storage::disk('public')->url('suppliers/'.$supplier->image, $supplier->image) : null;
+            $supplier->use_image = ($supplier->image) ? Storage::disk('public')->url(FileStorage::Suppliers->publicPath().$supplier->image, $supplier->image) : null;
         }
 
         return (new SelectlistTransformer)->transformSelectlist($suppliers);

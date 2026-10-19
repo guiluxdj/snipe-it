@@ -139,7 +139,6 @@ class LicensesController extends Controller
      *
      * @since [v1.0]
      *
-     * @param  int  $licenseId
      * @return View
      *
      * @throws AuthorizationException
@@ -172,7 +171,6 @@ class LicensesController extends Controller
      * @see LicensesController::getEdit() method that provides the form view
      * @since [v1.0]
      *
-     * @param  int  $licenseId
      * @return RedirectResponse
      *
      * @throws AuthorizationException
@@ -225,7 +223,6 @@ class LicensesController extends Controller
      *
      * @since [v1.0]
      *
-     * @param  int  $licenseId
      * @return RedirectResponse
      *
      * @throws AuthorizationException
@@ -266,7 +263,6 @@ class LicensesController extends Controller
      *
      * @since [v1.0]
      *
-     * @param  int  $licenseId
      * @return View
      *
      * @throws AuthorizationException
@@ -316,7 +312,7 @@ class LicensesController extends Controller
             return redirect()->route('licenses.index')->with('error', trans('admin/licenses/message.does_not_exist'));
         }
 
-        $this->authorize('create', License::class);
+        $this->authorize('clone', $license_to_clone);
 
         $maintained_list = [
             '' => 'Maintained',
