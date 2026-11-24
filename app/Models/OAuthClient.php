@@ -21,6 +21,7 @@ use Laravel\Passport\Client as PassportClient;
  * @property ?string $approved_by_id
  * @property ?string $registered_ip
  * @property ?string $rejected_reason
+ * @mixin IdeHelperOAuthClient
  */
 class OAuthClient extends PassportClient
 {

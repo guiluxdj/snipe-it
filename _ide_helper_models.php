@@ -349,7 +349,21 @@ namespace App\Models{
  * @property int $checkin_counter
  * @property int $checkout_counter
  * @property int $requests_counter
+ * @property string|null $_snipeit_ram_2
+ * @property string|null $_snipeit_cpu_3
+ * @property string|null $_snipeit_imei_4
+ * @property string|null $_snipeit_os_5
+ * @property string|null $_snipeit_taille_decran_6
  * @property int|null $byod
+ * @property string|null $_snipeit_disque_dur_7
+ * @property string|null $_snipeit_entrees_video_8
+ * @property string|null $_snipeit_bitlocker_9
+ * @property string|null $_snipeit_imei_2_10
+ * @property string|null $_snipeit_wifi_11
+ * @property string|null $_snipeit_reseau_lan_12
+ * @property string|null $_snipeit_impression_13
+ * @property string|null $_snipeit_fin_de_garantie_14
+ * @property string|null $_snipeit_informations_de_garantie_15
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Accessory> $accessories
  * @property-read int|null $accessories_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Actionlog> $actionlog
@@ -361,6 +375,8 @@ namespace App\Models{
  * @property-read int|null $assigned_accessories_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Asset> $assignedAssets
  * @property-read int|null $assigned_assets_count
+ * @property-read \App\Models\Location|null $assignedToLocation
+ * @property-read \App\Models\User|null $assignedToUser
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CalendarEvent> $calendarEvents
  * @property-read int|null $calendar_events_count
  * @property-read \App\Models\Category|null $category
@@ -517,7 +533,21 @@ namespace App\Models{
  * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereRequestsCounter($value)
  * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereRtdLocationId($value)
  * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSerial($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitBitlocker9($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitCpu3($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitDisqueDur7($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitEntreesVideo8($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitFinDeGarantie14($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitImei210($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitImei4($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitImpression13($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitInformationsDeGarantie15($value)
  * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitMacAddress1($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitOs5($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitRam2($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitReseauLan12($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitTailleDecran6($value)
+ * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSnipeitWifi11($value)
  * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereStatusId($value)
  * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereSupplierId($value)
  * @method static \App\Models\Builders\AssetQueryBuilder<static>|Asset whereUpdatedAt($value)
@@ -807,6 +837,8 @@ namespace App\Models{
  * @property-write mixed $status_id
  * @property-write mixed $supplier_id
  * @property-write mixed $warranty_months
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Asset> $showableAssets
+ * @property-read int|null $showable_assets_count
  * @method static \App\Models\Builders\CategoryQueryBuilder<static>|Category applyOffsetAndLimit(int $total)
  * @method static \Database\Factories\CategoryFactory factory($count = null, $state = [])
  * @method static \App\Models\Builders\CategoryQueryBuilder<static>|Category newModelQuery()
@@ -977,9 +1009,9 @@ namespace App\Models{
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property string|null $image
- * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property int|null $created_by
  * @property string|null $notes
+ * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property string|null $webhook_selected
  * @property string|null $webhook_endpoint
  * @property string|null $webhook_channel
@@ -2096,8 +2128,8 @@ namespace App\Models{
  * @property string|null $ldap_ou
  * @property int|null $manager_id
  * @property string|null $image
- * @property int|null $company_id
  * @property string|null $notes
+ * @property int|null $company_id
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Accessory> $accessories
  * @property-read int|null $accessories_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Actionlog> $actionlog
@@ -2107,6 +2139,8 @@ namespace App\Models{
  * @property-read int|null $assets_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\AccessoryCheckout> $assignedAccessories
  * @property-read int|null $assigned_accessories_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Asset> $assignedAssets
+ * @property-read int|null $assigned_assets_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Location> $children
  * @property-read int|null $children_count
  * @property-read \App\Models\Company|null $company
@@ -2456,6 +2490,71 @@ namespace App\Models{
  */
 	#[\AllowDynamicProperties]
 	class IdeHelperManufacturer {}
+}
+
+namespace App\Models{
+/**
+ * Snipe-IT OAuth client with an approval workflow on top of Passport's
+ * base Client. The status + metadata columns are populated by the DCR
+ * handler and read by the authorize/token middleware so a pending or
+ * rejected client can't complete an OAuth exchange.
+ *
+ * Registered in AuthServiceProvider via Passport::useClientModel() so
+ * every Passport code path (ClientRepository::createAuthorizationCodeGrantClient,
+ * legacy client:create artisan commands, laravel/mcp DCR) reads and
+ * writes through this subclass.
+ *
+ * @property string $status
+ * @property ?\Carbon\Carbon $approved_at
+ * @property ?string $approved_by_id
+ * @property ?string $registered_ip
+ * @property ?string $rejected_reason
+ * @property string $id
+ * @property int|null $user_id
+ * @property string $name
+ * @property string|null $secret
+ * @property string|null $provider
+ * @property string $redirect
+ * @property bool $personal_access_client
+ * @property bool $password_client
+ * @property bool $revoked
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Passport\AuthCode> $authCodes
+ * @property-read int|null $auth_codes_count
+ * @property-read array $grant_types
+ * @property-read \Illuminate\Foundation\Auth\User $owner
+ * @property-read string|null $plain_secret
+ * @property-read string|null $primary_redirect_uri
+ * @property-read array $redirect_uris
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Passport\Token> $tokens
+ * @property-read int|null $tokens_count
+ * @property-read \App\Models\User|null $user
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OAuthClient existsIn(array $haystack)
+ * @method static \Laravel\Passport\Database\Factories\ClientFactory factory($count = null, $state = [])
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OAuthClient newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OAuthClient newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OAuthClient query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OAuthClient whereApprovedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OAuthClient whereApprovedById($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OAuthClient whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OAuthClient whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OAuthClient whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OAuthClient wherePasswordClient($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OAuthClient wherePersonalAccessClient($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OAuthClient whereProvider($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OAuthClient whereRedirect($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OAuthClient whereRegisteredIp($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OAuthClient whereRejectedReason($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OAuthClient whereRevoked($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OAuthClient whereSecret($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OAuthClient whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OAuthClient whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|OAuthClient whereUserId($value)
+ * @mixin \Eloquent
+ */
+	#[\AllowDynamicProperties]
+	class IdeHelperOAuthClient {}
 }
 
 namespace App\Models{
@@ -2813,7 +2912,7 @@ namespace App\Models{
  * @property-read int|null $calendar_events_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Asset> $checkoutRequests
  * @property-read int|null $checkout_requests_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Passport\Client> $clients
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OAuthClient> $clients
  * @property-read int|null $clients_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Company> $companies
  * @property-read int|null $companies_count
@@ -2848,7 +2947,7 @@ namespace App\Models{
  * @property-read int|null $manages_users_count
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Passport\Client> $oauthApps
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OAuthClient> $oauthApps
  * @property-read int|null $oauth_apps_count
  * @property-read mixed $purchase_date_formatted
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ReportTemplate> $reportTemplates
@@ -3137,6 +3236,8 @@ namespace App\Models{
  * @property int $admin_cc_always
  * @property int $labels_display_model
  * @property string|null $privacy_policy_link
+ * @property string|null $mcp_trusted_custom_schemes
+ * @property string|null $mcp_trusted_redirect_domains
  * @property string|null $version_footer
  * @property int $unique_serial
  * @property int $logo_print_assets
@@ -3164,6 +3265,9 @@ namespace App\Models{
  * @property string|null $ldap_client_tls_cert
  * @property string|null $ldap_client_tls_key
  * @property string|null $dash_chart_type
+ * @property int|null $google_login
+ * @property string|null $google_client_id
+ * @property string|null $google_client_secret
  * @property int $label2_enable
  * @property string|null $label2_template
  * @property string|null $label2_title
@@ -3174,13 +3278,10 @@ namespace App\Models{
  * @property string $label2_2d_target
  * @property string $label2_fields
  * @property int $label2_empty_row_count
- * @property int|null $google_login
- * @property string|null $google_client_id
- * @property string|null $google_client_secret
  * @property int|null $profile_edit
- * @property bool|null $require_checkinout_notes
  * @property int $shortcuts_enabled
  * @property int|null $due_checkin_days
+ * @property bool|null $require_checkinout_notes
  * @property int $ldap_invert_active_flag
  * @property bool $manager_view_enabled Allow managers to view assets assigned to their subordinates
  * @property bool|null $require_adjust_quantity_notes
@@ -3312,6 +3413,8 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereLogo($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereLogoPrintAssets($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereManagerViewEnabled($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereMcpTrustedCustomSchemes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereMcpTrustedRedirectDomains($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereModellistDisplays($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereNameDisplayFormat($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Setting whereNavLinkColor($value)
@@ -3703,7 +3806,7 @@ namespace App\Models{
  * @property-read int|null $calendar_events_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Asset> $checkoutRequests
  * @property-read int|null $checkout_requests_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Passport\Client> $clients
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OAuthClient> $clients
  * @property-read int|null $clients_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Company> $companies
  * @property-read int|null $companies_count
@@ -3738,7 +3841,7 @@ namespace App\Models{
  * @property-read int|null $manages_users_count
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Passport\Client> $oauthApps
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\OAuthClient> $oauthApps
  * @property-read int|null $oauth_apps_count
  * @property-read mixed $purchase_date_formatted
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ReportTemplate> $reportTemplates
