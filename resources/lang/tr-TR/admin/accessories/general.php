@@ -4,6 +4,8 @@ return [
     'accessory_category' => 'Aksesuar Kategorisi',
     'accessory_name' => 'Aksesuar Adı',
     'checkout' => 'Aksesuar Çıkışı',
+    'bulk_checkout' => 'Bulk Checkout Accessories',
+    'accessories_selected' => 'Accessories Selected',
     'checkin' => 'Aksesuar Atama',
     'create' => 'Aksesuar oluşturun',
     'edit' => 'Aksesuarı Düzenle',
@@ -19,5 +21,6 @@ return [
     'use_default_eula_disabled' => '<del>Varsayılan sözleşmeyi kullan</del> Varsayılan sözleşme tanımlı değil. Lütfen Ayarlar\'dan ekleyiniz.',
     'clone' => 'Aksesuarı çoğalt',
     'delete_disabled' => 'Bu aksesuar henüz silinemiyor çünkü bazı öğeler hâlâ kontrol ediliyor.',
+    'accessory_deleted_warning' => 'This accessory has been deleted. You must restore it before you can assign it.',
 
 ];

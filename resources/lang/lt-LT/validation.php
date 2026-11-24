@@ -185,8 +185,10 @@ return [
     'ulid' => ':attribute lauke turi būti galiojantis ULID identifikatorius.',
     'uuid' => ':attribute lauke turi būti galiojantis UUID identifikatorius.',
     'valid_css_color' => ':attribute laukas turi būti galiojanti CSS spalva (hex, rgb, rgba, hsl arba hsla).',
+    'eloquent_model_class' => 'The :attribute field must be the fully-qualified class name of an Eloquent model.',
     'fmcs_company' => 'Laukas :attribute yra privalomas, nes yra įjungtas visiškas kelių įmonių palaikymas ir nėra leidžiami „bendri visiems“ objektai.',
     'fmcs_location' => 'Vieta ":location" priklauso :location_company, kuri nesutampa su pasirinkta įmone.',
+    'fmcs_target_compat' => 'The :attribute does not belong to a company this user can report to.',
     'is_unique_across_company_and_location' => ':attribute turi būti unikalus pasirinktai įmonei ir vietai.',
 
     /*

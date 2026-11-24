@@ -36,6 +36,12 @@ class Kernel extends ConsoleKernel
         $schedule->command('snipeit:push-inventory')
             ->dailyAt('03:00')
             ->withoutOverlapping();
+
+        // Deletes pending / rejected MCP OAuth clients older than 30
+        // days
+        $schedule->command('snipeit:prune-pending-oauth-clients')
+            ->dailyAt('03:15')
+            ->withoutOverlapping();
     }
 
     /**

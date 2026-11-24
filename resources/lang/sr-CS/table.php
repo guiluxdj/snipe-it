@@ -12,5 +12,7 @@ return [
     'load_error_http_status' => 'HTTP status',
     'load_error_session_expired' => 'Vaša sesija je istekla. Stranica se ponovo učitava.',
     'shift_select' => 'Kliknite na potvrdno polje i držite <code>shift</code> i kliknite na drugo potvrdno polje u tabeli da odaberete opseg.',
+    'reset_column_order' => 'Reset column order',
+    'reset_column_order_tooltip' => 'Restore the default column order for this table',
 
 ];

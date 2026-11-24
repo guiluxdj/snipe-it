@@ -4,6 +4,8 @@ return [
     'accessory_category' => 'Дагалдах хэрэгслийн ангилал',
     'accessory_name' => 'Дагалдах хэрэгслийн нэр',
     'checkout' => 'Төлбөрийн дагалдах хэрэгсэл',
+    'bulk_checkout' => 'Bulk Checkout Accessories',
+    'accessories_selected' => 'Accessories Selected',
     'checkin' => 'Дагалдах хэрэгслийг шалгах',
     'create' => 'Дагалдах хэрэгсэл үүсгэх',
     'edit' => 'Дагалдах хэрэгслийг засах',
@@ -19,5 +21,6 @@ return [
     'use_default_eula_disabled' => '<del> оронд үндсэн анхдагч EULA ашигла.</del> Үндсэн анхдагч EULA тохируулагдаагүй байна. Тохиргоо дотроос нэгийг нэмж оруулна уу.',
     'clone' => 'Clone Accessory',
     'delete_disabled' => 'This accessory cannot be deleted yet because some items are still checked out.',
+    'accessory_deleted_warning' => 'This accessory has been deleted. You must restore it before you can assign it.',
 
 ];

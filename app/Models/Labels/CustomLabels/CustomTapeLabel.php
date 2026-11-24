@@ -301,6 +301,16 @@ abstract class CustomTapeLabel extends Label
         | Resolve positioned elements
         |--------------------------------------------------------------------------
         */
+
+        $logoTop = $this->getLogoPosition() === 'top';
+
+        $logoBox = null;
+
+        if ($logoTop) {
+            $logoBox = $this->resolveLogoBox($record, $layout['body']);
+            $layout['body'] = $this->resolveContentBody($layout['body'], $logoBox);
+        }
+
         if ($this->getBarcode2DPlacement() === 'stacked') {
             $barcode2dBox = $this->resolve2DBarcodeBox($record, $layout['body'], null);
 
@@ -313,9 +323,9 @@ abstract class CustomTapeLabel extends Label
             $layout['body']['h'] = max(0, $layout['body']['y2'] - $layout['body']['y1']);
 
             $layout['text'] = $layout['body'];
-            $layout['logo'] = null;
+            $layout['logo'] = $logoTop ? $logoBox : null;
             $layout['tag'] = null;
-        } elseif ($this->getLogoPlacement() === 'text_column') {
+        } elseif (! $logoTop && $this->getLogoPlacement() === 'text_column') {
             $barcode2dBox = $this->resolve2DBarcodeBox($record, $layout['body'], null);
             $tagBox = $this->resolveTagBox($record, $layout['body'], $barcode2dBox, null);
 
@@ -350,9 +360,11 @@ abstract class CustomTapeLabel extends Label
                 $layout['text']['h'] = max(0, $layout['text']['y2'] - $layout['text']['y1']);
             }
         } else {
-            $logoBox = $this->resolveLogoBox($record, $layout['body']);
-            $barcode2dBox = $this->resolve2DBarcodeBox($record, $layout['body'], $logoBox);
-            $tagBox = $this->resolveTagBox($record, $layout['body'], $barcode2dBox, $logoBox);
+            $logoBox = $logoTop ? $logoBox : $this->resolveLogoBox($record, $layout['body']);
+
+            $barcode2dBox = $this->resolve2DBarcodeBox($record, $layout['body'], $logoTop ? null : $logoBox);
+
+            $tagBox = $this->resolveTagBox($record, $layout['body'], $barcode2dBox, $logoTop ? null : $logoBox);
 
             $layout['logo'] = $logoBox;
             $layout['barcode2d'] = $barcode2dBox;
@@ -361,7 +373,7 @@ abstract class CustomTapeLabel extends Label
             $layout['text'] = $this->resolveTextBox(
                 $layout['body'],
                 array_filter([
-                    $layout['logo'],
+                    $logoTop ? null : $layout['logo'],
                     $layout['barcode2d'],
                     $layout['tag'],
                 ])

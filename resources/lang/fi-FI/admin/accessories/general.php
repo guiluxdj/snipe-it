@@ -4,6 +4,8 @@ return [
     'accessory_category' => 'Kategoria',
     'accessory_name' => 'Oheistarvikkeen nimi',
     'checkout' => 'Oheistarvikkeen luovutus',
+    'bulk_checkout' => 'Bulk Checkout Accessories',
+    'accessories_selected' => 'Accessories Selected',
     'checkin' => 'Oheistarvikkeen palautus',
     'create' => 'Luo oheistarvike',
     'edit' => 'Muokkaa oheistarviketta',
@@ -19,5 +21,6 @@ return [
     'use_default_eula_disabled' => '<del>Käytä yleisiä käyttöehtoja.</del> Et ole vielä määritellyt yleisiä käyttöehtoja, voit lisätä ne asetuksista.',
     'clone' => 'Kopioi oheistarvike',
     'delete_disabled' => 'Tätä oheistarviketta ei voi vielä poistaa, koska jotkin tarvikkeet ovat vielä lainattuna.',
+    'accessory_deleted_warning' => 'This accessory has been deleted. You must restore it before you can assign it.',
 
 ];

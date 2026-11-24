@@ -20,8 +20,8 @@ return [
         'confirm' => 'آیا مطمئن هستید می خواهید این وسیله حذف شود?',
         'error' => 'اشکال در حذف دسته بندی.لطفا دوباره امتحان کنید.',
         'success' => 'دسته بندی با موفقیت حذف شد.',
-        'bulk_success' => 'Accessory deleted successfully.|:count accessories were deleted successfully.',
-        'partial_success' => ':count accessory was deleted successfully, but others could not be deleted. See below for details.|:count accessories were deleted successfully, but others could not be deleted. See below for details.',
+        'bulk_success' => 'لوازم جانبی با موفقیت حذف شد.|:count لوازم جانبی با موفقیت حذف شدند.',
+        'partial_success' => ':count لوازم جانبی با موفقیت حذف شد، اما موارد دیگر حذف نشدند. جزئیات را در زیر مشاهده کنید.|:count لوازم جانبی با موفقیت حذف شدند، اما موارد دیگر حذف نشدند. جزئیات را در زیر مشاهده کنید.',
     ],
 
     'checkout' => [
@@ -41,4 +41,38 @@ return [
         'user_does_not_exist' => 'کاربر نامعتبر است لطفا دوباره امتحان کنید.',
     ],
 
+    'restore' => [
+        'error' => 'لوازم جانبی بازیابی نشد، لطفاً دوباره امتحان کنید',
+        'success' => 'لوازم جانبی با موفقیت بازیابی شد.',
+    ],
+
+    'bulk' => [
+        'no_accessories_selected' => 'هیچ لوازم جانبی انتخاب نشده است.',
+        'no_action_selected' => 'لطفاً یک اقدام را از لیست کشویی انتخاب کنید.',
+        'no_fields_updated' => 'هیچ فیلدی تغییر نکرده بود، بنابراین چیزی به روز نشد.',
+        'skipped_unauthorized' => ':count لوازم جانبی نادیده گرفته شد زیرا شما مجوز به‌روزرسانی آن را ندارید.',
+
+        'update' => [
+            'success' => ':count لوازم جانبی به‌روزرسانی شد.|:count لوازم جانبی به‌روزرسانی شدند.',
+            'none_updated' => 'لوازم جانبی انتخاب‌شده به‌روزرسانی نشد. برای جزئیات خطاهای زیر را مشاهده کنید.|هیچ‌یک از لوازم جانبی انتخاب‌شده به‌روزرسانی نشدند. برای جزئیات خطاهای زیر را مشاهده کنید.',
+        ],
+
+        'restore' => [
+            'success' => ':count لوازم جانبی بازیابی شد.|:count لوازم جانبی بازیابی شدند.',
+        ],
+
+        'checkin_selected' => [
+            'no_rows_selected' => 'هیچ لوازم جانبی تحویل‌داده‌شده‌ای انتخاب نشده است.',
+            'success' => ':count تحویل لوازم جانبی ثبت شد.|:count تحویل لوازم جانبی ثبت شدند.',
+        ],
+
+        'checkout' => [
+            'nothing_selectable' => 'هیچ‌یک از لوازم جانبی انتخاب‌شده قابل واگذاری نیستند. لوازم جانبی بایگانی‌شده و فاقد موجودی مستثنی شده‌اند.',
+            'excluded_notice' => 'لوازم جانبی زیر از این فرایند واگذاری مستثنی شدند زیرا بایگانی شده‌اند یا موجودی باقی‌مانده ندارند:',
+            'skipped_archived' => ':name نادیده گرفته شد زیرا بایگانی شده است.',
+            'skipped_unavailable' => ':name نادیده گرفته شد زیرا در حال حاضر هیچ واحدی از آن موجود نیست.',
+            'skipped_company_mismatch' => ':name نادیده گرفته شد زیرا متعلق به شرکتی (:item_company) متفاوت از مقصد انتخاب‌شده است.',
+            'summary' => ':checked_out از :total لوازم جانبی واگذار شدند.',
+        ],
+    ],
 ];

@@ -12,5 +12,7 @@ return [
     'load_error_http_status' => 'HTTP 상태',
     'load_error_session_expired' => '세션이 만료되었습니다. 페이지를 다시 불러옵니다.',
     'shift_select' => 'Click on a checkbox and hold <code>shift</code> and click another checkbox in the table to select/de-select a range.',
+    'reset_column_order' => 'Reset column order',
+    'reset_column_order_tooltip' => 'Restore the default column order for this table',
 
 ];

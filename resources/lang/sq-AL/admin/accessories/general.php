@@ -4,6 +4,8 @@ return [
     'accessory_category' => 'Accessory Category',
     'accessory_name' => 'Accessory Name',
     'checkout' => 'Checkout Accessory',
+    'bulk_checkout' => 'Bulk Checkout Accessories',
+    'accessories_selected' => 'Accessories Selected',
     'checkin' => 'Checkin Accessory',
     'create' => 'Krijo Aksesor',
     'edit' => 'Modifiko Aksesorin',
@@ -19,5 +21,6 @@ return [
     'use_default_eula_disabled' => '<del>Përdorni në vend të kësaj EULA-n kryesore.</del> Nuk është vendosur asnjë EULA kryesore. Ju lutemi shtoni një te Cilësimet.',
     'clone' => 'Clone Accessory',
     'delete_disabled' => 'Ky aksesor nuk mund të fshihet ende sepse disa artikuj janë ende të kontrolluar.',
+    'accessory_deleted_warning' => 'This accessory has been deleted. You must restore it before you can assign it.',
 
 ];

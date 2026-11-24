@@ -4,6 +4,8 @@ return [
     'accessory_category' => 'Ang Katergorya sa Aksesorya',
     'accessory_name' => 'Ang Pangalan ng Aksesorya',
     'checkout' => 'I-checkout ang Aksesorya',
+    'bulk_checkout' => 'Bulk Checkout Accessories',
+    'accessories_selected' => 'Accessories Selected',
     'checkin' => 'I-checkin ang Aksesorya',
     'create' => 'Magsagawa ng Aksesorya',
     'edit' => 'I-edit ang Aksesorya',
@@ -19,5 +21,6 @@ return [
     'use_default_eula_disabled' => '<del>Sa halip ay gumamit ng pangunahing default na EULA.</del> Walang pangunahing default na EULA na nai-set. Paki-dagdag ng isa sa mga setting.',
     'clone' => 'Clone Accessory',
     'delete_disabled' => 'This accessory cannot be deleted yet because some items are still checked out.',
+    'accessory_deleted_warning' => 'This accessory has been deleted. You must restore it before you can assign it.',
 
 ];

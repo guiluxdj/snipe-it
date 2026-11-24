@@ -12,5 +12,7 @@ return [
     'load_error_http_status' => 'HTTPステータス',
     'load_error_session_expired' => 'セッションの有効期限が切れました。ページを再読み込みします。',
     'shift_select' => '表内のチェックボックスをクリックし、<code>Shift</code>キーを押しながら別のチェックボックスをクリックすると、範囲をまとめて選択／解除できます。',
+    'reset_column_order' => 'Reset column order',
+    'reset_column_order_tooltip' => 'Restore the default column order for this table',
 
 ];

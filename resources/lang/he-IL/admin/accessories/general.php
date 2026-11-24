@@ -4,6 +4,8 @@ return [
     'accessory_category' => 'סוג האביזר',
     'accessory_name' => 'שם אביזר',
     'checkout' => 'נפק עזר',
+    'bulk_checkout' => 'Bulk Checkout Accessories',
+    'accessories_selected' => 'Accessories Selected',
     'checkin' => 'החזר עזר',
     'create' => 'ליצור אביזר',
     'edit' => 'ערוך עזר',
@@ -19,5 +21,6 @@ return [
     'use_default_eula_disabled' => '<del> השתמש ב- EULA ברירת המחדל הראשוני במקום. </del> לא נקבעה ברירת המחדל הראשית של הסכם הרישיון למשתמש קצה. הוסף אחד בהגדרות.',
     'clone' => 'שכפול אביזר',
     'delete_disabled' => 'אביזר זה אינו יכול להמחק עדיין בגלל שיש ציוד שנופק ולא הוחזר.',
+    'accessory_deleted_warning' => 'This accessory has been deleted. You must restore it before you can assign it.',
 
 ];

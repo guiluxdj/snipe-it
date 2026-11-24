@@ -4,6 +4,8 @@ return [
     'accessory_category' => 'Categoría de accesorio',
     'accessory_name' => 'Nombre de Accesorio',
     'checkout' => 'Asignar accesorio',
+    'bulk_checkout' => 'Bulk Checkout Accessories',
+    'accessories_selected' => 'Accessories Selected',
     'checkin' => 'Ingresar accesorio',
     'create' => 'Crear accesorio',
     'edit' => 'Editar accesorio',
@@ -19,5 +21,6 @@ return [
     'use_default_eula_disabled' => '<del>En su lugar, utilice el acuerdo de uso predeterminado.</del> No está configurado el acuerdo de uso predeterminado. Por favor agregue uno en Configuración.',
     'clone' => 'Clonar accesorio',
     'delete_disabled' => 'Este accesorio no se puede eliminar aún porque algunos elementos todavía están asignados.',
+    'accessory_deleted_warning' => 'This accessory has been deleted. You must restore it before you can assign it.',
 
 ];

@@ -4,6 +4,8 @@ return [
     'accessory_category' => '付属品カテゴリー',
     'accessory_name' => '付属品名',
     'checkout' => '付属品の貸し出し',
+    'bulk_checkout' => 'Bulk Checkout Accessories',
+    'accessories_selected' => 'Accessories Selected',
     'checkin' => '付属品の返却',
     'create' => '付属品の作成',
     'edit' => '付属品の編集',
@@ -19,5 +21,6 @@ return [
     'use_default_eula_disabled' => '<del>初期設定EULAを代わりに利用する。</del> 初期設定EULAが設定されていません。一つは追加してください。',
     'clone' => '付属品を複製',
     'delete_disabled' => 'いくつかのアイテムがまだチェックアウトされているため、このアクセサリはまだ削除できません。',
+    'accessory_deleted_warning' => 'この付属品は削除されています。割り当てるには、復元する必要があります。',
 
 ];

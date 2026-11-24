@@ -4,6 +4,8 @@ return [
     'accessory_category' => 'Qaybta Agabka',
     'accessory_name' => 'Magaca dheeriga ah',
     'checkout' => 'Hubinta Agabka',
+    'bulk_checkout' => 'Bulk Checkout Accessories',
+    'accessories_selected' => 'Accessories Selected',
     'checkin' => 'Hubi Agabka',
     'create' => 'Abuur Agabka',
     'edit' => 'Wax ka beddel Agabka',
@@ -19,5 +21,6 @@ return [
     'use_default_eula_disabled' => '<del>Isticmaal beddelka EULA-ga aasaasiga ah.</del> Ma jiro EULA aasaasiga ah oo la habeeyay. Fadlan hal mid kudar Settings.',
     'clone' => 'Qalabka Clone',
     'delete_disabled' => 'Qalabkan weli lama tirtiri karo sababtoo ah walxaha qaarkood weli waa la hubiyay.',
+    'accessory_deleted_warning' => 'This accessory has been deleted. You must restore it before you can assign it.',
 
 ];

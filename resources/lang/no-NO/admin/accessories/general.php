@@ -4,6 +4,8 @@ return [
     'accessory_category' => 'Tilbehørskategori',
     'accessory_name' => 'Navn tilbehør',
     'checkout' => 'Sjekk ut tilbehør',
+    'bulk_checkout' => 'Bulk Checkout Accessories',
+    'accessories_selected' => 'Accessories Selected',
     'checkin' => 'Sjekk inn tilbehør',
     'create' => 'Legg til tilbehør',
     'edit' => 'Rediger tilbehør',
@@ -19,5 +21,6 @@ return [
     'use_default_eula_disabled' => '<del>Bruk standard EULA i stedet.</del> Ingen standard EULA er satt. Legg til en i Innstillinger.',
     'clone' => 'Klon tilbehør',
     'delete_disabled' => 'Dette tilbehøret kan ikke slettes enda fordi noen elementer er fremdeles sjekket ut.',
+    'accessory_deleted_warning' => 'This accessory has been deleted. You must restore it before you can assign it.',
 
 ];

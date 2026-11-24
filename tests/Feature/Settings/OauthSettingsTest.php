@@ -5,6 +5,7 @@ namespace Tests\Feature\Settings;
 use App\Helpers\Helper;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class OauthSettingsTest extends TestCase
@@ -20,7 +21,9 @@ class OauthSettingsTest extends TestCase
         $createdAt = now()->subHour();
         $expiresAt = now()->addDay();
 
-        $personalClientId = DB::table('oauth_clients')->insertGetId([
+        $personalClientId = (string) Str::uuid();
+        DB::table('oauth_clients')->insert([
+            'id' => $personalClientId,
             'user_id' => null,
             'name' => 'Personal Client',
             'secret' => 'secret',
@@ -32,7 +35,9 @@ class OauthSettingsTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $nonPersonalClientId = DB::table('oauth_clients')->insertGetId([
+        $nonPersonalClientId = (string) Str::uuid();
+        DB::table('oauth_clients')->insert([
+            'id' => $nonPersonalClientId,
             'user_id' => null,
             'name' => 'OAuth Client',
             'secret' => 'secret',
@@ -85,7 +90,9 @@ class OauthSettingsTest extends TestCase
     {
         $superuser = User::factory()->superuser()->create();
 
-        $personalClientId = DB::table('oauth_clients')->insertGetId([
+        $personalClientId = (string) Str::uuid();
+        DB::table('oauth_clients')->insert([
+            'id' => $personalClientId,
             'user_id' => null,
             'name' => 'Personal Client',
             'secret' => 'secret',
@@ -157,7 +164,9 @@ class OauthSettingsTest extends TestCase
         ]);
         $tokenOwner->delete();
 
-        $personalClientId = DB::table('oauth_clients')->insertGetId([
+        $personalClientId = (string) Str::uuid();
+        DB::table('oauth_clients')->insert([
+            'id' => $personalClientId,
             'user_id' => null,
             'name' => 'Personal Client',
             'secret' => 'secret',
@@ -188,112 +197,19 @@ class OauthSettingsTest extends TestCase
             ->assertSee(route('users.show', $tokenOwner));
     }
 
-    public function test_authorized_applications_show_and_link_client_creator_with_soft_deleted_strikethrough(): void
-    {
-        $superuser = User::factory()->superuser()->create();
-
-        $activeCreator = User::factory()->create([
-            'display_name' => 'Active Client Creator',
-            'username' => 'active-creator',
-        ]);
-
-        $softDeletedCreator = User::factory()->create([
-            'display_name' => 'Deleted Client Creator',
-            'username' => 'deleted-creator',
-        ]);
-        $softDeletedCreator->delete();
-
-        $activeClientId = DB::table('oauth_clients')->insertGetId([
-            'user_id' => $activeCreator->id,
-            'name' => 'Authorized Client Active',
-            'secret' => 'secret',
-            'redirect' => 'http://localhost/callback',
-            'personal_access_client' => 0,
-            'password_client' => 0,
-            'revoked' => 0,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        $deletedClientId = DB::table('oauth_clients')->insertGetId([
-            'user_id' => $softDeletedCreator->id,
-            'name' => 'Authorized Client Deleted',
-            'secret' => 'secret',
-            'redirect' => 'http://localhost/callback',
-            'personal_access_client' => 0,
-            'password_client' => 0,
-            'revoked' => 0,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        DB::table('oauth_access_tokens')->insert([
-            [
-                'id' => 'authorized-active-token',
-                'user_id' => $superuser->id,
-                'client_id' => $activeClientId,
-                'name' => 'Authorized Active Token',
-                'scopes' => '[]',
-                'revoked' => 0,
-                'created_at' => now(),
-                'updated_at' => now(),
-                'expires_at' => now()->addDay(),
-            ],
-            [
-                'id' => 'authorized-active-token-2',
-                'user_id' => $superuser->id,
-                'client_id' => $activeClientId,
-                'name' => 'Authorized Active Token Two',
-                'scopes' => '[]',
-                'revoked' => 0,
-                'created_at' => now(),
-                'updated_at' => now(),
-                'expires_at' => now()->addDay(),
-            ],
-            [
-                'id' => 'authorized-revoked-token',
-                'user_id' => $superuser->id,
-                'client_id' => $activeClientId,
-                'name' => 'Authorized Revoked Token',
-                'scopes' => '[]',
-                'revoked' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
-                'expires_at' => now()->addDay(),
-            ],
-            [
-                'id' => 'authorized-deleted-token',
-                'user_id' => $superuser->id,
-                'client_id' => $deletedClientId,
-                'name' => 'Authorized Deleted Token',
-                'scopes' => '[]',
-                'revoked' => 0,
-                'created_at' => now(),
-                'updated_at' => now(),
-                'expires_at' => now()->addDay(),
-            ],
-        ]);
-
-        $this->actingAs($superuser)
-            ->get(route('settings.oauth.index'))
-            ->assertOk()
-            ->assertSee('Active Client Creator')
-            ->assertSee(route('users.show', $activeCreator))
-            ->assertSee('<del>Deleted Client Creator</del>', false)
-            ->assertSee(route('users.show', $softDeletedCreator))
-            ->assertDontSee('Authorized Active Token')
-            ->assertDontSee('Authorized Active Token Two')
-            ->assertDontSee('Authorized Deleted Token')
-            ->assertDontSee('Authorized Revoked Token')
-            ->assertSee('data-field="client_owner"', false)
-            ->assertSee('data-sortable="true"', false);
-    }
+    // Authorized Applications tab was removed - the OAuth Clients +
+    // Pending OAuth Clients tabs now cover every admin workflow it
+    // used to surface, and deleting an OAuth client cascades token
+    // revocation via Passport's ClientRepository::delete anyway, so
+    // the derived "clients with active tokens" view was redundant.
 
     public function test_oauth_clients_table_shows_associated_token_count_per_client_id(): void
     {
         $superuser = User::factory()->superuser()->create();
 
-        $ownedClientId = DB::table('oauth_clients')->insertGetId([
+        $ownedClientId = (string) Str::uuid();
+        DB::table('oauth_clients')->insert([
+            'id' => $ownedClientId,
             'user_id' => $superuser->id,
             'name' => 'Owned OAuth Client',
             'secret' => 'secret',
@@ -305,7 +221,9 @@ class OauthSettingsTest extends TestCase
             'updated_at' => now(),
         ]);
 
-        $otherClientId = DB::table('oauth_clients')->insertGetId([
+        $otherClientId = (string) Str::uuid();
+        DB::table('oauth_clients')->insert([
+            'id' => $otherClientId,
             'user_id' => User::factory()->create()->id,
             'name' => 'Other OAuth Client',
             'secret' => 'secret',
@@ -318,6 +236,7 @@ class OauthSettingsTest extends TestCase
         ]);
 
         DB::table('oauth_clients')->insert([
+            'id' => (string) Str::uuid(),
             'user_id' => null,
             'name' => 'Personal Access Legacy Client',
             'secret' => 'secret',
@@ -330,6 +249,7 @@ class OauthSettingsTest extends TestCase
         ]);
 
         DB::table('oauth_clients')->insert([
+            'id' => (string) Str::uuid(),
             'user_id' => null,
             'name' => 'Password Grant Legacy Client',
             'secret' => 'secret',
@@ -342,6 +262,7 @@ class OauthSettingsTest extends TestCase
         ]);
 
         DB::table('oauth_clients')->insert([
+            'id' => (string) Str::uuid(),
             'user_id' => null,
             'name' => 'Revoked OAuth Legacy Client',
             'secret' => 'secret',
@@ -395,13 +316,17 @@ class OauthSettingsTest extends TestCase
             ->assertSee(trans('admin/settings/general.oauth_associated_token_count'))
             ->assertSee(trans('admin/settings/general.oauth_client_type'))
             ->assertSee('Owned OAuth Client')
-            ->assertSee('Personal Access Legacy Client')
+            // Personal Access clients are Passport internal plumbing
+            // for the PAT grant and the Personal Access Tokens tab
+            // owns their management, so the Approved OAuth Clients tab
+            // deliberately excludes them.
+            ->assertDontSee('Personal Access Legacy Client')
             ->assertSee('Password Grant Legacy Client')
-            ->assertSee('Revoked OAuth Legacy Client')
+            // Revoked clients hide behind the Show Revoked toggle by
+            // default.
+            ->assertDontSee('Revoked OAuth Legacy Client')
             ->assertSee(trans('admin/settings/general.oauth_client_type_oauth'))
-            ->assertSee(trans('admin/settings/general.oauth_client_type_personal_access'))
             ->assertSee(trans('admin/settings/general.oauth_client_type_password_grant'))
-            ->assertSee(trans('admin/settings/general.oauth_token_status_revoked'))
             ->assertSee('data-field="associated_token_count"', false)
             ->assertSee('data-field="client_type"', false)
             ->assertSeeInOrder(['Owned OAuth Client', '<td>2</td>'], false)
@@ -412,7 +337,9 @@ class OauthSettingsTest extends TestCase
     {
         $superuser = User::factory()->superuser()->create();
 
-        $personalClientId = DB::table('oauth_clients')->insertGetId([
+        $personalClientId = (string) Str::uuid();
+        DB::table('oauth_clients')->insert([
+            'id' => $personalClientId,
             'user_id' => null,
             'name' => 'Personal Client',
             'secret' => 'secret',
@@ -475,7 +402,9 @@ class OauthSettingsTest extends TestCase
 
     public function test_permission_required_to_toggle_oauth_token_state(): void
     {
-        $personalClientId = DB::table('oauth_clients')->insertGetId([
+        $personalClientId = (string) Str::uuid();
+        DB::table('oauth_clients')->insert([
+            'id' => $personalClientId,
             'user_id' => null,
             'name' => 'Personal Client',
             'secret' => 'secret',

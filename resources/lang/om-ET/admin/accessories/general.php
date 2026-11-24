@@ -4,6 +4,8 @@ return [
     'accessory_category' => 'Kaatagarii Gabaadaa',
     'accessory_name' => 'Maqaa Gabaadaa',
     'checkout' => 'Gabaadaa Baafachuu',
+    'bulk_checkout' => 'Bulk Checkout Accessories',
+    'accessories_selected' => 'Accessories Selected',
     'checkin' => 'Gabaadaa Galchu',
     'create' => 'Gabaadaa Uumuu',
     'edit' => 'Gabaadaa Haaromsuu',
@@ -19,5 +21,6 @@ return [
     'use_default_eula_disabled' => '<del>Ulaagaalee duraa sirrii itti fayyadami.</del> EULA duraa sirrii tokko hin qophaa\'in. Mee kaayyoo keessatti tokko dabaladhu.',
     'clone' => 'Gabaadaa Uumuu',
     'delete_disabled' => 'Ulaagaaleen kun hatattamaan akka dhabamuu hin danda\'amne sababni isaas wantoonni muraasni ammas qabatamaa jiru.',
+    'accessory_deleted_warning' => 'This accessory has been deleted. You must restore it before you can assign it.',
 
 ];

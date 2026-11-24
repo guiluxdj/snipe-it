@@ -4,6 +4,8 @@ return [
     'accessory_category' => 'Kategori Aksesoris',
     'accessory_name' => 'Nama Aksesoris',
     'checkout' => 'Keluarkan Aksesoris',
+    'bulk_checkout' => 'Bulk Checkout Accessories',
+    'accessories_selected' => 'Accessories Selected',
     'checkin' => 'Masukan Aksesoris',
     'create' => 'Buat Aksesoris',
     'edit' => 'Ubah Aksesoris',
@@ -19,5 +21,6 @@ return [
     'use_default_eula_disabled' => '<del> Gunakan EULA standar utama sebagai gantinya. </ del> Tidak ada standar utama EULA diatur. Silakan menambahkan satu di Settings.',
     'clone' => 'Clone Accessory',
     'delete_disabled' => 'This accessory cannot be deleted yet because some items are still checked out.',
+    'accessory_deleted_warning' => 'This accessory has been deleted. You must restore it before you can assign it.',
 
 ];

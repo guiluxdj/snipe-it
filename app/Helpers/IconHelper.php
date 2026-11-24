@@ -27,6 +27,7 @@ class IconHelper
                 return 'fas fa-trash';
             case 'archived':
             case 'archive':
+            case 'unarchive':
                 return 'fa-solid fa-ban';
             case 'create':
                 return 'fa-solid fa-plus';
@@ -109,6 +110,10 @@ class IconHelper
             case 'request':
             case 'requested':
                 return 'fa-solid fa-bell-concierge';
+            case 'pending-requests':
+                return 'fa-solid fa-boxes-packing';
+            case 'offboarding':
+                return 'fa-solid fa-door-open';
             case 'fulfill_multiple':
                 return 'fa-solid fa-arrows-down-to-people';
             case 'reports':
@@ -128,6 +133,7 @@ class IconHelper
             case 'alerts':
                 return 'far fa-flag';
             case 'password':
+            case 'key':
                 return 'fa-solid fa-key';
             case 'api-key':
                 return 'fas fa-user-secret';

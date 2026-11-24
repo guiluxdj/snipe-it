@@ -4,6 +4,8 @@ return [
     'accessory_category' => 'Категорија на додаток',
     'accessory_name' => 'Име на додаток',
     'checkout' => 'Задолжи додаток',
+    'bulk_checkout' => 'Bulk Checkout Accessories',
+    'accessories_selected' => 'Accessories Selected',
     'checkin' => 'Раздолжи додаток',
     'create' => 'Направете додаток',
     'edit' => 'Уредување на додаток',
@@ -19,5 +21,6 @@ return [
     'use_default_eula_disabled' => '<del>Наместо тоа користете стандардни Услови за користење.</del> Не се внесени стандардни Услови за користење. Ве молиме внесете ги во Поставки.',
     'clone' => 'Клонирај додаток',
     'delete_disabled' => 'Овој додаток не може да се избрише сè уште бидејќи некои ставки сè уште се позајмени.',
+    'accessory_deleted_warning' => 'This accessory has been deleted. You must restore it before you can assign it.',
 
 ];

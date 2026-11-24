@@ -44,7 +44,6 @@ class AcceptanceStorageFailureTest extends TestCase
         ob_start();
         imagepng($canvas);
         $signaturePng = (string) ob_get_clean();
-        imagedestroy($canvas);
 
         return [
             'asset_acceptance' => 'accepted',

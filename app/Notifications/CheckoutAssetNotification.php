@@ -38,7 +38,7 @@ class CheckoutAssetNotification extends Notification implements ShouldQueue
     public function __construct(
         public Asset $item,
         public $target,
-        public User $admin,
+        public ?User $admin,
         public $acceptance, // ???? what is this? (doesn't seem used)
         public $note,
         public Company|Setting $webhookSource,
@@ -93,8 +93,12 @@ class CheckoutAssetNotification extends Notification implements ShouldQueue
 
         $fields = [
             trans('general.to_user') => '<'.$target->present()->viewUrl().'|'.$target->display_name.'>',
-            trans('general.by_user') => '<'.$admin->present()->viewUrl().'|'.$admin->display_name.'>',
         ];
+
+        // Sync-driven checkouts from scheduled runs have no admin.
+        if ($admin) {
+            $fields[trans('general.by_user')] = '<'.$admin->present()->viewUrl().'|'.$admin->display_name.'>';
+        }
 
         if ($item->location) {
             $fields[trans('general.location')] = $item->location->name;
@@ -125,6 +129,8 @@ class CheckoutAssetNotification extends Notification implements ShouldQueue
         $admin = $this->admin;
         $item = $this->item;
         $note = $this->note;
+        $targetName = $target ? (string) $target->display_name : '';
+        $adminName = $admin ? (string) $admin->display_name : '';
 
         if (! Str::contains($this->webhookSource->webhook_endpoint, 'workflows')) {
             return MicrosoftTeamsMessage::create()
@@ -132,9 +138,9 @@ class CheckoutAssetNotification extends Notification implements ShouldQueue
                 ->type('success')
                 ->title(trans('mail.Asset_Checkout_Notification', ['tag' => '']))
                 ->addStartGroupToSection('activityText')
-                ->fact(trans('mail.assigned_to'), (string) ($target?->display_name ?? ''))
+                ->fact(trans('mail.assigned_to'), $targetName)
                 ->fact(htmlspecialchars_decode($item->display_name), '', 'activityText')
-                ->fact(trans('general.administrator'), (string) ($admin?->display_name ?? ''))
+                ->fact(trans('general.administrator'), $adminName)
                 ->fact(trans('mail.notes'), $note ?: '');
         }
 
@@ -142,7 +148,7 @@ class CheckoutAssetNotification extends Notification implements ShouldQueue
         $details = [
             trans('mail.assigned_to') => $target->present()->name,
             trans('mail.asset') => htmlspecialchars_decode($item->display_name),
-            trans('general.administrator') => $admin->display_name,
+            trans('general.administrator') => $adminName,
             trans('mail.notes') => $note ?: '',
         ];
 

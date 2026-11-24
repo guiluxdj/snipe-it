@@ -4,6 +4,8 @@ return [
     'accessory_category' => 'Kategorija Dodatki',
     'accessory_name' => 'Ime Dodatka',
     'checkout' => 'Izdaj Dodatek',
+    'bulk_checkout' => 'Bulk Checkout Accessories',
+    'accessories_selected' => 'Accessories Selected',
     'checkin' => 'Prevzemi Dodatek',
     'create' => 'Ustvari Dodatek',
     'edit' => 'Uredi Dodatek',
@@ -19,5 +21,6 @@ return [
     'use_default_eula_disabled' => '<del>Namesto tega uporabite privzeto EULA.</del> Ni privzetega EULA. Dodajte ga v Nastavitvah.',
     'clone' => 'Clone Accessory',
     'delete_disabled' => 'Tega dodatka še ni mogoče izbrisati, ker so nekateri elementi še vedno rezervirani.',
+    'accessory_deleted_warning' => 'This accessory has been deleted. You must restore it before you can assign it.',
 
 ];

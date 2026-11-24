@@ -3,10 +3,14 @@
 namespace Tests\Feature\Notifications\Webhooks;
 
 use App\Events\CheckoutableCheckedOut;
+use App\Listeners\CheckoutableCheckedOutEmailNotification;
+use App\Listeners\CheckoutableCheckedOutWebhookNotification;
+use App\Mail\CheckoutAssetMail;
 use App\Models\Accessory;
 use App\Models\Asset;
 use App\Models\AssetModel;
 use App\Models\Category;
+use App\Models\CheckoutAcceptance;
 use App\Models\Component;
 use App\Models\Consumable;
 use App\Models\LicenseSeat;
@@ -46,6 +50,55 @@ class IntegrationNotificationsUponCheckoutTest extends TestCase
             'Asset checked out to asset' => [fn () => Asset::factory()->laptopMbp()->create()],
             'Asset checked out to location' => [fn () => Location::factory()->create()],
         ];
+    }
+
+    public static function checkoutNotificationOrders(): array
+    {
+        return [
+            'discovered listeners' => [null],
+            'email first' => [false],
+            'webhook first' => [true],
+        ];
+    }
+
+    #[DataProvider('checkoutNotificationOrders')]
+    public function test_checkout_notifications_share_one_acceptance(?bool $webhookFirst): void
+    {
+        $this->settings->enableSlackWebhook()->disableAdminCC()->disableAdminCCAlways();
+
+        $asset = Asset::factory()->create();
+        $asset->model->category->update(['require_acceptance' => true]);
+        $user = User::factory()->create();
+        $event = new CheckoutableCheckedOut($asset, $user, User::factory()->create(), null);
+
+        if ($webhookFirst === null) {
+            event($event);
+        } else {
+            $emailListener = new CheckoutableCheckedOutEmailNotification;
+            $webhookListener = new CheckoutableCheckedOutWebhookNotification;
+            $listeners = $webhookFirst
+                ? [$webhookListener, $emailListener]
+                : [$emailListener, $webhookListener];
+
+            foreach ($listeners as $listener) {
+                $listener->handle($event);
+            }
+        }
+
+        $this->assertDatabaseCount('checkout_acceptances', 1);
+        $acceptance = CheckoutAcceptance::firstOrFail();
+        $this->assertSame($acceptance->id, $event->checkoutAcceptance?->id);
+
+        Mail::assertSent(CheckoutAssetMail::class, 1);
+        Mail::assertSent(CheckoutAssetMail::class, function (CheckoutAssetMail $mail) use ($acceptance, $user): bool {
+            return $mail->hasTo($user->email)
+                && str_contains($mail->render(), route('account.accept.item', $acceptance));
+        });
+
+        Notification::assertSentOnDemandTimes(CheckoutAssetNotification::class, 1);
+        Notification::assertSentOnDemand(CheckoutAssetNotification::class, function (CheckoutAssetNotification $notification) use ($acceptance): bool {
+            return $notification->acceptance->id === $acceptance->id;
+        });
     }
 
     public static function licenseCheckoutTargets(): array

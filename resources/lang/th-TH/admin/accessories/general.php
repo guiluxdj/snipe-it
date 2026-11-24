@@ -4,6 +4,8 @@ return [
     'accessory_category' => 'หมวดหมู่อุปกรณ์เสริม',
     'accessory_name' => 'ชื่ออุปกรณ์เสริม',
     'checkout' => 'เชคเอาท์อุปกรณ์เสริม',
+    'bulk_checkout' => 'Bulk Checkout Accessories',
+    'accessories_selected' => 'Accessories Selected',
     'checkin' => 'เช็คอินอุปกรณ์เสริม',
     'create' => 'สร้างอุปกรณ์เสริม',
     'edit' => 'แก้ไขอุปกรณ์เสริม',
@@ -19,5 +21,6 @@ return [
     'use_default_eula_disabled' => '<del>ใช้ข้อกำหนดการใช้งานหลักแทน</del> ค่าเริ่มต้นหลักจะตั้งข้อกำหนดการใช้งาน กรุณาเพิ่มในการตั้งค่า',
     'clone' => 'โคลนส่วนเสริม',
     'delete_disabled' => 'ส่วนเสริมนี้ยังไม่ถูกลบ เพราะยังบางไอเทมถูกเลือกอยู่',
+    'accessory_deleted_warning' => 'This accessory has been deleted. You must restore it before you can assign it.',
 
 ];

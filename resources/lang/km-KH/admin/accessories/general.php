@@ -4,6 +4,8 @@ return [
     'accessory_category' => 'ប្រភេទគ្រឿងបន្លាស់',
     'accessory_name' => 'ឈ្មោះគ្រឿងបន្លាស់',
     'checkout' => 'Checkout Accessory',
+    'bulk_checkout' => 'Bulk Checkout Accessories',
+    'accessories_selected' => 'Accessories Selected',
     'checkin' => 'Checkin Accessory',
     'create' => 'បង្កើតគ្រឿងបន្លាស់',
     'edit' => 'កែសម្រួលគ្រឿងបន្លាស់',
@@ -19,5 +21,6 @@ return [
     'use_default_eula_disabled' => '<del>ប្រើ EULA លំនាំដើមចម្បងជំនួសវិញ។</del> គ្មាន EULA លំនាំដើមចម្បងត្រូវបានកំណត់ទេ។ សូមបន្ថែមមួយនៅក្នុងការកំណត់។',
     'clone' => 'Clone Accessory',
     'delete_disabled' => 'គ្រឿងបន្លាស់នេះមិនអាចលុបចេញបានទេ ដោយសារធាតុមួយចំនួននៅតែត្រូវបានដកចេញ។',
+    'accessory_deleted_warning' => 'This accessory has been deleted. You must restore it before you can assign it.',
 
 ];

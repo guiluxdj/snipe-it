@@ -4,6 +4,8 @@ return [
     'accessory_category' => 'Categoria do Acessório',
     'accessory_name' => 'Nome do Acessório',
     'checkout' => 'Alocar acessório',
+    'bulk_checkout' => 'Bulk Checkout Accessories',
+    'accessories_selected' => 'Accessories Selected',
     'checkin' => 'Devolver acessório',
     'create' => 'Criar acessório',
     'edit' => 'Editar acessório',
@@ -19,5 +21,6 @@ return [
     'use_default_eula_disabled' => '<del>Em vez disso, utilize o EULA padrão</del> Nenhum foi definido. Adicione um nas Configurações.',
     'clone' => 'Clonar Acessório',
     'delete_disabled' => 'Este acessório não pode ser excluído ainda, porque alguns itens ainda em saída.',
+    'accessory_deleted_warning' => 'This accessory has been deleted. You must restore it before you can assign it.',
 
 ];

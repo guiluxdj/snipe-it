@@ -185,8 +185,10 @@ return [
     'ulid' => 'crwdns12552:0crwdne12552:0',
     'uuid' => 'crwdns12554:0crwdne12554:0',
     'valid_css_color' => 'crwdns14917:0crwdne14917:0',
+    'eloquent_model_class' => 'crwdns18211:0crwdne18211:0',
     'fmcs_company' => 'crwdns15215:0crwdne15215:0',
     'fmcs_location' => 'crwdns14949:0crwdne14949:0',
+    'fmcs_target_compat' => 'crwdns18777:0crwdne18777:0',
     'is_unique_across_company_and_location' => 'crwdns14272:0crwdne14272:0',
 
     /*

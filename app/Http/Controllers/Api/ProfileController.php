@@ -18,7 +18,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
-use Laravel\Passport\RefreshTokenRepository;
+use Laravel\Passport\AccessToken;
+use Laravel\Passport\Passport;
 use Laravel\Passport\TokenRepository;
 
 class ProfileController extends Controller
@@ -255,19 +256,24 @@ class ProfileController extends Controller
      * client credentials rather than bearer auth, so this
      * "log me out of this session" affordance is a Snipe-IT addition.
      */
-    public function logout(RefreshTokenRepository $refreshTokens): Response
+    public function logout(): Response
     {
         $token = auth()->user()?->token();
 
         // auth:api on the route guarantees a bearer-authenticated user,
-        // but session-cookie / personal-access flows leave token() null.
-        // Return 401 for those instead of a 500 on a null property read.
-        if ($token === null) {
+        // but session-cookie / personal-access flows leave token() null,
+        // and the HasApiTokens trait signature returns the ScopeAuthorizable
+        // interface. Only AccessToken carries the underlying DB row we need
+        // to revoke, so other implementers like TransientToken skip the path.
+        if (! $token instanceof AccessToken) {
             return new Response('', Response::HTTP_UNAUTHORIZED);
         }
 
-        $this->tokenRepository->revokeAccessToken($token->id);
-        $refreshTokens->revokeRefreshTokensByAccessTokenId($token->id);
+        $token->revoke();
+
+        Passport::refreshToken()->newQuery()
+            ->where('access_token_id', $token->id)
+            ->update(['revoked' => true]);
 
         return new Response('', Response::HTTP_NO_CONTENT);
     }

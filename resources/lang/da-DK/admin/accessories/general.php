@@ -4,6 +4,8 @@ return [
     'accessory_category' => 'Tilbehør Kategori',
     'accessory_name' => 'Tilbehør Navn',
     'checkout' => 'Tjek tilbehør ud',
+    'bulk_checkout' => 'Bulk Checkout Accessories',
+    'accessories_selected' => 'Accessories Selected',
     'checkin' => 'Tjek tilbehør ind',
     'create' => 'Opret tilbehør',
     'edit' => 'Rediger tilbehør',
@@ -19,5 +21,6 @@ return [
     'use_default_eula_disabled' => '<del>Brug den primære standard slutbrugerlicens i stedet for.</del> Ingen primær standard slutbrugerlicens er defineret. Tilføj en under indstillinger.',
     'clone' => 'Klon Tilbehør',
     'delete_disabled' => 'Dette tilbehør kan ikke slettes endnu, fordi nogle elementer stadig er tjekket ud.',
+    'accessory_deleted_warning' => 'This accessory has been deleted. You must restore it before you can assign it.',
 
 ];

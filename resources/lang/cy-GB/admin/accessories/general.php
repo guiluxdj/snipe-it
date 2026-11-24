@@ -4,6 +4,8 @@ return [
     'accessory_category' => 'Categori Ategolyn',
     'accessory_name' => 'Enw Ategolyn',
     'checkout' => 'Cofnodi ategolyn allan',
+    'bulk_checkout' => 'Bulk Checkout Accessories',
+    'accessories_selected' => 'Accessories Selected',
     'checkin' => 'Cofnodi ategolyn i fewn',
     'create' => 'Creu Ategolyn',
     'edit' => 'Golygu Ategolyn',
@@ -19,5 +21,6 @@ return [
     'use_default_eula_disabled' => '<del>Defnyddio\'r CTDT diofn yn lle\'r un presennol.</del>Nid oes prif CTDT diofyn wedi gosod. Ychwanegwch un yn gosodiadau os gwelwch yn dda.',
     'clone' => 'Clone Accessory',
     'delete_disabled' => 'This accessory cannot be deleted yet because some items are still checked out.',
+    'accessory_deleted_warning' => 'This accessory has been deleted. You must restore it before you can assign it.',
 
 ];

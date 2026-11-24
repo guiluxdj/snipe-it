@@ -4,6 +4,8 @@ return [
     'accessory_category' => 'Zubehör Kategorie',
     'accessory_name' => 'Zubehör Name',
     'checkout' => 'Zubehör herausgeben',
+    'bulk_checkout' => 'Bulk Checkout Accessories',
+    'accessories_selected' => 'Accessories Selected',
     'checkin' => 'Zubehör zurücknehmen',
     'create' => 'Zubehör erstellen',
     'edit' => 'Zubehör bearbeiten',
@@ -19,5 +21,6 @@ return [
     'use_default_eula_disabled' => '<del>Die Standard-EULA verwenden.</del> Es wurde keine Standard-EULA definiert. Bitte füge eine in den Einstellungen hinzu.',
     'clone' => 'Zubehör kopieren',
     'delete_disabled' => 'Dieses Zubehör kann noch nicht gelöscht werden, da einige Artikel noch herausgegeben sind.',
+    'accessory_deleted_warning' => 'Dieses Zubehör wurde gelöscht. Es muss wiederhergestellt werden, bevor es zugewiesen werden kann.',
 
 ];

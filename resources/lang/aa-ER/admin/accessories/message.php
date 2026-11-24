@@ -41,4 +41,38 @@ return [
         'user_does_not_exist' => 'crwdns1234:0crwdne1234:0',
     ],
 
+    'restore' => [
+        'error' => 'crwdns17771:0crwdne17771:0',
+        'success' => 'crwdns17773:0crwdne17773:0',
+    ],
+
+    'bulk' => [
+        'no_accessories_selected' => 'crwdns17775:0crwdne17775:0',
+        'no_action_selected' => 'crwdns17777:0crwdne17777:0',
+        'no_fields_updated' => 'crwdns17779:0crwdne17779:0',
+        'skipped_unauthorized' => 'crwdns17781:0crwdne17781:0',
+
+        'update' => [
+            'success' => 'crwdns17783:0crwdne17783:0',
+            'none_updated' => 'crwdns17785:0crwdne17785:0',
+        ],
+
+        'restore' => [
+            'success' => 'crwdns17787:0crwdne17787:0',
+        ],
+
+        'checkin_selected' => [
+            'no_rows_selected' => 'crwdns17789:0crwdne17789:0',
+            'success' => 'crwdns17791:0crwdne17791:0',
+        ],
+
+        'checkout' => [
+            'nothing_selectable' => 'crwdns18837:0crwdne18837:0',
+            'excluded_notice' => 'crwdns18839:0crwdne18839:0',
+            'skipped_archived' => 'crwdns18841:0crwdne18841:0',
+            'skipped_unavailable' => 'crwdns18843:0crwdne18843:0',
+            'skipped_company_mismatch' => 'crwdns18845:0crwdne18845:0',
+            'summary' => 'crwdns18847:0crwdne18847:0',
+        ],
+    ],
 ];

@@ -4,6 +4,8 @@ return [
     'accessory_category' => 'Kategorija pribora',
     'accessory_name' => 'Naziv pribora',
     'checkout' => 'Izdaj pribor',
+    'bulk_checkout' => 'Bulk Checkout Accessories',
+    'accessories_selected' => 'Accessories Selected',
     'checkin' => 'Checkin Accessory',
     'create' => 'Kreiraj pribor',
     'edit' => 'Izmeni atribute pribora',
@@ -19,5 +21,6 @@ return [
     'use_default_eula_disabled' => '<del>Koristi osnovnu, default EULA.</del> Nema primarne, default EULA. Dodajte jednu u Postavke.',
     'clone' => 'Kloniraj pribor',
     'delete_disabled' => 'Pribor za sada ne može biti obrisan jer su neke stavke još uvek zadužene.',
+    'accessory_deleted_warning' => 'This accessory has been deleted. You must restore it before you can assign it.',
 
 ];

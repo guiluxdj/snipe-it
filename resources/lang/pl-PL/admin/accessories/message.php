@@ -20,7 +20,7 @@ return [
         'confirm' => 'Czy na pewno chcesz usunąć to Akcesorium?',
         'error' => 'Wystąpił błąd podczas usuwania akcesorium. Proszę spróbować ponownie.',
         'success' => 'Akcesorium zostało usunięte pomyślnie.',
-        'bulk_success' => 'Accessory deleted successfully.|:count accessories were deleted successfully.',
+        'bulk_success' => 'Akcesoria usunięto pomyślnie.|:count akcesoriów usunięto pomyślnie.',
         'partial_success' => ':count accessory was deleted successfully, but others could not be deleted. See below for details.|:count accessories were deleted successfully, but others could not be deleted. See below for details.',
     ],
 
@@ -41,4 +41,38 @@ return [
         'user_does_not_exist' => 'Użytkownik nie istnieje. Spróbuj ponownie.',
     ],
 
+    'restore' => [
+        'error' => 'Accessory was not restored, please try again',
+        'success' => 'Akcesorium utworzono pomyślnie.',
+    ],
+
+    'bulk' => [
+        'no_accessories_selected' => 'Nie wybrano akcesoriów.',
+        'no_action_selected' => 'Wybierz akcję z listy rozwijanej.',
+        'no_fields_updated' => 'Żadne pole nie zostało zmodyfikowane, więc nic nie zostało zaktualizowane.',
+        'skipped_unauthorized' => ':count accessory(s) were skipped because you do not have permission to update them.',
+
+        'update' => [
+            'success' => ':count accessory was updated.|:count accessories were updated.',
+            'none_updated' => 'The selected accessory could not be updated. See errors below for details.|None of the selected accessories could be updated. See errors below for details.',
+        ],
+
+        'restore' => [
+            'success' => ':count accessory was restored.|:count accessories were restored.',
+        ],
+
+        'checkin_selected' => [
+            'no_rows_selected' => 'No checked-out accessories were selected.',
+            'success' => ':count accessory checkout was returned.|:count accessory checkouts were returned.',
+        ],
+
+        'checkout' => [
+            'nothing_selectable' => 'None of the selected accessories can be checked out. Archived accessories and accessories with no remaining stock are excluded.',
+            'excluded_notice' => 'The following accessories were excluded from this checkout because they are archived or have no remaining stock:',
+            'skipped_archived' => ':name was skipped because it is archived.',
+            'skipped_unavailable' => ':name was skipped because no units are currently available.',
+            'skipped_company_mismatch' => ':name was skipped because it belongs to a different company (:item_company) than the selected target.',
+            'summary' => ':checked_out of :total accessories were checked out.',
+        ],
+    ],
 ];

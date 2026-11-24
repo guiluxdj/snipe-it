@@ -12,10 +12,17 @@ use App\Models\User;
 use App\Notifications\AcceptanceItemAcceptedNotification;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class AssetAcceptanceTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        Storage::fake();
+    }
+
     public function test_asset_checkout_accept_page_renders()
     {
         $checkoutAcceptance = CheckoutAcceptance::factory()->pending()->create();
@@ -115,8 +122,6 @@ class AssetAcceptanceTest extends TestCase
         ob_start();
         imagepng($canvas);
         $signaturePng = (string) ob_get_clean();
-        imagedestroy($canvas);
-
         $signatureOutput = 'data:image/png;base64,'.base64_encode($signaturePng);
 
         $this->actingAs($checkoutAcceptance->assignedTo)

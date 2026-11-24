@@ -1,11 +1,11 @@
 <?php
 
 return [
-    'bulk_delete' => 'Patvirtinkite masinį turto panaikinimą',
+    'bulk_delete' => 'Patvirtinkite masinį turto ištrynimą',
     'bulk_restore' => 'Patvirtinkite masinį turto atkūrimą',
-    'bulk_delete_help' => 'Peržiūrėkite turtą, kurį norite panaikinti. Panaikintą turtą galima atkurti, tačiau jis nebebus susietas su tais naudotojais, kuriems šiuo metu yra išduotas.',
+    'bulk_delete_help' => 'Peržiūrėkite turtą, kurį norite ištrinti. Ištrintą turtą galima atkurti, tačiau jis nebebus susietas su tais naudotojais, kuriems šiuo metu yra išduotas.',
     'bulk_restore_help' => 'Peržiūrėkite turtą, kurį norite atkurti. Atkūrus turtą, jis nebus susietas su tais naudotojais, kuriems anksčiau buvo išduotas.',
-    'bulk_delete_warn' => 'Bus panaikinta turto vienetų: :asset_count.',
+    'bulk_delete_warn' => 'Bus ištrinti :asset_count turto vienetai.',
     'bulk_restore_warn' => 'Bus atkurta turto vienetų: :asset_count.',
     'bulk_update' => 'Masinis turto atnaujinimas',
     'bulk_update_help' => 'Ši forma suteikia galimybę atnaujinti iškart kelis turto vienetus. Užpildykite tik tuos laukus, kuriuos norite pakeisti. Laukai, kuriuos paliksite tuščius, liks nepakeisti. ',
@@ -56,8 +56,6 @@ return [
     'years' => 'metai',
     'asset_location' => 'Atnaujinti turto vietą',
     'asset_location_update_default_current' => 'Atnaujinti numatytąją vietą IR faktinę vietą',
-    'asset_location_update_default' => 'Atnaujinti tik numatytąją vietą',
-    'asset_location_update_actual' => 'Atnaujinti tik faktinę vietą',
     'asset_not_deployable' => 'Turto būsena netinkama išdavimui, todėl šis turtas negali būti išduotas.',
     'asset_not_deployable_checkin' => '{1} Šios turto būsenos tipas yra „Negalima išduoti“. Pasirinkus šią būsenos žymą, turtas bus paimtas.|[2,*] Šios turto būsenos tipas yra „Negalima išduoti“. Pasirinkus šią būsenos žymą, niekas nepasikeis.',
     'asset_deployable' => '{1} Šį turtą galima išduoti.|[2,*] Šį turtą galima išduoti.',

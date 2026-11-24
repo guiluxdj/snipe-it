@@ -12,5 +12,7 @@ return [
     'load_error_http_status' => 'Estado HTTP',
     'load_error_session_expired' => 'Tu sesión ha caducado. Recargando la página.',
     'shift_select' => 'Click on a checkbox and hold <code>shift</code> and click another checkbox in the table to select/de-select a range.',
+    'reset_column_order' => 'Reset column order',
+    'reset_column_order_tooltip' => 'Restore the default column order for this table',
 
 ];

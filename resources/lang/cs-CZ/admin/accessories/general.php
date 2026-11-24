@@ -4,6 +4,8 @@ return [
     'accessory_category' => 'Kategorie příslušenství',
     'accessory_name' => 'Název příslušenství',
     'checkout' => 'Předat příslušenství',
+    'bulk_checkout' => 'Bulk Checkout Accessories',
+    'accessories_selected' => 'Accessories Selected',
     'checkin' => 'Převzít příslušenství',
     'create' => 'Vytvoř příslušenství',
     'edit' => 'Upravit Příslušenství',
@@ -20,5 +22,6 @@ return [
 Žádná výchozí EULA nenastavena. Zadejte novou v nastevení.',
     'clone' => 'Klonovat příslušenství',
     'delete_disabled' => 'Toto příslušenství ještě nelze odstranit, protože některé jeho položky jsou stále vydány.',
+    'accessory_deleted_warning' => 'This accessory has been deleted. You must restore it before you can assign it.',
 
 ];
